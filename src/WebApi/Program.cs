@@ -9,7 +9,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<BloggingContext>(options =>
+builder.Services.AddDbContextPool<BloggingContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("BloggingDatabase")));
 
 var app = builder.Build();

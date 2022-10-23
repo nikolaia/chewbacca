@@ -11,6 +11,16 @@ public class BloggingContext : DbContext
     
     public DbSet<Blog> Blogs { get; set; }
     public DbSet<Post> Posts { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Blog>().HasData(new Blog { BlogId = 1, Url = "http://sample.com" }); 
+        
+        modelBuilder.Entity<Post>().HasData(
+            new Post { BlogId = 1, PostId = 1, Title = "First post", Content = "Test 1" }); 
+
+        base.OnModelCreating(modelBuilder);
+    }
 }
 
 public class Blog
