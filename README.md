@@ -12,9 +12,27 @@ Løsningen er bygget slik at arbeid på den gir relevant erfaring for hva vi mø
 
 Det det er tatt noen avgjørelser rundt arkitektur og hvordan vi bruker skytjenester. De avgjørelsene kan du [lese mer om her](docs/architecture.md).
 
-## Up and running
+## Up and running med mocked data
 
 Løsningen skal fungere lokalt uten noe ekstra oppsett, men alle integrasjoner vil da være _mocked_.
+
+Installer Docker for Windows/Mac fra dockers hjemmeside. Kjør opp SQL Server og installer entitiy framework tools:
+
+```bash
+# Installer tools for entity framework (ORMen)
+dotnet tool install --global dotnet-ef
+
+# Kjør opp en lokal database i docker
+docker run --cap-add SYS_PTRACE -e 'ACCEPT_EULA=1' -e 'MSSQL_SA_PASSWORD=yourStrong(!)Password' -p 1433:1433 --name azuresqledge -d mcr.microsoft.com/azure-sql-edge
+```
+
+Man kan da kjøre migrations fra cmd line:
+
+```bash
+dotnet ef database update -s .\src\WebApi\ -p .\src\Database\
+```
+
+## Up and running med ekte integrasjoner
 
 For å få tilgang til integrasjoner må man ha: 
 
