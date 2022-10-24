@@ -32,6 +32,12 @@ Man kan da kjøre migrations fra cmd line:
 dotnet ef database update -s .\src\WebApi\ -p .\src\Database\
 ```
 
+EF Code First er benyttet. Det betyr at man endrer i context og entities først, for så å automatisk generere migrations ved å kjøre følgende kommando i Database-prosjektet:
+
+```bash
+dotnet ef migrations add MigrationName
+```
+
 ## Up and running med ekte integrasjoner
 
 For å få tilgang til integrasjoner må man ha: 

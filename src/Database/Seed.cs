@@ -1,20 +1,22 @@
-﻿namespace Database.Seed;
+﻿using Database.Seed.Entities;
+
+namespace Database.Seed;
 
 public static class Seed
 {
-    public static List<Blog> GetSeedingBlogs()
+    public static List<Employee> GetSeedingEmployees()
     {
-        return new List<Blog>()
+        return new List<Employee>()
         {
-            new Blog { BlogId = 1, Url = "http://sample.com" }
-        };
-    }
-    
-    public static List<Post> GetSeedingPosts()
-    {
-        return new List<Post>()
-        {
-            new Post { BlogId = 1, PostId = 1, Title = "First post", Content = "Test 1" }
+            new()
+            {
+                Email = "test@example.com",
+                Name = "Navn",
+                Telephone = "123982131",
+                FullName = "Navn Navnersen",
+                ImageUrl = "https://example.com/image.png",
+                OfficeName = "Oslo"
+            }
         };
     }
 }

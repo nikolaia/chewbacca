@@ -4,17 +4,15 @@ namespace IntegrationTests;
 
 public static class Utilities
 {
-    public static void InitializeDbForTests(BloggingContext db)
+    public static void InitializeDbForTests(EmployeeContext db)
     {
-        db.Blogs.AddRange(Seed.GetSeedingBlogs());
-        db.Posts.AddRange(Seed.GetSeedingPosts());
+        db.Employees.AddRange(Seed.GetSeedingEmployees());
         db.SaveChanges();
     }
 
-    public static void ReinitializeDbForTests(BloggingContext db)
+    public static void ReinitializeDbForTests(EmployeeContext db)
     {
-        db.Blogs.RemoveRange(db.Blogs);
-        db.Posts.RemoveRange(db.Posts);
+        db.Employees.RemoveRange(db.Employees);
         InitializeDbForTests(db);
     }
 

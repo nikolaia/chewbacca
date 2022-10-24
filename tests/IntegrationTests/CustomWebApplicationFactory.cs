@@ -15,11 +15,11 @@ public class CustomWebApplicationFactory<TStartup>
         {
             var descriptor = services.SingleOrDefault(
                 d => d.ServiceType ==
-                     typeof(DbContextOptions<BloggingContext>));
+                     typeof(DbContextOptions<EmployeeContext>));
 
             services.Remove(descriptor!);
 
-            services.AddDbContextPool<BloggingContext>(options =>
+            services.AddDbContextPool<EmployeeContext>(options =>
             {
                 options.UseInMemoryDatabase("InMemoryDbForTesting");
             });
@@ -29,7 +29,7 @@ public class CustomWebApplicationFactory<TStartup>
             using var scope = sp.CreateScope();
             
             var scopedServices = scope.ServiceProvider;
-            var db = scopedServices.GetRequiredService<BloggingContext>();
+            var db = scopedServices.GetRequiredService<EmployeeContext>();
             var logger = scopedServices
                 .GetRequiredService<ILogger<CustomWebApplicationFactory<TStartup>>>();
 
