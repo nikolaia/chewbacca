@@ -11,7 +11,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContextPool<EmployeeContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("BloggingDatabase")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("EmployeeDatabase")));
 
 var app = builder.Build();
 
