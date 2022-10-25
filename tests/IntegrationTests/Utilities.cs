@@ -1,5 +1,6 @@
-﻿using Database.Seed;
+﻿using Employee.Repositories;
 
+using Employee;
 using Employee.Repositories;
 
 namespace IntegrationTests;

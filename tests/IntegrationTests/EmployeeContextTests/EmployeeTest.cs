@@ -1,4 +1,5 @@
-using Database.Seed;
+using Employee;
+using Employee.Repositories;
 
 using Employee.Repositories;
 
@@ -28,7 +29,7 @@ public class EmployeeTest :
 
         // Act
         var blogsResponse = await _client.GetAsync("/Employee");
-        var content = JsonConvert.DeserializeObject<List<Employee>>(await blogsResponse.Content.ReadAsStringAsync());
+        var content = JsonConvert.DeserializeObject<List<Employee.Models.Employee>>(await blogsResponse.Content.ReadAsStringAsync());
 
         // Assert
         content.Should().BeEquivalentTo(knownSeedData, options =>
