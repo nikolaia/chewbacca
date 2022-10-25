@@ -20,7 +20,7 @@ do
             zip -9 -r -q chewbacca.zip .
             cd ../
             mkdir artifacts
-            mv ./build/app.zip artifacts/
+            mv ./build/chewbacca.zip artifacts/
             ;;
     esac
     shift
