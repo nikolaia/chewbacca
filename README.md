@@ -29,7 +29,11 @@ docker run --cap-add SYS_PTRACE -e 'ACCEPT_EULA=1' -e 'MSSQL_SA_PASSWORD=yourStr
 Man kan da kjøre migrations fra cmd line:
 
 ```bash
+(Windows)
 dotnet ef database update -s .\src\WebApi\ -p .\src\Database\
+
+(Mac / Linux)
+dotnet ef database update -s ./src/WebApi/ -p ./src/Database/
 ```
 
 EF Code First er benyttet. Det betyr at man endrer i context og entities først, for så å automatisk generere migrations ved å kjøre følgende kommando i Database-prosjektet:
