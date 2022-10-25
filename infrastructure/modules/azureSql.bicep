@@ -1,3 +1,5 @@
+param sqlServerName string
+
 @description('Specifies region for all resources')
 param location string
 
@@ -12,11 +14,10 @@ param adminIdentitySid string
 param tenant string
 
 @description('Specifies database name')
-param databaseName string
-
+param sqlDatabaseName string
 
 resource sqlserver 'Microsoft.Sql/servers@2020-11-01-preview' = {
-  name: 'sqlserver${uniqueString(resourceGroup().id)}'
+  name: sqlServerName
   location: location
   properties: {
     administratorLogin: sqlAdministratorLogin
@@ -25,7 +26,7 @@ resource sqlserver 'Microsoft.Sql/servers@2020-11-01-preview' = {
   }
 
   resource database 'databases@2020-08-01-preview' = {
-    name: databaseName
+    name: sqlDatabaseName
     location: location
     sku: {
       name: 'Basic'
@@ -43,7 +44,7 @@ resource sqlserver 'Microsoft.Sql/servers@2020-11-01-preview' = {
       startIpAddress: '0.0.0.0'
     }
   }
-  
+
   resource administrators 'administrators@2022-05-01-preview' = {
     name: 'ActiveDirectory'
     properties: {
@@ -56,4 +57,5 @@ resource sqlserver 'Microsoft.Sql/servers@2020-11-01-preview' = {
 
 }
 
-output appConfigConnectionString string = listKeys(sqlserver.id, sqlserver.apiVersion).value[0].connectionString
+// output sqlConnectionString string = 'Server=tcp:${reference(sqlServerName).fullyQualifiedDomainName},1433;Initial Catalog=${sqlDatabaseName};Persist Security Info=False;User ID=${reference(sqlServerName).administratorLogin};Password=${reference(sqlServerName).administratorLoginPassword};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
+output sqlConnectionString string = 'Server=tcp:${reference(sqlServerName).fullyQualifiedDomainName},1433; Initial Catalog=${sqlDatabaseName};Persist Security Info=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Authentication="Active Directory Integrated";'
