@@ -1,6 +1,6 @@
-﻿using Database.Seed.Entities;
+﻿namespace Employee;
 
-namespace Database.Seed;
+using Employee.Models;
 
 public static class Seed
 {

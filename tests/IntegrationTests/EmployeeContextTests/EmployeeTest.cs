@@ -1,5 +1,7 @@
-using Database.Seed;
-using Database.Seed.Entities;
+using Employee;
+using Employee.Repositories;
+
+using Employee.Repositories;
 
 using FluentAssertions;
 
@@ -27,7 +29,7 @@ public class EmployeeTest :
 
         // Act
         var blogsResponse = await _client.GetAsync("/Employee");
-        var content = JsonConvert.DeserializeObject<List<Employee>>(await blogsResponse.Content.ReadAsStringAsync());
+        var content = JsonConvert.DeserializeObject<List<Employee.Models.Employee>>(await blogsResponse.Content.ReadAsStringAsync());
 
         // Assert
         content.Should().BeEquivalentTo(knownSeedData, options =>

@@ -11,14 +11,13 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Database\Database.csproj" />
   </ItemGroup>
     
   <ItemGroup>
     <InternalsVisibleTo Include="IntegrationTests" />
+  </ItemGroup>
+    
+  <ItemGroup>
+    <ProjectReference Include="..\Employee\Employee.csproj" />
   </ItemGroup>
 </Project>
