@@ -1,5 +1,7 @@
 ﻿using Database.Seed;
 
+using Employee.Repositories;
+
 namespace IntegrationTests;
 
 public static class Utilities

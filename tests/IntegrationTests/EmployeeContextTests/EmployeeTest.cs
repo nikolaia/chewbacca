@@ -1,5 +1,6 @@
 using Database.Seed;
-using Database.Seed.Entities;
+
+using Employee.Repositories;
 
 using FluentAssertions;
 
