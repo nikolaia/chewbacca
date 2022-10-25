@@ -4,7 +4,7 @@
 
 </div>
 
-> Dette er en hårete løsning som håndterer mye. Men som Chewbacca fra Star Wars tar den de tunge løftene for vennene  sine (les: andre internapplikasjoner) og er alltid til å stole på.
+> Dette er en hårete løsning som håndterer mye. Men som Chewbacca fra Star Wars tar den de tunge løftene for vennene sine (les: andre internapplikasjoner) og er alltid til å stole på.
 
 Variant har mange internesystemer (UniEconomy, Harvest, CVPartner etc.) og denne løsningen fungerer som en proxy og cache for løsninger som ønsker å bruke data fra disse systemene.
 
@@ -29,11 +29,7 @@ docker run --cap-add SYS_PTRACE -e 'ACCEPT_EULA=1' -e 'MSSQL_SA_PASSWORD=yourStr
 Man kan da kjøre migrations fra cmd line:
 
 ```bash
-(Windows)
-dotnet ef database update -s .\src\WebApi\ -p .\src\Database\
-
-(Mac / Linux)
-dotnet ef database update -s ./src/WebApi/ -p ./src/Database/
+dotnet ef database update -s ./src/WebApi/ -p ./src/Employee/
 ```
 
 EF Code First er benyttet. Det betyr at man endrer i context og entities først, for så å automatisk generere migrations ved å kjøre følgende kommando i Database-prosjektet:
@@ -44,7 +40,7 @@ dotnet ef migrations add MigrationName
 
 ## Up and running med ekte integrasjoner
 
-For å få tilgang til integrasjoner må man ha: 
+For å få tilgang til integrasjoner må man ha:
 
 1. En variant-bruker/epost
 2. Blitt lagt til i _developers_ gruppen i Azure AD
