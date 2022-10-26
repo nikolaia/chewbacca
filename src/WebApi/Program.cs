@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using Shared;
 using Shared.AzureIdentity;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -15,6 +14,13 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+     // appsettings.Local.json is in the .gitignore. Using a local config instead of userSecrets to avoid references in the .csproj:
+    .AddJsonFile($"appsettings.Local.json", optional: true, reloadOnChange: true)
+    .AddEnvironmentVariables();
 
 // Bind configuration "TestApp:Settings" section to the Settings object
 var appSettingsSection = builder.Configuration
