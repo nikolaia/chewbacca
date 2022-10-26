@@ -1,19 +1,11 @@
-﻿using Microsoft.Azure.Services.AppAuthentication;
-using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-
-using Shared;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace Employee.Repositories;
 
 public class EmployeeContext : DbContext
 {
-    private readonly AzureServiceTokenProvider _azureServiceTokenProvider;
-
-    public EmployeeContext(DbContextOptions options, AzureServiceTokenProvider azureServiceTokenProvider) : base(options)
+    public EmployeeContext(DbContextOptions options) : base(options)
     {
-        this._azureServiceTokenProvider = azureServiceTokenProvider;
     }
 
     public DbSet<Models.Employee> Employees { get; set; }
