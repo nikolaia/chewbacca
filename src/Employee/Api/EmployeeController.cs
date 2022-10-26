@@ -17,9 +17,9 @@ public class EmployeeController : ControllerBase
     private readonly ILogger<EmployeeController> _logger;
      public interface IEmployeeApi
     {
-        [Headers("Authorization: Token token=6151d4be9aa0fc8f2e51367b57a9c78b")]
+        // [Headers("Authorization: Token token=6151d4be9aa0fc8f2e51367b57a9c78b")]
         [Get("/users?")]
-        Task<IEnumerable<CVPartnerUserDTO>> GetAllEmployee();
+        Task<IEnumerable<CVPartnerUserDTO>> GetAllEmployee([Authorize("Token")] string authorization);
     }
 
     public EmployeeController(EmployeeContext db, ILogger<EmployeeController> logger)
@@ -33,7 +33,7 @@ public class EmployeeController : ControllerBase
     {
         // _logger.LogInformation("Getting employees from database");
         var cvPartnerApi = RestService.For<IEmployeeApi>("https://variant.cvpartner.com/api/v1");
-        var employees = await cvPartnerApi.GetAllEmployee();
+        var employees = await cvPartnerApi.GetAllEmployee("6151d4be9aa0fc8f2e51367b57a9c78b");
 
         return employees;
 
