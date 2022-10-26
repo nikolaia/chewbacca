@@ -19,6 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\CvPartner\CvPartner.csproj" />
       <ProjectReference Include="..\Shared\Shared.csproj" />
     </ItemGroup>
 
