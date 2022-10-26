@@ -2,6 +2,8 @@ using Azure.Identity;
 using Employee.Repositories;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration.Ini;
+
 using Shared;
 using Shared.AzureIdentity;
 
@@ -15,6 +17,15 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+
+// Employee key
+
+// var EmployeeApiKey = builder.Configuration["Employee:ServiceApiKey"];
+//LEGG TIL EGEN USERSECRET ID NÅR DU HAR OPPRETTET EN SECRET
+builder.Configuration.AddUserSecrets("d18b48ed-e001-4e15-9d23-f47a671ddd76");
+
+
 
 // Bind configuration "TestApp:Settings" section to the Settings object
 var appSettingsSection = builder.Configuration
@@ -37,6 +48,10 @@ builder.Services.AddDbContext<EmployeeContext>(options =>
     options.AddInterceptors(new AzureAdAuthenticationDbConnectionInterceptor());
 });
 
+
+
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -53,7 +68,10 @@ if (appSettings.UseAzureAppConfig)
 
 app.UseHttpsRedirection();
 
+
 app.UseAuthorization();
+
+
 
 app.MapControllers();
 
