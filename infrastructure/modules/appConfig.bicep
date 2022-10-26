@@ -1,5 +1,5 @@
 param location string
-param name string
+param appConfName string
 @allowed([
   'free'
   'standard'
@@ -7,8 +7,11 @@ param name string
 param configSku string = 'standard'
 
 resource config 'Microsoft.AppConfiguration/configurationStores@2020-06-01' = {
-  name: name
+  name: appConfName
   location: location
+  identity: {
+    type: 'SystemAssigned'
+  }
   sku: {
     name: configSku
   }

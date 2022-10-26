@@ -21,7 +21,7 @@ public class CustomWebApplicationFactory<TStartup>
 
             services.Remove(descriptor!);
 
-            services.AddDbContextPool<EmployeeContext>(options =>
+            services.AddDbContext<EmployeeContext>(options =>
             {
                 options.UseInMemoryDatabase("InMemoryDbForTesting");
             });

@@ -1,10 +1,10 @@
 param location string
-param name string
+param keyVaultName string
 param accessPrincipalId string
 
 resource kv 'Microsoft.KeyVault/vaults@2019-09-01' = {
   // Make sure the Key Vault name begins with a letter.
-  name: 'kv${name}'
+  name: keyVaultName
   location: location
   properties: {
     sku: {

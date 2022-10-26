@@ -1,7 +1,4 @@
 using Employee;
-using Employee.Repositories;
-
-using Employee.Repositories;
 
 using FluentAssertions;
 
