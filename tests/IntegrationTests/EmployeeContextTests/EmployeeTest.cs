@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 
 using Newtonsoft.Json;
 
-namespace IntegrationTests.BloggingContextTests;
+namespace IntegrationTests.EmployeeContextTests;
 
 public class EmployeeTest :
     IClassFixture<CustomWebApplicationFactory<Program>>
