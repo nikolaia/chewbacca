@@ -10,7 +10,7 @@ Variant har mange internesystemer (UniEconomy, Harvest, CVPartner etc.) og denne
 
 Løsningen er bygget slik at arbeid på den gir relevant erfaring for hva vi møter ute hos våre kunder. [Les mer om det her](docs/relevance.md).
 
-Det det er tatt noen avgjørelser rundt arkitektur og hvordan vi bruker skytjenester. De avgjørelsene kan du [lese mer om her](docs/architecture.md).
+Det er tatt noen avgjørelser rundt arkitektur og hvordan vi bruker skytjenester. De avgjørelsene kan du [lese mer om her](docs/architecture.md).
 
 ## Up and running med mocked data
 
