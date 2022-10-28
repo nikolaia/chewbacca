@@ -15,4 +15,8 @@
         <ProjectReference Include="..\CvPartner\CvPartner.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <Folder Include="Migrations" />
+    </ItemGroup>
+
 </Project>
