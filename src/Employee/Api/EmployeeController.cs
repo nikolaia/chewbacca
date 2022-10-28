@@ -1,5 +1,4 @@
 using CvPartner.Api;
-using CvPartnerService;
 using Employee.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -35,10 +34,10 @@ public class EmployeeController : ControllerBase
     }
 
     [HttpPost]
-    public void PostAllEmployees()
+    public async Task PostAllEmployees()
     {
-        var service = new CVPartnerService(_appSettings, _getAllEmployeesLogger);
-        var dataToDatabase = service.FormatData();
+        var service = new CvPartnerService.CvPartnerService(_appSettings, _getAllEmployeesLogger);
+        var dataToDatabase = await service.FormatData();
 
         foreach (var employee in dataToDatabase)
         {
