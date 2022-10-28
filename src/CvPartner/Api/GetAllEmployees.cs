@@ -1,4 +1,5 @@
 using CvPartner.DTOs;
+using CvPartner.Utils;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -23,24 +24,11 @@ public class GetAllEmployees : ControllerBase
         _appSettings = appSettings;
         _logger = logger;
     }
-
-    public interface IEmployeeApi
-    {
-        [Get("/users?")]
-        Task<IEnumerable<CVPartnerUserDTO>> GetAllEmployee([Authorize("Token")] string authorization);
-    }
-
-
+    
     [HttpGet]
     public async Task<IEnumerable<CVPartnerUserDTO>> Get()
     {
         _logger.LogInformation("Getting employees from database");
-        var cvPartnerApi = RestService.For<IEmployeeApi>("https://variant.cvpartner.com/api/v1");
-        var employees = await cvPartnerApi.GetAllEmployee(_appSettings.Value.Token);
-
-        return employees;
-
-        // var employees = _db.Employees.ToList();
-        // return employees;
+        return await new CVPartnerRepository(_appSettings).GetCVPartnerDTO();
     }
 }
