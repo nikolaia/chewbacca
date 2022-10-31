@@ -19,14 +19,14 @@ public class EmployeeTest :
     }
 
     [Fact]
-    public async void Given_BlogExists_When_CallingEmployeeControllerGET_Then_ReturnsSampleData()
+    public async void Given_EmployeeExists_When_CallingEmployeeControllerGET_Then_ReturnsSampleData()
     {
         // Arrange
         var knownSeedData = Seed.GetSeedingEmployees();
 
         // Act
-        var blogsResponse = await _client.GetAsync("/Employee");
-        var content = JsonConvert.DeserializeObject<List<Employee.Models.Employee>>(await blogsResponse.Content.ReadAsStringAsync());
+        var employeeResponse = await _client.GetAsync("/Employee");
+        var content = JsonConvert.DeserializeObject<List<Employee.Models.Employee>>(await employeeResponse.Content.ReadAsStringAsync());
 
         // Assert
         content.Should().BeEquivalentTo(knownSeedData, options =>

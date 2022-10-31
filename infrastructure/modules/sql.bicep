@@ -57,5 +57,4 @@ resource sqlserver 'Microsoft.Sql/servers@2020-11-01-preview' = {
 
 }
 
-// output sqlConnectionString string = 'Server=tcp:${reference(sqlServerName).fullyQualifiedDomainName},1433;Initial Catalog=${sqlDatabaseName};Persist Security Info=False;User ID=${reference(sqlServerName).administratorLogin};Password=${reference(sqlServerName).administratorLoginPassword};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
-output sqlConnectionString string = 'Server=tcp:${reference(sqlServerName).fullyQualifiedDomainName},1433; Initial Catalog=${sqlDatabaseName};Persist Security Info=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Authentication="Active Directory Integrated";'
+output sqlConnectionString string = 'Server=tcp:${reference(sqlServerName).fullyQualifiedDomainName},1433; Initial Catalog=${sqlDatabaseName};Persist Security Info=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False'

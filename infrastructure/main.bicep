@@ -5,7 +5,7 @@ param name string = 'chewie'
 param location string = resourceGroup().location
 
 @description('The web site hosting plan')
-param sku string = 'F1'
+param sku string = 'S1'
 
 @description('Specifies sql admin password')
 @secure()
@@ -25,13 +25,19 @@ resource plan 'Microsoft.Web/serverfarms@2020-12-01' = {
   sku: {
     name: sku
   }
+  kind: 'linux'
+  properties: {
+    reserved: true
+  }
 }
 
-module config 'modules/appConfig.bicep' = {
+module config 'modules/config.bicep' = {
   name: appConfName
   params: {
     appConfName: appConfName
     location: location
+    keyVaultName: keyVaultName
+    webPrincipalId: web.identity.principalId
   }
 }
 
@@ -42,21 +48,19 @@ resource web 'Microsoft.Web/sites@2020-12-01' = {
     type: 'SystemAssigned'
   }
   properties: {
+
     httpsOnly: true
     serverFarmId: plan.id
+    siteConfig: {
+      linuxFxVersion: 'DOTNETCORE|6.0'
+      minTlsVersion: '1.2'
+      httpLoggingEnabled: true
+      logsDirectorySizeLimit: 35
+    }
   }
 }
 
-module kv 'modules/keyvault.bicep' = {
-  name: keyVaultName
-  params: {
-    keyVaultName: keyVaultName
-    location: location
-    accessPrincipalId: web.identity.principalId
-  }
-}
-
-module sql 'modules/azureSql.bicep' = {
+module sql 'modules/sql.bicep' = {
   name: sqlServerName
   params: {
     sqlServerName: sqlServerName
@@ -90,12 +94,16 @@ resource webAppSettings 'Microsoft.Web/sites/config@2022-03-01' = {
         name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
         value: applicationInsights.properties.InstrumentationKey
       }
+      {
+        name: 'AppSettings__UseAzureAppConfig'
+        value: 'true'
+      }
+      {
+        name: 'AppSettings__AzureAppConfigUri'
+        value: config.outputs.appConfigEndpoint
+      }
     ]
     connectionStrings: [
-      {
-        name: 'AppConfig'
-        connectionString: config.outputs.appConfigConnectionString
-      }
       {
         name: 'EmployeeDatabase'
         connectionString: sql.outputs.sqlConnectionString
