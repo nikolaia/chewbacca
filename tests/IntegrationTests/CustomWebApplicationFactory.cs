@@ -1,4 +1,4 @@
-﻿using Employee.Repositories;
+﻿using Employees.Repositories;
 
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;

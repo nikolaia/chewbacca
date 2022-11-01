@@ -1,5 +1,5 @@
 using Azure.Identity;
-using Employee.Repositories;
+using Employees.Repositories;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration.Ini;
@@ -31,7 +31,7 @@ var appSettings = appSettingsSection.Get<AppSettings>();
 
 builder.Services.AddSingleton(new AzureServiceTokenProvider()); 
 
-builder.Services.AddSingleton(new CVPartnerRepository());
+// builder.Services.AddSingleton(new CVPartnerRepository());
 
 if (appSettings.UseAzureAppConfig)
 {

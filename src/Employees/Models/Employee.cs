@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Employee.Models;
+namespace Employees.Models;
 
 public class Employee
 {

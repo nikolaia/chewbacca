@@ -1,6 +1,6 @@
-﻿using Employee.Repositories;
+﻿using Employees.Repositories;
 
-using Employee;
+using Employees;
 
 namespace IntegrationTests;
 

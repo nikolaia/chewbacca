@@ -1,9 +1,6 @@
 using CvPartner.DTOs;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Refit;
-using Shared;
+using CvPartner.Service;
 
 namespace CvPartner.Api;
 
@@ -11,16 +8,17 @@ namespace CvPartner.Api;
 [Route("[controller]")]
 public class DummyController : ControllerBase
 {
-    private readonly CVPartnerRepository _cvPartnerRepository;
+    private readonly CvPartnerService _cvPartnerService;
 
-    public DummyController(CVPartnerRepository _cvPartnerRepository)
+    public DummyController(CvPartnerService _cvPartnerService)
     {
-        this._cvPartnerRepository = _cvPartnerRepository;
+        this._cvPartnerService = _cvPartnerService;
     }
     
     [HttpGet]
-    public async Task<IEnumerable<CVPartnerUserDTO>> Get()
+    public async Task<IActionResult> Get()
     {
-        return await _cvPartnerRepository.GetAllEmployees();
+        await _cvPartnerService.GetCVPartnerEmployees();
+        return Ok();
     }
 }
