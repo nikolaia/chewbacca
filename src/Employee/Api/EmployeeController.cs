@@ -1,5 +1,7 @@
 using Employee.Repositories;
+
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Employee.Api;
@@ -10,18 +12,19 @@ public class EmployeeController : ControllerBase
 {
     private readonly EmployeeContext _db;
     private readonly ILogger<EmployeeController> _logger;
-    
+
     public EmployeeController(EmployeeContext db, ILogger<EmployeeController> logger)
     {
         _db = db;
         _logger = logger;
     }
-    
+
     [HttpGet]
-    public List<Models.Employee> Get()
+    public async Task<List<Models.Employee>> Get()
     {
         _logger.LogInformation("Getting employees from database");
-        var employees = _db.Employees.ToList();
+        
+        var employees = await _db.Employees.ToListAsync();
         return employees;
     }
 }

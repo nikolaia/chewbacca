@@ -1,5 +1,7 @@
 using Azure.Identity;
+
 using Employee.Repositories;
+
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration.Ini;
@@ -20,21 +22,27 @@ builder.Services.AddSwaggerGen();
 builder.Configuration
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
-     // appsettings.Local.json is in the .gitignore. Using a local config instead of userSecrets to avoid references in the .csproj:
+    // appsettings.Local.json is in the .gitignore. Using a local config instead of userSecrets to avoid references in the .csproj:
     .AddJsonFile($"appsettings.Local.json", optional: true, reloadOnChange: true)
     .AddEnvironmentVariables();
 
 // Bind configuration "TestApp:Settings" section to the Settings object
 var appSettingsSection = builder.Configuration
     .GetSection("AppSettings");
-var appSettings = appSettingsSection.Get<AppSettings>(); 
+var appSettings = appSettingsSection.Get<AppSettings>();
 
-builder.Services.AddSingleton(new AzureServiceTokenProvider()); 
+builder.Services.AddSingleton(new AzureServiceTokenProvider());
 
 if (appSettings.UseAzureAppConfig)
 {
+    builder.Services.AddAzureAppConfiguration();
     // Load configuration from Azure App Configuration
-    builder.Configuration.AddAzureAppConfiguration(options => options.Connect(appSettings.AzureAppConfigUri, new DefaultAzureCredential()));
+    builder.Configuration.AddAzureAppConfiguration(options => options
+        .Connect(appSettings.AzureAppConfigUri, new DefaultAzureCredential()).ConfigureKeyVault(
+            vaultOptions =>
+            {
+                vaultOptions.SetCredential(new DefaultAzureCredential());
+            }));
 }
 
 builder.Services.Configure<AppSettings>(appSettingsSection);
@@ -48,22 +56,33 @@ builder.Services.AddDbContextPool<EmployeeContext>(options =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+/*
+ * Migrate the database.
+ * Ideally the app shouldn't have access to alter the database schema, but we do it for simplicity's sake,
+ * both here and in the bicep/infrastructure-as-code.
+ */
+using (var scope = app.Services.CreateScope())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    var db = scope.ServiceProvider.GetRequiredService<EmployeeContext>();
+    var isInMemoryDatabase = db.Database.ProviderName?.StartsWith("Microsoft.EntityFrameworkCore.InMemory") ?? false;
+    if (!isInMemoryDatabase)
+    {
+        db.Database.Migrate();
+    }
 }
+
+// Configure the HTTP request pipeline.
+app.UseSwagger();
+app.UseSwaggerUI();
 
 if (appSettings.UseAzureAppConfig)
 {
     app.UseAzureAppConfiguration();
 }
 
-app.UseHttpsRedirection();
-
 app.UseAuthorization();
 
+app.MapGet("/", () => "Hello World!");
 app.MapControllers();
 
 app.Run();
