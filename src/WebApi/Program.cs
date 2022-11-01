@@ -31,6 +31,8 @@ var appSettings = appSettingsSection.Get<AppSettings>();
 
 builder.Services.AddSingleton(new AzureServiceTokenProvider()); 
 
+builder.Services.AddSingleton(new CVPartnerRepository());
+
 if (appSettings.UseAzureAppConfig)
 {
     // Load configuration from Azure App Configuration

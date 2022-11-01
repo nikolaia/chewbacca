@@ -3,25 +3,21 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Shared;
 using EmployeeModel = Employee.Models.Employee;
+using CvPartner;
 
 namespace CvPartnerService;
 
 public class CvPartnerService
 {
-    private readonly IOptionsSnapshot<AppSettings> _appSettings;
-    private readonly ILogger<GetAllEmployees> _getAllEmployeesLogger;
+    private readonly CVPartnerRepository _cvPartnerRepository;
 
-    public CvPartnerService(IOptionsSnapshot<AppSettings> appSettings,
-        ILogger<GetAllEmployees> getAllEmployeesLogger)
-    {
-        _appSettings = appSettings;
-        _getAllEmployeesLogger = getAllEmployeesLogger;
+    public CvPartnerService(CVPartnerRepository _cvPartnerRepository) {
+        this._cvPartnerRepository = _cvPartnerRepository;
     }
-    
+
     public async Task<IEnumerable<EmployeeModel>> FormatData ()
     {
-        var cvPartnerDto = await new GetAllEmployees(_appSettings, _getAllEmployeesLogger).Get();
-
+        var cvPartnerDto = this._cvPartnerRepository.GetAllEmployees();
         return cvPartnerDto.Select(person => new EmployeeModel
         {
             Name = person.name,
