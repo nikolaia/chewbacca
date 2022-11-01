@@ -3,7 +3,7 @@ name: DotNet Deploy to Webapp
 on:
   push:
     branches:
-      - f_deploy_action
+      - main
 
 jobs:
   build:
