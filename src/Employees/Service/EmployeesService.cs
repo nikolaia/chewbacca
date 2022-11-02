@@ -1,32 +1,30 @@
 using Employees.Models;
 using Employees.Repositories;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Employees.Service;
 
 public class EmployeesService {
 
-    private readonly EmployeeContext _db;
+    private readonly EmployeesRepository _employeesRepository;
 
-    public EmployeesService(EmployeeContext _db)
+    public EmployeesService(EmployeesRepository _employeesRepository)
     {
-        this._db = _db;
+        this._employeesRepository = _employeesRepository;
     }
 
+    /**
+     * <returns>list of employees from database</returns>
+     */
     public async Task<IEnumerable<Employee>> GetAllEmployees() 
     {
-        // Henter alle Employees fra EmployeeContext
-
         // [optional] slå sammen data fra flere kilder
         // [optional] formater data på noe spesielt vis
-        var lol = await _db.Employees.ToListAsync();
-        return  lol;
+        return await _employeesRepository.GetAllEmployees();
     }
 
-    public async Task AddOrUpdateEmployees(Employee employee) {
-        _db.Add(employee);
-        _db.SaveChanges();
-        // TODO Async
+    public Task AddOrUpdateEmployees(Employee employee)
+    {
+        _employeesRepository.AddToDatabase(employee);
+        return Task.CompletedTask;
     }
 }

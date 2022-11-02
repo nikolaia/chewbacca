@@ -1,7 +1,5 @@
 using Employees.Repositories;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Employees.Service;
 using Employees.Models;
 
@@ -18,11 +16,12 @@ public class EmployeeController : ControllerBase
         this._employeeService = _employeeService;
     }
 
+    /**
+     * <returns>a call to Service's GetAllEmployees</returns>
+     */
     [HttpGet]
     public async Task<IEnumerable<Employee>> Get()
     {
-        // Hente Employees fra EmployeesSevice
-        // Returner
         return await _employeeService.GetAllEmployees();
     }
 }

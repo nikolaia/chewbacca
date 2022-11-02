@@ -2,10 +2,10 @@ using Azure.Identity;
 using Employees.Repositories;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration.Ini;
-
 using Shared;
 using Shared.AzureIdentity;
+using CvPartner;
+using Employees.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,7 +31,10 @@ var appSettings = appSettingsSection.Get<AppSettings>();
 
 builder.Services.AddSingleton(new AzureServiceTokenProvider()); 
 
-// builder.Services.AddSingleton(new CVPartnerRepository());
+builder.Services.AddScoped<CvPartnerService>();
+builder.Services.AddScoped<CvPartnerRepository>();
+builder.Services.AddScoped<EmployeesService>();
+builder.Services.AddScoped<EmployeesRepository>();
 
 if (appSettings.UseAzureAppConfig)
 {

@@ -1,25 +1,20 @@
-using CvPartner.Api;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Shared;
-using Employees.Models;
-using CvPartner;
-using Employees.Service;
 using CvPartner.DTOs;
+using Employees.Models;
+using Employees.Service;
 
-namespace CvPartner.Service;
+namespace CvPartner;
 
 public class CvPartnerService
 {
-    private readonly CVPartnerRepository _cvPartnerRepository;
+    private readonly CvPartnerRepository _cvPartnerRepository;
     private readonly EmployeesService _employeeService;
 
-    public CvPartnerService(CVPartnerRepository _cvPartnerRepository, EmployeesService _employeeService) {
+    public CvPartnerService(CvPartnerRepository _cvPartnerRepository, EmployeesService _employeeService) {
         this._cvPartnerRepository = _cvPartnerRepository;
         this._employeeService = _employeeService;
     }
 
-    private Employee ConvertToEmployee(CVPartnerUserDTO dto) {
+    private static Employee ConvertToEmployee(CVPartnerUserDTO dto) {
         return new Employee {
             Name = dto.name,
             FullName = dto.name,
@@ -29,17 +24,16 @@ public class CvPartnerService
             ImageUrl = dto.image.url
         };
     }
-
-    public async Task GetCVPartnerEmployees(){
-        // Hent data
-        // konverter
-        // sendt til lagring
+    
+    /**
+     * <summary>Calls CvPartnerRepository's GetAllEmployee and converts them
+     * to an employee. Adds to database.</summary>
+     */
+    public async Task GetCvPartnerEmployees(){
         var cvpartnerEmployees = await _cvPartnerRepository.GetAllEmployees();
 
         cvpartnerEmployees
             .Select(cvpartnerEmployee => ConvertToEmployee(cvpartnerEmployee))
             .Select(async (employee) => await _employeeService.AddOrUpdateEmployees(employee));
-            // TODO Må sikkert ha en spesiell syntaks for å kjøre async/await på en liste
     }
-
 }

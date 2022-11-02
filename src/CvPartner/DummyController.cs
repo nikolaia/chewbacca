@@ -1,6 +1,4 @@
-using CvPartner.DTOs;
 using Microsoft.AspNetCore.Mvc;
-using CvPartner.Service;
 
 namespace CvPartner.Api;
 
@@ -18,7 +16,7 @@ public class DummyController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> Get()
     {
-        await _cvPartnerService.GetCVPartnerEmployees();
+        await _cvPartnerService.GetCvPartnerEmployees();
         return Ok();
     }
 }
