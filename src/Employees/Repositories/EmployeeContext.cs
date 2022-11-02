@@ -8,7 +8,7 @@ public class EmployeeContext : DbContext
     {
     }
 
-    public DbSet<Models.Employee> Employees { get; set; }
+    public DbSet<Models.EmployeeEntity> Employees { get; set; }
 
     // // Example on how to seed data into the database:
     // protected override void OnModelCreating(ModelBuilder modelBuilder)
