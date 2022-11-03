@@ -17,14 +17,11 @@ public class EmployeesService {
      */
     public async Task<IEnumerable<Employee>> GetAllEmployees() 
     {
-        // [optional] slå sammen data fra flere kilder
-        // [optional] formater data på noe spesielt vis
         return await _employeesRepository.GetAllEmployees();
     }
 
-    public Task AddOrUpdateEmployees(Employee employee)
+    public async Task AddOrUpdateEmployees(EmployeeEntity employee)
     {
-        _employeesRepository.AddToDatabase(employee);
-        return Task.CompletedTask;
+        await _employeesRepository.AddToDatabase(employee);
     }
 }

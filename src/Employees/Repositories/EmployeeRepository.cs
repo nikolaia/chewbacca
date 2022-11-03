@@ -22,7 +22,6 @@ public class EmployeesRepository
             Telephone = employee.Telephone,
             ImageUrl = employee.ImageUrl,
             OfficeName = employee.OfficeName,
-            Id = employee.Id
         };
     }
 
@@ -36,18 +35,18 @@ public class EmployeesRepository
             Telephone = employeeEntity.Telephone,
             ImageUrl = employeeEntity.ImageUrl,
             OfficeName = employeeEntity.OfficeName,
-            Id = employeeEntity.Id
         };
     }
-
+    
     public async Task<IEnumerable<Employee>> GetAllEmployees()
     {
-        return await _db.Employees.Select(entity => ToEmployee(entity)).ToListAsync();
+        var employees = await _db.Employees.ToListAsync();
+        return employees.Select(ToEmployee);
     }
 
-    public async void AddToDatabase(Employee employee)
+    public async Task AddToDatabase(EmployeeEntity employee)
     {
-        await _db.AddAsync(employee);
+        _db.AddAsync(employee);
         await _db.SaveChangesAsync();
     }
 }

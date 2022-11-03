@@ -14,8 +14,8 @@ public class CvPartnerService
         this._employeeService = _employeeService;
     }
 
-    private static Employee ConvertToEmployee(CVPartnerUserDTO dto) {
-        return new Employee {
+    private static EmployeeEntity ConvertToEmployeeEntity(CVPartnerUserDTO dto) {
+        return new EmployeeEntity {
             Name = dto.name,
             FullName = dto.name,
             Email = dto.email,
@@ -32,8 +32,14 @@ public class CvPartnerService
     public async Task GetCvPartnerEmployees(){
         var cvpartnerEmployees = await _cvPartnerRepository.GetAllEmployees();
 
-        cvpartnerEmployees
-            .Select(cvpartnerEmployee => ConvertToEmployee(cvpartnerEmployee))
-            .Select(async (employee) => await _employeeService.AddOrUpdateEmployees(employee));
+        foreach (var cvEmployeeDto in cvpartnerEmployees)
+        {
+            var converted = ConvertToEmployeeEntity(cvEmployeeDto);
+            await _employeeService.AddOrUpdateEmployees(converted);
+        }
+        // TODO: Hva er feil med den her? 
+        // IEnumerable<Task> enumerable = cvpartnerEmployees
+        //     .Select(cvpartnerEmployee => ConvertToEmployeeEntity(cvpartnerEmployee))
+        //     .Select(async employee =>  await _employeeService.AddOrUpdateEmployees(employee));
     }
 }
