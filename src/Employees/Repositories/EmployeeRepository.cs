@@ -46,7 +46,23 @@ public class EmployeesRepository
 
     public async Task AddToDatabase(EmployeeEntity employee)
     {
-        _db.AddAsync(employee);
+        var tmp = _db.Employees.SingleOrDefault(e => e.Email == employee.Email);
+        if (tmp != null)
+        {
+            tmp.Email = employee.Email;
+            tmp.Name = employee.Name;
+            tmp.ImageUrl = employee.ImageUrl;
+            tmp.FullName = employee.FullName;
+            tmp.Telephone = employee.Telephone;
+            tmp.OfficeName = employee.OfficeName;
+        }
+        else
+        {
+            _db.Add(employee);
+        }
         await _db.SaveChangesAsync();
+        
+        // _db.AddAsync(employee);
+        // await _db.SaveChangesAsync();
     }
 }
