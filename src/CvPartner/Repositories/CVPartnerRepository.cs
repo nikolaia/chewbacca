@@ -1,9 +1,13 @@
-﻿using Refit;
-using Shared;
-using Microsoft.Extensions.Options;
-using CvPartner.DTOs;
+﻿
+using CvPartner.Models;
 
-namespace CvPartner;
+using Microsoft.Extensions.Options;
+
+using Refit;
+
+using Shared;
+
+namespace CvPartner.Repositories;
 
 public class CvPartnerRepository
 {

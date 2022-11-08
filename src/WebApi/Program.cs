@@ -1,11 +1,16 @@
 using Azure.Identity;
+
+using CvPartner.Repositories;
+using CvPartner.Service;
+
 using Employees.Repositories;
+using Employees.Service;
+
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.EntityFrameworkCore;
+
 using Shared;
 using Shared.AzureIdentity;
-using CvPartner;
-using Employees.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 

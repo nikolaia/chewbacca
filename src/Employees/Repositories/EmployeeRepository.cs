@@ -61,8 +61,5 @@ public class EmployeesRepository
             _db.Add(employee);
         }
         await _db.SaveChangesAsync();
-        
-        // _db.AddAsync(employee);
-        // await _db.SaveChangesAsync();
     }
 }

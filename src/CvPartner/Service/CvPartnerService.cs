@@ -1,8 +1,10 @@
-using CvPartner.DTOs;
+using CvPartner.Models;
+using CvPartner.Repositories;
+
 using Employees.Models;
 using Employees.Service;
 
-namespace CvPartner;
+namespace CvPartner.Service;
 
 public class CvPartnerService
 {
