@@ -26,22 +26,23 @@ public class CvPartnerService
             ImageUrl = dto.image.url
         };
     }
-    
+
     /**
      * <summary>Calls CvPartnerRepository's GetAllEmployee and converts them
      * to an employee. Adds to database.</summary>
      */
-    public async Task GetCvPartnerEmployees(){
+    public async Task GetCvPartnerEmployees()
+    {
         var cvpartnerEmployees = await _cvPartnerRepository.GetAllEmployees();
-
         foreach (var cvEmployeeDto in cvpartnerEmployees)
         {
             var converted = ConvertToEmployeeEntity(cvEmployeeDto);
-            await _employeeService.AddOrUpdateEmployees(converted);
+            await _employeeService.AddOrUpdateEmployee(converted);
         }
         // TODO: Hva er feil med den her? 
         // IEnumerable<Task> enumerable = cvpartnerEmployees
-        //     .Select(cvpartnerEmployee => ConvertToEmployeeEntity(cvpartnerEmployee))
-        //     .Select(async employee =>  await _employeeService.AddOrUpdateEmployees(employee));
+        //     .Select(ConvertToEmployeeEntity)
+        //     .Select(_employeeService.AddOrUpdateEmployees);
+        // await Task.WhenAll(enumerable);
     }
 }

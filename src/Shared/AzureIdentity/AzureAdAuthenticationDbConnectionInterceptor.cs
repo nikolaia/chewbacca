@@ -3,9 +3,6 @@ using Azure.Core;
 using Azure.Identity;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
-using System;
 
 namespace Shared.AzureIdentity;
 

@@ -20,7 +20,7 @@ public class EmployeesService {
         return await _employeesRepository.GetAllEmployees();
     }
 
-    public async Task AddOrUpdateEmployees(EmployeeEntity employee)
+    public async Task AddOrUpdateEmployee(EmployeeEntity employee)
     {
         await _employeesRepository.AddToDatabase(employee);
     }

@@ -1,9 +1,6 @@
-﻿
-using CvPartner.Models;
+﻿using CvPartner.Models;
 
 using Microsoft.Extensions.Options;
-
-using Refit;
 
 using Shared;
 
@@ -12,23 +9,16 @@ namespace CvPartner.Repositories;
 public class CvPartnerRepository
 {
     private readonly IOptionsSnapshot<AppSettings> _appSettings;
+    private readonly IEmployeeApi _employeeApi;
 
-    public CvPartnerRepository(IOptionsSnapshot<AppSettings> appSettings)
+    public CvPartnerRepository(IOptionsSnapshot<AppSettings> appSettings, IEmployeeApi _employeeApi)
     {
         _appSettings = appSettings;
+        this._employeeApi = _employeeApi;
     }
 
     public async Task<IEnumerable<CVPartnerUserDTO>> GetAllEmployees()
     {
-        var cvPartnerApi = RestService.For<IEmployeeApi>("https://variant.cvpartner.com/api/v1");
-
-        var employees = await cvPartnerApi.GetAllEmployee(_appSettings.Value.Token);
-        return employees;
-    }
-
-    public interface IEmployeeApi
-    {
-        [Get("/users")]
-        Task<IEnumerable<CVPartnerUserDTO>> GetAllEmployee([Authorize("Token")] string authorization);
+        return await _employeeApi.GetAllEmployee(_appSettings.Value.Token);
     }
 }
