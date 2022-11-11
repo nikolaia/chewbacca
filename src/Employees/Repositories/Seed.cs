@@ -1,12 +1,12 @@
-﻿namespace Employee;
+﻿namespace Employees;
 
-using Employee.Models;
+using Employees.Models;
 
 public static class Seed
 {
-    public static List<Employee> GetSeedingEmployees()
+    public static List<EmployeeEntity> GetSeedingEmployees()
     {
-        return new List<Employee>()
+        return new List<EmployeeEntity>()
         {
             new()
             {

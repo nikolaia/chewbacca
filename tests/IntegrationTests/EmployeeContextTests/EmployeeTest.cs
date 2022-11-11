@@ -1,8 +1,8 @@
-using Employee;
-
+using Employees;
 using FluentAssertions;
 
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.VisualStudio.TestPlatform.TestHost;
 
 using Newtonsoft.Json;
 
@@ -26,7 +26,7 @@ public class EmployeeTest :
 
         // Act
         var employeeResponse = await _client.GetAsync("/Employee");
-        var content = JsonConvert.DeserializeObject<List<Employee.Models.Employee>>(await employeeResponse.Content.ReadAsStringAsync());
+        var content = JsonConvert.DeserializeObject<List<Employees.Models.Employee>>(await employeeResponse.Content.ReadAsStringAsync());
 
         // Assert
         content.Should().BeEquivalentTo(knownSeedData, options =>

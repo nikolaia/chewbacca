@@ -1,4 +1,4 @@
-﻿namespace CvPartner.DTOs;
+﻿namespace CvPartner.Models;
 
 // Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(myJsonResponse);
 public class FitThumb

@@ -16,6 +16,8 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="6.0.10" />
+      <PackageReference Include="Refit" Version="6.3.2" />
+      <PackageReference Include="Refit.HttpClientFactory" Version="6.3.2" />
   </ItemGroup>
     
   <ItemGroup>
@@ -23,8 +25,9 @@
   </ItemGroup>
     
   <ItemGroup>
-    <ProjectReference Include="..\Employee\Employee.csproj" />
+    <ProjectReference Include="..\Employees\Employees.csproj" />
     <ProjectReference Include="..\Shared\Shared.csproj" />
+    <ProjectReference Include="..\CvPartner\CvPartner.csproj" />
   </ItemGroup>
     
   <ItemGroup>

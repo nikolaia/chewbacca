@@ -1,4 +1,4 @@
-using Employee.Repositories;
+using Employees.Repositories;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;

@@ -1,10 +1,16 @@
 using Azure.Identity;
 
-using Employee.Repositories;
+using CvPartner.Repositories;
+using CvPartner.Service;
+
+using Employees.Repositories;
+using Employees.Service;
 
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration.Ini;
+
+using Refit;
 
 using Shared;
 using Shared.AzureIdentity;
@@ -32,6 +38,15 @@ var appSettingsSection = builder.Configuration
 var appSettings = appSettingsSection.Get<AppSettings>();
 
 builder.Services.AddSingleton(new AzureServiceTokenProvider());
+
+builder.Services.AddScoped<CvPartnerService>();
+builder.Services.AddScoped<CvPartnerRepository>();
+builder.Services.AddScoped<EmployeesService>();
+builder.Services.AddScoped<EmployeesRepository>();
+
+// Refit
+builder.Services.AddRefitClient<IEmployeeApi>()
+    .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://variant.cvpartner.com/api/v1"));
 
 if (appSettings.UseAzureAppConfig)
 {
