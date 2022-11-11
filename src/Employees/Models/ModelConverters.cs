@@ -6,7 +6,6 @@ public class ModelConverters
     {
         return new EmployeeEntity
         {
-            FullName = employee.FullName,
             Name = employee.Name,
             Email = employee.Email,
             Telephone = employee.Telephone,
@@ -19,7 +18,6 @@ public class ModelConverters
     {
         return new Employee
         {
-            FullName = employeeEntity.FullName,
             Name = employeeEntity.Name,
             Email = employeeEntity.Email,
             Telephone = employeeEntity.Telephone,

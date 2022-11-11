@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Employees.Models;
+
+using Microsoft.EntityFrameworkCore;
 
 namespace Employees.Repositories;
 
@@ -8,7 +10,7 @@ public class EmployeeContext : DbContext
     {
     }
 
-    public DbSet<Models.EmployeeEntity> Employees { get; set; }
+    public DbSet<EmployeeEntity> Employees { get; set; }
 
     // // Example on how to seed data into the database:
     // protected override void OnModelCreating(ModelBuilder modelBuilder)
