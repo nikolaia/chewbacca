@@ -27,7 +27,6 @@ public class EmployeesRepository
             updateEmployee.Email = employee.Email;
             updateEmployee.Name = employee.Name;
             updateEmployee.ImageUrl = employee.ImageUrl;
-            updateEmployee.FullName = employee.FullName;
             updateEmployee.Telephone = employee.Telephone;
             updateEmployee.OfficeName = employee.OfficeName;
         }

@@ -19,7 +19,6 @@ public class CvPartnerService
     private static EmployeeEntity ConvertToEmployeeEntity(CVPartnerUserDTO dto) {
         return new EmployeeEntity {
             Name = dto.name,
-            FullName = dto.name,
             Email = dto.email,
             Telephone = dto.telephone,
             OfficeName = dto.office_name,
@@ -35,10 +34,11 @@ public class CvPartnerService
     {
         var cvPartnerUserDTOs = await _cvPartnerRepository.GetAllEmployees();
         
-        var saveToDbTasks = cvPartnerUserDTOs
-            .Select(ConvertToEmployeeEntity)
-            .Select(_employeeService.AddOrUpdateEmployee);
-        
-        await Task.WhenAll(saveToDbTasks);
+        var employeeEntities = cvPartnerUserDTOs.Select(ConvertToEmployeeEntity);
+
+        foreach (var employeeEntity in employeeEntities)
+        {
+            await _employeeService.AddOrUpdateEmployee(employeeEntity);
+        }
     }
 }

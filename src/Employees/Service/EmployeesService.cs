@@ -15,13 +15,13 @@ public class EmployeesService {
     /**
      * <returns>list of employees from database</returns>
      */
-    public async Task<IEnumerable<Employee>> GetAllEmployees() 
+    public Task<IEnumerable<Employee>> GetAllEmployees() 
     {
-        return await _employeesRepository.GetAllEmployees();
+        return _employeesRepository.GetAllEmployees();
     }
 
-    public async Task AddOrUpdateEmployee(EmployeeEntity employee)
+    public Task AddOrUpdateEmployee(EmployeeEntity employee)
     {
-        await _employeesRepository.AddToDatabase(employee);
+        return _employeesRepository.AddToDatabase(employee);
     }
 }

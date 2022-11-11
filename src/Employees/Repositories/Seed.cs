@@ -13,7 +13,6 @@ public static class Seed
                 Email = "test@example.com",
                 Name = "Navn",
                 Telephone = "123982131",
-                FullName = "Navn Navnersen",
                 ImageUrl = "https://example.com/image.png",
                 OfficeName = "Oslo"
             }
