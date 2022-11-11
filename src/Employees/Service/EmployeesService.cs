@@ -7,9 +7,9 @@ public class EmployeesService {
 
     private readonly EmployeesRepository _employeesRepository;
 
-    public EmployeesService(EmployeesRepository _employeesRepository)
+    public EmployeesService(EmployeesRepository employeesRepository)
     {
-        this._employeesRepository = _employeesRepository;
+        this._employeesRepository = employeesRepository;
     }
 
     /**

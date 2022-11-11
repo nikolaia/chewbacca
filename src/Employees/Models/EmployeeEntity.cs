@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Employees.Models;
 
-public class EmployeeEntity
+public record EmployeeEntity
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

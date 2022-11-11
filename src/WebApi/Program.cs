@@ -8,7 +8,6 @@ using Employees.Service;
 
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration.Ini;
 
 using Refit;
 
@@ -45,8 +44,8 @@ builder.Services.AddScoped<EmployeesService>();
 builder.Services.AddScoped<EmployeesRepository>();
 
 // Refit
-builder.Services.AddRefitClient<IEmployeeApi>()
-    .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://variant.cvpartner.com/api/v1"));
+builder.Services.AddRefitClient<ICvPartnerApiClient>()
+    .ConfigureHttpClient(c => c.BaseAddress = appSettings.CvPartner.Uri);
 
 if (appSettings.UseAzureAppConfig)
 {

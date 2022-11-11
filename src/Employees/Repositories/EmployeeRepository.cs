@@ -8,9 +8,9 @@ public class EmployeesRepository
 {
     private readonly EmployeeContext _db;
 
-    public EmployeesRepository(EmployeeContext _db)
+    public EmployeesRepository(EmployeeContext db)
     {
-        this._db = _db;
+        this._db = db;
     }
     public async Task<IEnumerable<Employee>> GetAllEmployees()
     {

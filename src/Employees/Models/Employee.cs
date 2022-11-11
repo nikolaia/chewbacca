@@ -1,6 +1,6 @@
 ﻿namespace Employees.Models;
 
-public class Employee
+public record Employee
 {
     public string Email { get; set; }
     public string FullName { get; set; }
