@@ -1,6 +1,6 @@
-﻿namespace Employees;
+﻿using Employees.Models;
 
-using Employees.Models;
+namespace Employees.Repositories;
 
 public static class Seed
 {

@@ -10,9 +10,9 @@ public class CvPartnerController : ControllerBase
 {
     private readonly CvPartnerService _cvPartnerService;
 
-    public CvPartnerController(CvPartnerService _cvPartnerService)
+    public CvPartnerController(CvPartnerService cvPartnerService)
     {
-        this._cvPartnerService = _cvPartnerService;
+        this._cvPartnerService = cvPartnerService;
     }
     
     [HttpGet]

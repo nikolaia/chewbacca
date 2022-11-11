@@ -1,16 +1,25 @@
-﻿using Employees.Repositories;
+﻿using CvPartner.Models;
+using CvPartner.Repositories;
+
+using Employees.Repositories;
 
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
+
+using Moq;
+using Moq.AutoMock;
 
 namespace IntegrationTests;
 
 public class CustomWebApplicationFactory<TStartup>
-    : WebApplicationFactory<TStartup> where TStartup: class
+    : WebApplicationFactory<TStartup> where TStartup : class
 {
+    public readonly AutoMocker Mocker = new();
+    
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.ConfigureServices(services =>
@@ -23,29 +32,12 @@ public class CustomWebApplicationFactory<TStartup>
 
             services.AddDbContextPool<EmployeeContext>(options =>
             {
-                options.UseInMemoryDatabase("InMemoryDbForTesting");
+                options.UseInMemoryDatabase(Guid.NewGuid().ToString());
             });
 
-            var sp = services.BuildServiceProvider();
-
-            using var scope = sp.CreateScope();
-            
-            var scopedServices = scope.ServiceProvider;
-            var db = scopedServices.GetRequiredService<EmployeeContext>();
-            var logger = scopedServices
-                .GetRequiredService<ILogger<CustomWebApplicationFactory<TStartup>>>();
-
-            db.Database.EnsureCreated();
-
-            try
-            {
-                Utilities.InitializeDbForTests(db);
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "An error occurred seeding the " +
-                                    "database with test messages. Error: {Message}", ex.Message);
-            }
+            var cvPartnerApiMock = Mocker.GetMock<ICvPartnerApiClient>();
+            cvPartnerApiMock.Setup(client => client.GetAllEmployee(It.IsAny<string>())).ReturnsAsync(Array.Empty<CVPartnerUserDTO>());
+            services.Replace(ServiceDescriptor.Transient(_ => cvPartnerApiMock.Object));
         });
     }
 }

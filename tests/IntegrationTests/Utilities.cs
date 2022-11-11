@@ -1,7 +1,5 @@
 ﻿using Employees.Repositories;
 
-using Employees;
-
 namespace IntegrationTests;
 
 public static class Utilities

@@ -33,16 +33,12 @@ public class CvPartnerService
      */
     public async Task GetCvPartnerEmployees()
     {
-        var cvpartnerEmployees = await _cvPartnerRepository.GetAllEmployees();
-        foreach (var cvEmployeeDto in cvpartnerEmployees)
-        {
-            var converted = ConvertToEmployeeEntity(cvEmployeeDto);
-            await _employeeService.AddOrUpdateEmployee(converted);
-        }
-        // TODO: Hva er feil med den her? 
-        // IEnumerable<Task> enumerable = cvpartnerEmployees
-        //     .Select(ConvertToEmployeeEntity)
-        //     .Select(_employeeService.AddOrUpdateEmployees);
-        // await Task.WhenAll(enumerable);
+        var cvPartnerUserDTOs = await _cvPartnerRepository.GetAllEmployees();
+        
+        var saveToDbTasks = cvPartnerUserDTOs
+            .Select(ConvertToEmployeeEntity)
+            .Select(_employeeService.AddOrUpdateEmployee);
+        
+        await Task.WhenAll(saveToDbTasks);
     }
 }

@@ -1,6 +1,5 @@
 ﻿namespace CvPartner.Models;
 
-// Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(myJsonResponse);
 public class FitThumb
 {
     public string url { get; set; }
