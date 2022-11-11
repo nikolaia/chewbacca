@@ -55,3 +55,21 @@ Work in progress. Se i `infrastructure`-mappa
 ```bash
 az deployment group create --resource-group my-test-group --template-file .\infrastructure\azuredeploy.bicep --location westeurope`
 ```
+
+## Feilsøking
+
+### Bygg feiler på MacOS med Norsk systemspråk
+
+Dersom du utvikler på en maskin med MacOS med Norsk systemspråk vil du sannsynligvis møte en
+byggfeil som sier at versjonen av MSBuild ikke er gyldig for å bygge Refit-avhengigheten vi bruker. Denne feilen oppstår fordi MSBuild-versjonen kan ha ulike formater for ulike språk, noe som fører til at
+Refit sin versjonssammenligning feiler.
+
+**Løsning**
+
+Som forklart i [denne artikkelen](https://learn.microsoft.com/en-us/dotnet/core/runtime-config/globalization) 
+kan man be MSBuild bygge uten å bruke språkavhengig formatering for tekster, datoer ol.:
+
+    DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1 dotnet build
+
+
+Man kan også sette `DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1` som en miljøvariabel for utviklermaskinen, og dermed slipp å oppgi variablen i selve byggkommandoen.
