@@ -1,5 +1,7 @@
 using AutoFixture.Xunit2;
 
+using BlobStorage.Repositories;
+
 using CvPartner.Models;
 using CvPartner.Repositories;
 
@@ -12,8 +14,6 @@ using Microsoft.Extensions.DependencyInjection;
 
 using Moq;
 using Moq.AutoMock;
-
-using Newtonsoft.Json;
 
 namespace IntegrationTests.Tests;
 
@@ -48,5 +48,9 @@ public class CvPartnerTest :
         using var scope = _factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<EmployeeContext>();
         db.Employees.Count().Should().Be(cvPartnerUserDtos.Count);
+        
+        // Check if blobService runs x amount of times
+        var blobStorageServiceMocker = _mocker.GetMock<IBlobStorageRepository>(); 
+        blobStorageServiceMocker.Verify(x => x.SaveToBlob(It.IsAny<string>(), It.IsAny<string>()), Times.Exactly(cvPartnerUserDtos.Count));
     }
 }

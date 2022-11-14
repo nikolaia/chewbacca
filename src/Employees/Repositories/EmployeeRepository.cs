@@ -10,7 +10,7 @@ public class EmployeesRepository
 
     public EmployeesRepository(EmployeeContext db)
     {
-        this._db = db;
+        _db = db;
     }
     public async Task<IEnumerable<Employee>> GetAllEmployees()
     {
@@ -18,7 +18,7 @@ public class EmployeesRepository
         return employees.Select(ModelConverters.ToEmployee);
     }
 
-    public async Task AddToDatabase(EmployeeEntity employee)
+    public async Task AddToDatabase(EmployeeEntity employee, string imageURL)
     {
         EmployeeEntity? updateEmployee = await _db.Employees.SingleOrDefaultAsync(e => e.Email == employee.Email);
 
@@ -26,7 +26,7 @@ public class EmployeesRepository
         {
             updateEmployee.Email = employee.Email;
             updateEmployee.Name = employee.Name;
-            updateEmployee.ImageUrl = employee.ImageUrl;
+            updateEmployee.ImageUrl = imageURL;
             updateEmployee.Telephone = employee.Telephone;
             updateEmployee.OfficeName = employee.OfficeName;
         }

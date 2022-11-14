@@ -20,8 +20,8 @@ public class EmployeesService {
         return _employeesRepository.GetAllEmployees();
     }
 
-    public Task AddOrUpdateEmployee(EmployeeEntity employee)
+    public Task AddOrUpdateEmployee(EmployeeEntity employee, string imageURL)
     {
-        return _employeesRepository.AddToDatabase(employee);
+        return _employeesRepository.AddToDatabase(employee, imageURL);
     }
 }

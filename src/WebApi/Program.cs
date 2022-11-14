@@ -1,5 +1,8 @@
 using Azure.Identity;
 
+using BlobStorage.Repositories;
+using BlobStorage.Service;
+
 using CvPartner.Repositories;
 using CvPartner.Service;
 
@@ -42,6 +45,10 @@ builder.Services.AddScoped<CvPartnerService>();
 builder.Services.AddScoped<CvPartnerRepository>();
 builder.Services.AddScoped<EmployeesService>();
 builder.Services.AddScoped<EmployeesRepository>();
+
+//BlobStorage
+builder.Services.AddScoped<BlobStorageService>();
+builder.Services.AddScoped<IBlobStorageRepository, BlobStorageRepository>();
 
 // Refit
 builder.Services.AddRefitClient<ICvPartnerApiClient>()
