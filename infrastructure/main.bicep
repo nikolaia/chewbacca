@@ -52,7 +52,7 @@ resource web 'Microsoft.Web/sites@2020-12-01' = {
     httpsOnly: true
     serverFarmId: plan.id
     siteConfig: {
-      linuxFxVersion: 'DOTNETCORE|6.0'
+      linuxFxVersion: 'DOTNETCORE|7.0'
       minTlsVersion: '1.2'
       httpLoggingEnabled: true
       logsDirectorySizeLimit: 35
