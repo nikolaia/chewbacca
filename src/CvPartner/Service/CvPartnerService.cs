@@ -12,16 +12,14 @@ public class CvPartnerService
 {
     private readonly CvPartnerRepository _cvPartnerRepository;
     private readonly EmployeesService _employeeService;
-    private readonly BemanningRepository _bemanningRepository;
 
-    public CvPartnerService(CvPartnerRepository _cvPartnerRepository, EmployeesService _employeeService, BemanningRepository bemanningRepository)
+    public CvPartnerService(CvPartnerRepository _cvPartnerRepository, EmployeesService _employeeService)
     {
         this._cvPartnerRepository = _cvPartnerRepository;
         this._employeeService = _employeeService;
-        _bemanningRepository = bemanningRepository;
     }
 
-    private static EmployeeEntity ConvertToEmployeeEntity(CVPartnerUserDTO dto, DateTime startDate)
+    private static EmployeeEntity ConvertToEmployeeEntity(CVPartnerUserDTO dto)
     {
         EmployeeEntity employee = new()
         {
@@ -30,7 +28,6 @@ public class CvPartnerService
             Telephone = dto.telephone,
             OfficeName = dto.office_name,
             ImageUrl = dto.image.url,
-            StartDate = startDate
         };
         return employee;
     }
@@ -42,17 +39,11 @@ public class CvPartnerService
     public async Task GetCvPartnerEmployees()
     {
         var cvPartnerUserDTOs = await _cvPartnerRepository.GetAllEmployees();
-        List<BemanningEmployee> bemanningEmployeeDTO = await _bemanningRepository.GetBemanningDataForEmployees();
-        // var employeeEntities = cvPartnerUserDTOs.Select(ConvertToEmployeeEntity);
 
         foreach (CVPartnerUserDTO cvPartnerUser in cvPartnerUserDTOs)
         {
-            BemanningEmployee? employeeStartDate = bemanningEmployeeDTO.Find(e => e.Email == cvPartnerUser.email);
-            if (employeeStartDate != null)
-            {
-                EmployeeEntity convertedEmployee = ConvertToEmployeeEntity(cvPartnerUser, employeeStartDate.StartDate);
+            EmployeeEntity convertedEmployee = ConvertToEmployeeEntity(cvPartnerUser);
                 await _employeeService.AddOrUpdateEmployee(convertedEmployee);
-            }
         }
     }
 }
