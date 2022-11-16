@@ -1,5 +1,3 @@
-using Bemanning;
-
 using CvPartner.Models;
 using CvPartner.Repositories;
 
@@ -39,11 +37,10 @@ public class CvPartnerService
     public async Task GetCvPartnerEmployees()
     {
         var cvPartnerUserDTOs = await _cvPartnerRepository.GetAllEmployees();
-
-        foreach (CVPartnerUserDTO cvPartnerUser in cvPartnerUserDTOs)
+        IEnumerable<EmployeeEntity> employeeEntities = cvPartnerUserDTOs.Select(ConvertToEmployeeEntity);
+        foreach (EmployeeEntity employeeEntity in employeeEntities)
         {
-            EmployeeEntity convertedEmployee = ConvertToEmployeeEntity(cvPartnerUser);
-                await _employeeService.AddOrUpdateEmployee(convertedEmployee);
+            await _employeeService.AddOrUpdateEmployee(employeeEntity);
         }
     }
 }
