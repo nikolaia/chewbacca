@@ -1,3 +1,5 @@
+using Bemanning;
+
 using CvPartner.Models;
 using CvPartner.Repositories;
 
@@ -10,20 +12,27 @@ public class CvPartnerService
 {
     private readonly CvPartnerRepository _cvPartnerRepository;
     private readonly EmployeesService _employeeService;
+    private readonly BemanningRepository _bemanningRepository;
 
-    public CvPartnerService(CvPartnerRepository _cvPartnerRepository, EmployeesService _employeeService) {
+    public CvPartnerService(CvPartnerRepository _cvPartnerRepository, EmployeesService _employeeService, BemanningRepository bemanningRepository)
+    {
         this._cvPartnerRepository = _cvPartnerRepository;
         this._employeeService = _employeeService;
+        _bemanningRepository = bemanningRepository;
     }
 
-    private static EmployeeEntity ConvertToEmployeeEntity(CVPartnerUserDTO dto) {
-        return new EmployeeEntity {
+    private static EmployeeEntity ConvertToEmployeeEntity(CVPartnerUserDTO dto, DateTime startDate)
+    {
+        EmployeeEntity employee = new()
+        {
             Name = dto.name,
             Email = dto.email,
             Telephone = dto.telephone,
             OfficeName = dto.office_name,
-            ImageUrl = dto.image.url
+            ImageUrl = dto.image.url,
+            StartDate = startDate
         };
+        return employee;
     }
 
     /**
@@ -33,12 +42,17 @@ public class CvPartnerService
     public async Task GetCvPartnerEmployees()
     {
         var cvPartnerUserDTOs = await _cvPartnerRepository.GetAllEmployees();
-        
-        var employeeEntities = cvPartnerUserDTOs.Select(ConvertToEmployeeEntity);
+        List<BemanningEmployee> bemanningEmployeeDTO = await _bemanningRepository.GetBemanningDataForEmployees();
+        // var employeeEntities = cvPartnerUserDTOs.Select(ConvertToEmployeeEntity);
 
-        foreach (var employeeEntity in employeeEntities)
+        foreach (CVPartnerUserDTO cvPartnerUser in cvPartnerUserDTOs)
         {
-            await _employeeService.AddOrUpdateEmployee(employeeEntity);
+            BemanningEmployee? employeeStartDate = bemanningEmployeeDTO.Find(e => e.Email == cvPartnerUser.email);
+            if (employeeStartDate != null)
+            {
+                EmployeeEntity convertedEmployee = ConvertToEmployeeEntity(cvPartnerUser, employeeStartDate.StartDate);
+                await _employeeService.AddOrUpdateEmployee(convertedEmployee);
+            }
         }
     }
 }
