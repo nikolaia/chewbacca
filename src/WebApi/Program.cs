@@ -13,6 +13,10 @@ using Microsoft.EntityFrameworkCore;
 
 using Refit;
 
+using Scheduler;
+using Scheduler.Repositories;
+using Scheduler.Service;
+
 using Shared;
 using Shared.AzureIdentity;
 
@@ -47,6 +51,10 @@ builder.Services.AddScoped<EmployeesRepository>();
 
 // Bemanning
 builder.Services.AddScoped<BemanningRepository>();
+
+// Scheduler
+builder.Services.AddScoped<SchedulerService>();
+builder.Services.AddScoped<SchedulerRepository>();
 
 
 // Refit

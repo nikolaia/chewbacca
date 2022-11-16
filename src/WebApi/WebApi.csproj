@@ -28,6 +28,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Bemanning\Bemanning.csproj" />
     <ProjectReference Include="..\Employees\Employees.csproj" />
+    <ProjectReference Include="..\Scheduler\Scheduler.csproj" />
     <ProjectReference Include="..\Shared\Shared.csproj" />
     <ProjectReference Include="..\CvPartner\CvPartner.csproj" />
   </ItemGroup>
