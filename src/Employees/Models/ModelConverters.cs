@@ -22,7 +22,8 @@ public class ModelConverters
             Email = employeeEntity.Email,
             Telephone = employeeEntity.Telephone,
             ImageUrl = employeeEntity.ImageUrl,
-            OfficeName = employeeEntity.OfficeName
+            OfficeName = employeeEntity.OfficeName,
+            StartDate = employeeEntity.StartDate
         };
     }
 }

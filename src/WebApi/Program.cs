@@ -1,5 +1,7 @@
 using Azure.Identity;
 
+using Bemanning;
+
 using BlobStorage.Repositories;
 using BlobStorage.Service;
 
@@ -17,7 +19,7 @@ using Refit;
 using Shared;
 using Shared.AzureIdentity;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
@@ -31,13 +33,13 @@ builder.Configuration
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
     // appsettings.Local.json is in the .gitignore. Using a local config instead of userSecrets to avoid references in the .csproj:
-    .AddJsonFile($"appsettings.Local.json", optional: true, reloadOnChange: true)
+    .AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true)
     .AddEnvironmentVariables();
 
 // Bind configuration "TestApp:Settings" section to the Settings object
-var appSettingsSection = builder.Configuration
+IConfigurationSection appSettingsSection = builder.Configuration
     .GetSection("AppSettings");
-var appSettings = appSettingsSection.Get<AppSettings>();
+AppSettings? appSettings = appSettingsSection.Get<AppSettings>();
 
 builder.Services.AddSingleton(new AzureServiceTokenProvider());
 
@@ -45,6 +47,9 @@ builder.Services.AddScoped<CvPartnerService>();
 builder.Services.AddScoped<CvPartnerRepository>();
 builder.Services.AddScoped<EmployeesService>();
 builder.Services.AddScoped<EmployeesRepository>();
+
+// Bemanning
+builder.Services.AddScoped<BemanningRepository>();
 
 //BlobStorage
 builder.Services.AddScoped<BlobStorageService>();

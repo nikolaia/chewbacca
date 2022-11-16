@@ -29,6 +29,7 @@ public class EmployeesRepository
             updateEmployee.ImageUrl = employee.ImageUrl;
             updateEmployee.Telephone = employee.Telephone;
             updateEmployee.OfficeName = employee.OfficeName;
+            updateEmployee.StartDate = employee.StartDate;
         }
         else
         {

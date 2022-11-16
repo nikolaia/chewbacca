@@ -30,10 +30,10 @@ public class BemanningRepository
            """";
 
         // Retrieve all rows
-        await using var cmd = dataSource.CreateCommand(bemanningCommand);
-        await using var reader = await cmd.ExecuteReaderAsync();
+        await using NpgsqlCommand cmd = dataSource.CreateCommand(bemanningCommand);
+        await using NpgsqlDataReader reader = await cmd.ExecuteReaderAsync();
 
-        var bemanningEmployees = new List<BemanningEmployee>();
+        List<BemanningEmployee> bemanningEmployees = new();
         while (await reader.ReadAsync())
         {
             bemanningEmployees.Add(
@@ -46,16 +46,19 @@ public class BemanningRepository
 
     private static DateTime FirstDateOfWeekISO8601(int weekOfYear)
     {
-        var jan1 = new DateTime(DateTime.UtcNow.Year, 1, 1);
-        var daysOffset = DayOfWeek.Thursday - jan1.DayOfWeek;
+        int year = weekOfYear / 100;
+        int week = weekOfYear % year;
+        // https://stackoverflow.com/questions/662379/calculate-date-from-week-number
+        DateTime jan1 = new(year, month: 1, day: 1);
+        int daysOffset = DayOfWeek.Thursday - jan1.DayOfWeek;
 
         // Use first Thursday in January to get first week of the year as
         // it will never be in Week 52/53
         DateTime firstThursday = jan1.AddDays(daysOffset);
         var cal = CultureInfo.CurrentCulture.Calendar;
-        var firstWeek = cal.GetWeekOfYear(firstThursday, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+        int firstWeek = cal.GetWeekOfYear(firstThursday, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
 
-        var weekNum = weekOfYear;
+        int weekNum = week;
         // As we're adding days to a date in Week 1,
         // we need to subtract 1 in order to get the right date for week #1
         if (firstWeek == 1)
