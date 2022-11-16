@@ -21,9 +21,7 @@
     </ItemGroup>
     
     <ItemGroup>
-        <ProjectReference Include="..\Bemanning\Bemanning.csproj" />
         <ProjectReference Include="..\Shared\Shared.csproj" />
-        <ProjectReference Include="..\Employees\Employees.csproj" />
     </ItemGroup>
 
 </Project>
