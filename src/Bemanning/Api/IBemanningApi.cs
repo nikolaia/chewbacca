@@ -1,5 +1,5 @@
-using Microsoft.AspNetCore.Mvc;
 
+using Microsoft.AspNetCore.Mvc;
 namespace Bemanning.Api;
 
 public interface IBemanningApi
