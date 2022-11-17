@@ -24,7 +24,6 @@ public class CvPartnerService
         _employeeService = employeeService;
         _blobStorageService = blobStorageService;
         _bemanningRepository = bemanningRepository;
-
     }
 
     private static EmployeeEntity ConvertToEmployeeEntity(CVPartnerUserDTO dto)
