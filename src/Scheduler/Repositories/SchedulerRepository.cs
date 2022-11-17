@@ -34,6 +34,11 @@ public class SchedulerRepository
                     EmployeeEntity employee = ConvertToEmployeeEntityWithStartDate(cvPartnerDTO, matchingEmployee.StartDate);
                     await _employeesService.AddOrUpdateEmployee(employee);
                 }
+                else
+                {
+                    EmployeeEntity employee = ConvertToEmployeeEntity(cvPartnerDTO);
+                    await _employeesService.AddOrUpdateEmployee(employee);
+                }
             }
         }
     }
@@ -48,6 +53,18 @@ public class SchedulerRepository
             ImageUrl = cvPartnerUserDto.image.url,
             OfficeName = cvPartnerUserDto.office_name,
             StartDate = startDate
+        };
+    }
+
+    private EmployeeEntity ConvertToEmployeeEntity(CVPartnerUserDTO cvPartnerUserDto)
+    {
+        return new EmployeeEntity
+        {
+            Name = cvPartnerUserDto.name,
+            Email = cvPartnerUserDto.email,
+            Telephone = cvPartnerUserDto.telephone,
+            ImageUrl = cvPartnerUserDto.image.url,
+            OfficeName = cvPartnerUserDto.office_name
         };
     }
 }

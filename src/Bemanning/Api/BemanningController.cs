@@ -4,7 +4,7 @@ namespace Bemanning.Api;
 
 [ApiController]
 [Route("[controller]")]
-public class BemanningController
+public class BemanningController : IBemanningApi
 {
     private readonly BemanningRepository _bemanningRepository;
 

@@ -13,7 +13,6 @@ using Microsoft.EntityFrameworkCore;
 
 using Refit;
 
-using Scheduler;
 using Scheduler.Repositories;
 using Scheduler.Service;
 
@@ -44,8 +43,11 @@ AppSettings? appSettings = appSettingsSection.Get<AppSettings>();
 
 builder.Services.AddSingleton(new AzureServiceTokenProvider());
 
+// CvPartner
 builder.Services.AddScoped<CvPartnerService>();
 builder.Services.AddScoped<CvPartnerRepository>();
+
+// Employee
 builder.Services.AddScoped<EmployeesService>();
 builder.Services.AddScoped<EmployeesRepository>();
 

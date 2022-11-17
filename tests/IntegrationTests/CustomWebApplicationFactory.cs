@@ -1,4 +1,7 @@
-﻿using CvPartner.Models;
+﻿using Bemanning;
+using Bemanning.Api;
+
+using CvPartner.Models;
 using CvPartner.Repositories;
 
 using Employees.Repositories;
@@ -8,7 +11,6 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Logging;
 
 using Moq;
 using Moq.AutoMock;
@@ -38,6 +40,10 @@ public class CustomWebApplicationFactory<TStartup>
             var cvPartnerApiMock = Mocker.GetMock<ICvPartnerApiClient>();
             cvPartnerApiMock.Setup(client => client.GetAllEmployee(It.IsAny<string>())).ReturnsAsync(Array.Empty<CVPartnerUserDTO>());
             services.Replace(ServiceDescriptor.Transient(_ => cvPartnerApiMock.Object));
+
+            Mock<IBemanningApi> bemanningApiMock = Mocker.GetMock<IBemanningApi>();
+            bemanningApiMock.Setup(client => client.Get()).ReturnsAsync(new List<BemanningEmployee>());
+            services.Replace(ServiceDescriptor.Transient(_ => bemanningApiMock.Object));
         });
     }
 }

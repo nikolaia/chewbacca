@@ -16,7 +16,7 @@ public class SchedulerController
         _service = service;
     }
 
-    [HttpPost]
+    [HttpGet]
     public async Task TestScheduler()
     {
         await _service.AddEmployeeToDatabase();
