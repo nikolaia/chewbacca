@@ -18,7 +18,7 @@ public class EmployeesRepository
         return employees.Select(ModelConverters.ToEmployee);
     }
 
-    public async Task AddToDatabase(EmployeeEntity employee, string imageURL)
+    public async Task AddToDatabase(EmployeeEntity employee)
     {
         EmployeeEntity? updateEmployee = await _db.Employees.SingleOrDefaultAsync(e => e.Email == employee.Email);
 
@@ -26,7 +26,7 @@ public class EmployeesRepository
         {
             updateEmployee.Email = employee.Email;
             updateEmployee.Name = employee.Name;
-            updateEmployee.ImageUrl = imageURL;
+            updateEmployee.ImageUrl = employee.ImageUrl;
             updateEmployee.Telephone = employee.Telephone;
             updateEmployee.OfficeName = employee.OfficeName;
         }

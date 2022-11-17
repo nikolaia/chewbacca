@@ -42,10 +42,8 @@ public class CvPartnerService
 
         foreach (var employeeEntity in employeeEntities)
         {
-            //TODO: Udate tests after added function
-            //TODO: Improve runtime
-            var blobURL = await _blobStorageService.UploadStream(employeeEntity.Name, employeeEntity.ImageUrl); 
-            await _employeeService.AddOrUpdateEmployee(employeeEntity, blobURL);
+            employeeEntity.ImageUrl = await _blobStorageService.UploadStream(employeeEntity.Name, employeeEntity.ImageUrl);
+            await _employeeService.AddOrUpdateEmployee(employeeEntity);
         }
     }
 }

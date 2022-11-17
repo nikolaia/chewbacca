@@ -32,7 +32,6 @@ public class BlobStorageRepository: IBlobStorageRepository
     {
         Uri uri = new(employeeImageUri);
         BlobContainerClient container = new(_settings.Value.BlobStorage.ConnectionString.ToString(), _settings.Value.BlobStorage.ContainerName);
-        //TODO: Add check for when to push blob to storage. If imgDate differ from the old? overwrite
         var blockBlobClient = container.GetBlockBlobClient(employeeName + ".png");
         var status = await blockBlobClient.StartCopyFromUriAsync(uri);
         await status.WaitForCompletionAsync();

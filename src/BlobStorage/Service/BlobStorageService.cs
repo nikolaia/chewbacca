@@ -24,6 +24,7 @@ public class BlobStorageService
         {
             return await _blobStorageRepository.SaveToBlob(employeeName, employeeImageUri);
         }
-        else return "";
+
+        return null;
     }
 }
