@@ -10,7 +10,7 @@ public class EmployeesRepository
 
     public EmployeesRepository(EmployeeContext db)
     {
-        this._db = db;
+        _db = db;
     }
     public async Task<IEnumerable<Employee>> GetAllEmployees()
     {
