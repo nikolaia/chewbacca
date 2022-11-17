@@ -58,7 +58,8 @@ public class BemanningRepository
         var cal = CultureInfo.CurrentCulture.Calendar;
         int firstWeek = cal.GetWeekOfYear(firstThursday, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
 
-        int weekNum = week;
+        // Add 1 so it starts on the first week after last "inactive" day
+        int weekNum = week + 1;
         // As we're adding days to a date in Week 1,
         // we need to subtract 1 in order to get the right date for week #1
         if (firstWeek == 1)
