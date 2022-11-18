@@ -10,14 +10,14 @@ using Employees.Service;
 
 namespace Orchestrator.Repositories;
 
-public class OrchastratorRepository
+public class OrchestratorRepository
 {
     private readonly EmployeesService _employeesService;
     private readonly CvPartnerService _cvPartnerService;
     private readonly IBemanningRepository _bemanningRepository;
     private readonly BlobStorageService _blobStorageService;
 
-    public OrchastratorRepository(EmployeesService employeesService, CvPartnerService cvPartnerService, IBemanningRepository bemanningRepository,
+    public OrchestratorRepository(EmployeesService employeesService, CvPartnerService cvPartnerService, IBemanningRepository bemanningRepository,
         BlobStorageService blobStorageService)
     {
         _employeesService = employeesService;
@@ -26,24 +26,24 @@ public class OrchastratorRepository
         _blobStorageService = blobStorageService;
     }
 
-    public async Task PostEmployee()
+    public async Task FetchMapAndSaveEmployeeData()
     {
-        IEnumerable<CVPartnerUserDTO> cvPartnerDTOs = await _cvPartnerService.GetCvPartnerEmployees();
-        List<BemanningEmployee> BemanningDTOs = await _bemanningRepository.GetBemanningDataForEmployees();
+        var cvPartnerDTOs = await _cvPartnerService.GetCvPartnerEmployees();
+        var BemanningDTOs = await _bemanningRepository.GetBemanningDataForEmployees();
         foreach (CVPartnerUserDTO cvPartnerDTO in cvPartnerDTOs)
         {
             cvPartnerDTO.image.url = await _blobStorageService.UploadStream(cvPartnerDTO.name, cvPartnerDTO.image.url);
 
-            BemanningEmployee? matchingEmployee = BemanningDTOs.Find(e => e.Email == cvPartnerDTO.email);
+            var matchingEmployee = BemanningDTOs.Find(e => e.Email == cvPartnerDTO.email);
             {
                 if (matchingEmployee != null)
                 {
-                    EmployeeEntity employee = ConvertToEmployeeEntityWithStartDate(cvPartnerDTO, matchingEmployee.StartDate);
+                    var employee = ConvertToEmployeeEntityWithStartDate(cvPartnerDTO, matchingEmployee.StartDate);
                     await _employeesService.AddOrUpdateEmployee(employee);
                 }
                 else
                 {
-                    EmployeeEntity employee = ConvertToEmployeeEntity(cvPartnerDTO);
+                    var employee = ConvertToEmployeeEntity(cvPartnerDTO);
                     await _employeesService.AddOrUpdateEmployee(employee);
                 }
             }

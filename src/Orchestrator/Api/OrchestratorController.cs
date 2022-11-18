@@ -8,17 +8,17 @@ namespace Orchestrator.Api;
 [Route("[controller]")]
 public class OrchestratorController : ControllerBase
 {
-    private readonly OrchastratorService _orchastratorService;
+    private readonly OrchestratorService _orchestratorService;
 
-    public OrchestratorController(OrchastratorService orchastratorService)
+    public OrchestratorController(OrchestratorService orchestratorService)
     {
-        _orchastratorService = orchastratorService;
+        _orchestratorService = orchestratorService;
     }
 
     [HttpGet]
     public async Task<IActionResult> Get()
     {
-        await _orchastratorService.AddEmployeeToDatabase();
+        await _orchestratorService.AddEmployeeToDatabase();
         return Ok();
     }
 }

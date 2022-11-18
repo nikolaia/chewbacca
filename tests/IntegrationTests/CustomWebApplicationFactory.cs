@@ -43,7 +43,7 @@ public class CustomWebApplicationFactory<TStartup>
             services.Replace(ServiceDescriptor.Transient(_ => cvPartnerApiMock.Object));
             
             // Creates mock of Bemanning Repository
-            Mock<IBemanningRepository> bemanningRepositoryMock = Mocker.GetMock<IBemanningRepository>();
+            var bemanningRepositoryMock = Mocker.GetMock<IBemanningRepository>();
             bemanningRepositoryMock.Setup(clinet => clinet.GetBemanningDataForEmployees()).ReturnsAsync(new List<BemanningEmployee>());
             services.Replace(ServiceDescriptor.Transient(_ => bemanningRepositoryMock.Object));
             

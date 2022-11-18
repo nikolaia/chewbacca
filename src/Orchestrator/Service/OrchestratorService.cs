@@ -2,17 +2,17 @@ using Orchestrator.Repositories;
 
 namespace Orchestrator.Service;
 
-public class OrchastratorService
+public class OrchestratorService
 {
-    private readonly OrchastratorRepository _orchastratorRepository;
+    private readonly OrchestratorRepository _orchestratorRepository;
 
-    public OrchastratorService(OrchastratorRepository orchastratorRepository)
+    public OrchestratorService(OrchestratorRepository orchestratorRepository)
     {
-        _orchastratorRepository = orchastratorRepository;
+        _orchestratorRepository = orchestratorRepository;
     }
 
     public async Task AddEmployeeToDatabase()
     {
-        await _orchastratorRepository.PostEmployee();
+        await _orchestratorRepository.FetchMapAndSaveEmployeeData();
     }
 }

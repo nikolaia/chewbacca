@@ -59,8 +59,8 @@ builder.Services.AddScoped<BlobStorageService>();
 builder.Services.AddScoped<IBlobStorageRepository, BlobStorageRepository>();
 
 // Orchestrator
-builder.Services.AddScoped<OrchastratorService>();
-builder.Services.AddScoped<OrchastratorRepository>();
+builder.Services.AddScoped<OrchestratorService>();
+builder.Services.AddScoped<OrchestratorRepository>();
 
 // Refit
 builder.Services.AddRefitClient<ICvPartnerApiClient>()
