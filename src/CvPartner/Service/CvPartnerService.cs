@@ -15,10 +15,10 @@ public class CvPartnerService
     private readonly CvPartnerRepository _cvPartnerRepository;
     private readonly EmployeesService _employeeService;
     private readonly BlobStorageService _blobStorageService;
-    private readonly BemanningRepository _bemanningRepository;
+    private readonly IBemanningReository _bemanningRepository;
 
     public CvPartnerService(CvPartnerRepository cvPartnerRepository, EmployeesService employeeService, BlobStorageService blobStorageService,
-        BemanningRepository bemanningRepository)
+        IBemanningReository bemanningRepository)
     {
         _cvPartnerRepository = cvPartnerRepository;
         _employeeService = employeeService;
@@ -45,16 +45,20 @@ public class CvPartnerService
     public async Task GetCvPartnerEmployees()
     {
         var cvPartnerUserDTOs = await _cvPartnerRepository.GetAllEmployees();
-        List<BemanningEmployee> bemanningEmployeeDTO = await _bemanningRepository.GetBemanningDataForEmployees();
+        var bemanningEmployeeDTO = await _bemanningRepository.GetBemanningDataForEmployees();
         var employeeEntities = cvPartnerUserDTOs.Select(ConvertToEmployeeEntity);
 
         foreach (var employeeEntity in employeeEntities)
         {
             employeeEntity.ImageUrl = await _blobStorageService.UploadStream(employeeEntity.Name, employeeEntity.ImageUrl);
-            BemanningEmployee? matchingBemanningEmployee = bemanningEmployeeDTO.Find(e => e.Email == employeeEntity.Email);
+            var matchingBemanningEmployee = bemanningEmployeeDTO.Find(e => e.Email == employeeEntity.Email);
             if (matchingBemanningEmployee != null)
             {
                 employeeEntity.StartDate = matchingBemanningEmployee.StartDate;
+                await _employeeService.AddOrUpdateEmployee(employeeEntity);
+            }
+            else
+            {
                 await _employeeService.AddOrUpdateEmployee(employeeEntity);
             }
         }

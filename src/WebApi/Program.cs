@@ -19,7 +19,7 @@ using Refit;
 using Shared;
 using Shared.AzureIdentity;
 
-WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
@@ -37,9 +37,9 @@ builder.Configuration
     .AddEnvironmentVariables();
 
 // Bind configuration "TestApp:Settings" section to the Settings object
-IConfigurationSection appSettingsSection = builder.Configuration
+var appSettingsSection = builder.Configuration
     .GetSection("AppSettings");
-AppSettings? appSettings = appSettingsSection.Get<AppSettings>();
+var appSettings = appSettingsSection.Get<AppSettings>();
 
 builder.Services.AddSingleton(new AzureServiceTokenProvider());
 
@@ -49,7 +49,7 @@ builder.Services.AddScoped<EmployeesService>();
 builder.Services.AddScoped<EmployeesRepository>();
 
 // Bemanning
-builder.Services.AddScoped<BemanningRepository>();
+builder.Services.AddScoped<IBemanningReository, BemanningRepository>();
 
 //BlobStorage
 builder.Services.AddScoped<BlobStorageService>();
