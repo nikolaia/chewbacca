@@ -23,6 +23,6 @@ public record AppSettings
     public bool UseAzureAppConfig { get; set; }
     public Healthcheck Healthcheck { get; set; }
     public CvPartnerConfig CvPartner { get; set; }
-    
+    public string BemanningConnectionString { get; set; }
     public BlobStorageConfig BlobStorage { get; set; }
 }

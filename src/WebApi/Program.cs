@@ -1,5 +1,7 @@
 using Azure.Identity;
 
+using Bemanning;
+
 using BlobStorage.Repositories;
 using BlobStorage.Service;
 
@@ -31,7 +33,7 @@ builder.Configuration
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
     // appsettings.Local.json is in the .gitignore. Using a local config instead of userSecrets to avoid references in the .csproj:
-    .AddJsonFile($"appsettings.Local.json", optional: true, reloadOnChange: true)
+    .AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true)
     .AddEnvironmentVariables();
 
 // Bind configuration "TestApp:Settings" section to the Settings object
@@ -45,6 +47,9 @@ builder.Services.AddScoped<CvPartnerService>();
 builder.Services.AddScoped<CvPartnerRepository>();
 builder.Services.AddScoped<EmployeesService>();
 builder.Services.AddScoped<EmployeesRepository>();
+
+// Bemanning
+builder.Services.AddScoped<IBemanningReository, BemanningRepository>();
 
 //BlobStorage
 builder.Services.AddScoped<BlobStorageService>();

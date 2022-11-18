@@ -1,4 +1,6 @@
-﻿using BlobStorage.Repositories;
+﻿using Bemanning;
+
+using BlobStorage.Repositories;
 using BlobStorage.Service;
 
 using CvPartner.Models;
@@ -40,6 +42,11 @@ public class CustomWebApplicationFactory<TStartup>
             var cvPartnerApiMock = Mocker.GetMock<ICvPartnerApiClient>();
             cvPartnerApiMock.Setup(client => client.GetAllEmployee(It.IsAny<string>())).ReturnsAsync(Array.Empty<CVPartnerUserDTO>());
             services.Replace(ServiceDescriptor.Transient(_ => cvPartnerApiMock.Object));
+            
+            // Creates mock of Bemanning Repository
+            var bemanningRepositoryMock = Mocker.GetMock<IBemanningReository>();
+            bemanningRepositoryMock.Setup(clinet => clinet.GetBemanningDataForEmployees()).ReturnsAsync(new List<BemanningEmployee>());
+            services.Replace(ServiceDescriptor.Transient(_ => bemanningRepositoryMock.Object));
             
             // Creates mock of BlobStorageRepository and replaces it in program.cs. Returns string "test"
             var blobStorageServiceMock = Mocker.GetMock<IBlobStorageRepository>();

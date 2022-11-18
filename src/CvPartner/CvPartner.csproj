@@ -21,9 +21,10 @@
     </ItemGroup>
     
     <ItemGroup>
-        <ProjectReference Include="..\BlobStorage\BlobStorage.csproj"/>
-        <ProjectReference Include="..\Shared\Shared.csproj"/>
-        <ProjectReference Include="..\Employees\Employees.csproj"/>
+        <ProjectReference Include="..\Bemanning\Bemanning.csproj" />
+        <ProjectReference Include="..\BlobStorage\BlobStorage.csproj" />
+        <ProjectReference Include="..\Shared\Shared.csproj" />
+        <ProjectReference Include="..\Employees\Employees.csproj" />
     </ItemGroup>
 
 </Project>
