@@ -60,7 +60,7 @@ public class CvPartnerTest :
         db.Employees.Count().Should().Be(cvPartnerUserDtos.Count);
         //Check if updated date from Bemanning
         db.Employees.FirstOrDefault().StartDate.Should().NotBe(new DateTime(2018, 1, 1));
-        
+
         // Check if blobService runs x amount of times
         var blobStorageServiceMocker = _mocker.GetMock<IBlobStorageRepository>(); 
         blobStorageServiceMocker.Verify(x => x.SaveToBlob(It.IsAny<string>(), It.IsAny<string>()), Times.Exactly(cvPartnerUserDtos.Count));
