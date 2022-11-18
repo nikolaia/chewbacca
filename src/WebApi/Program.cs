@@ -52,7 +52,7 @@ builder.Services.AddScoped<EmployeesService>();
 builder.Services.AddScoped<EmployeesRepository>();
 
 // Bemanning
-builder.Services.AddScoped<BemanningRepository>();
+builder.Services.AddScoped<IBemanningRepository, BemanningRepository>();
 
 // Scheduler
 builder.Services.AddScoped<SchedulerService>();

@@ -45,11 +45,6 @@ public class CvPartnerTest :
     {
         // Arrange
         cvPartnerUserDtos.FirstOrDefault().email = bemanningEmployees.FirstOrDefault().Email;
-        foreach (var VARIABLE in bemanningEmployees)
-        {
-            Console.WriteLine("LOOP B E: " + VARIABLE.Email);   
-            Console.WriteLine("LOOP B S: " + VARIABLE.StartDate);   
-        }
         var cvPartnerApiClientMock = _mocker.GetMock<ICvPartnerApiClient>();
         var returnCV  = cvPartnerApiClientMock.Setup(client => client.GetAllEmployee(It.IsAny<string>())).ReturnsAsync(cvPartnerUserDtos);
 
@@ -66,24 +61,7 @@ public class CvPartnerTest :
         var db = scope.ServiceProvider.GetRequiredService<EmployeeContext>();
         db.Employees.Count().Should().Be(cvPartnerUserDtos.Count);
 
-        Check_If_Employee_StartDate_Is_Updated(db.Employees);
-        //Check_If_Employee_StartDate_Is_Updated(db.Employees).Should().BeTrue();
-    }
-
-    public Boolean Check_If_Employee_StartDate_Is_Updated(DbSet<EmployeeEntity> employees)
-    {
-        DateTime dateToCheck = new(year: 1, month: 1, day: 1);
-        foreach (EmployeeEntity employee in employees)
-        {
-            if (employee.StartDate != dateToCheck)
-            {
-                Console.WriteLine("true");
-            }
-
-            Console.WriteLine(employee.StartDate);
-            Console.WriteLine(employee.Email);
-        }
-
-        return false;
+        // Check_If_Employee_StartDate_Is_Updated(db.Employees).Should().BeTrue();
+        db.Employees.FirstOrDefault().Should().NotBe(new DateTime(1, 1, 1));
     }
 }

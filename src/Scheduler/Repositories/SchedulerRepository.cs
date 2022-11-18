@@ -12,9 +12,9 @@ public class SchedulerRepository
 {
     private readonly EmployeesService _employeesService;
     private readonly CvPartnerService _cvPartnerService;
-    private readonly BemanningRepository _bemanningRepository;
+    private readonly IBemanningRepository _bemanningRepository;
 
-    public SchedulerRepository(EmployeesService employeesService, CvPartnerService cvPartnerService, BemanningRepository bemanningRepository)
+    public SchedulerRepository(EmployeesService employeesService, CvPartnerService cvPartnerService, IBemanningRepository bemanningRepository)
     {
         _employeesService = employeesService;
         _cvPartnerService = cvPartnerService;
