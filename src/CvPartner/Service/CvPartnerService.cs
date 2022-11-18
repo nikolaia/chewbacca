@@ -1,41 +1,15 @@
-using Bemanning;
-
-using BlobStorage.Service;
-
 using CvPartner.Models;
 using CvPartner.Repositories;
-
-using Employees.Models;
-using Employees.Service;
 
 namespace CvPartner.Service;
 
 public class CvPartnerService
 {
     private readonly CvPartnerRepository _cvPartnerRepository;
-    private readonly EmployeesService _employeeService;
-    private readonly BlobStorageService _blobStorageService;
-    private readonly IBemanningRepository _bemanningRepository;
 
-    public CvPartnerService(CvPartnerRepository cvPartnerRepository, EmployeesService employeeService, BlobStorageService blobStorageService,
-        IBemanningRepository bemanningRepository)
+    public CvPartnerService(CvPartnerRepository cvPartnerRepository)
     {
         _cvPartnerRepository = cvPartnerRepository;
-        _employeeService = employeeService;
-        _blobStorageService = blobStorageService;
-        _bemanningRepository = bemanningRepository;
-    }
-
-    private static EmployeeEntity ConvertToEmployeeEntity(CVPartnerUserDTO dto)
-    {
-        return new EmployeeEntity
-        {
-            Name = dto.name,
-            Email = dto.email,
-            Telephone = dto.telephone,
-            OfficeName = dto.office_name,
-            ImageUrl = dto.image.url
-        };
     }
 
     /**

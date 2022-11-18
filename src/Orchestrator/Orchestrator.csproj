@@ -10,6 +10,7 @@
         <ProjectReference Include="..\Bemanning\Bemanning.csproj" />
         <ProjectReference Include="..\CvPartner\CvPartner.csproj" />
         <ProjectReference Include="..\Employees\Employees.csproj" />
+        <ProjectReference Include="..\BlobStorage\BlobStorage.csproj" />
     </ItemGroup>
     
     <ItemGroup>
