@@ -56,6 +56,9 @@ Work in progress. Se i `infrastructure`-mappa
 az deployment group create --resource-group my-test-group --template-file .\infrastructure\azuredeploy.bicep --location westeurope`
 ```
 
+## Struktur
+Skisse over hvordan applikasjonen er bygget opp finner man [her](./docs/Structure/Structure.md)
+
 ## Feilsøking
 
 ### Bygg feiler på MacOS med Norsk systemspråk
