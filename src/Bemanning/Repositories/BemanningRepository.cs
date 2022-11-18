@@ -17,6 +17,9 @@ public class BemanningRepository: IBemanningReository
         _appSettings = appSettings;
     }
 
+    /**
+     * <summary>Returns a email and a start date</summary>
+     */
     public async Task<List<BemanningEmployee>> GetBemanningDataForEmployees()
     {
         await using var dataSource = NpgsqlDataSource.Create(_appSettings.Value.BemanningConnectionString);
@@ -44,6 +47,10 @@ public class BemanningRepository: IBemanningReository
         return bemanningEmployees;
     }
 
+    /**
+     * <summary>Calculate and returns the start date</summary>
+     * <param name="weekOfYear">String containing year and start week. on the form yyyyww</param>
+     */
     private static DateTime FirstDateOfWeekISO8601(int weekOfYear)
     {
         int year = weekOfYear / 100;
@@ -76,4 +83,8 @@ public class BemanningRepository: IBemanningReository
     }
 }
 
+/**
+ * <param name="Email">Users email</param>
+ * <param name="StartDate">Users start date</param>
+ */
 public record BemanningEmployee(string Email, DateTime StartDate);
