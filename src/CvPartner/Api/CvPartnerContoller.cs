@@ -1,3 +1,4 @@
+using CvPartner.Models;
 using CvPartner.Service;
 
 using Microsoft.AspNetCore.Mvc;
@@ -16,9 +17,8 @@ public class CvPartnerController : ControllerBase
     }
     
     [HttpGet]
-    public async Task<IActionResult> Get()
+    public async Task<IEnumerable<CVPartnerUserDTO>> Get()
     {
-        await _cvPartnerService.GetCvPartnerEmployees();
-        return Ok();
+        return await _cvPartnerService.GetCvPartnerEmployees();
     }
 }
