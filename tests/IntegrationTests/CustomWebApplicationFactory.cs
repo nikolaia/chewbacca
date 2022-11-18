@@ -1,5 +1,4 @@
 ﻿using Bemanning;
-using Bemanning.Api;
 
 using CvPartner.Models;
 using CvPartner.Repositories;
@@ -41,8 +40,8 @@ public class CustomWebApplicationFactory<TStartup>
             cvPartnerApiMock.Setup(client => client.GetAllEmployee(It.IsAny<string>())).ReturnsAsync(Array.Empty<CVPartnerUserDTO>());
             services.Replace(ServiceDescriptor.Transient(_ => cvPartnerApiMock.Object));
 
-            Mock<IBemanningApi> bemanningApiMock = Mocker.GetMock<IBemanningApi>();
-            bemanningApiMock.Setup(client => client.Get()).ReturnsAsync(new List<BemanningEmployee>());
+            var bemanningApiMock = Mocker.GetMock<IBemanningRepository>();
+            bemanningApiMock.Setup(client => client.GetBemanningDataForEmployees()).ReturnsAsync(new List<BemanningEmployee>());
             services.Replace(ServiceDescriptor.Transient(_ => bemanningApiMock.Object));
         });
     }

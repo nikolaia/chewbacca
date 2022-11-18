@@ -6,7 +6,7 @@ using Shared;
 
 namespace CvPartner.Repositories;
 
-public class CvPartnerRepository
+public class CvPartnerRepository : ICvPartnerRepository
 {
     private readonly IOptionsSnapshot<AppSettings> _appSettings;
     private readonly ICvPartnerApiClient _cvPartnerApiClient;

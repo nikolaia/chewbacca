@@ -8,7 +8,7 @@ using Shared;
 
 namespace Bemanning;
 
-public class BemanningRepository
+public class BemanningRepository: IBemanningRepository
 {
     private readonly IOptionsSnapshot<AppSettings> _appSettings;
 

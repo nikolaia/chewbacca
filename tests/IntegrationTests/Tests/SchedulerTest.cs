@@ -1,7 +1,6 @@
 using AutoFixture.Xunit2;
 
 using Bemanning;
-using Bemanning.Api;
 
 using CvPartner.Models;
 using CvPartner.Repositories;
@@ -18,17 +17,21 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Moq.AutoMock;
 
+using Xunit.Abstractions;
+
 namespace IntegrationTests.Tests;
 
 public class CvPartnerTest :
     IClassFixture<CustomWebApplicationFactory<Program>>
 {
+    private readonly ITestOutputHelper _testOutputHelper;
     private readonly HttpClient _client;
     private readonly AutoMocker _mocker;
     private readonly CustomWebApplicationFactory<Program> _factory;
 
-    public CvPartnerTest()
+    public CvPartnerTest(ITestOutputHelper testOutputHelper)
     {
+        _testOutputHelper = testOutputHelper;
         _factory = new CustomWebApplicationFactory<Program>();
         _client = _factory.CreateClient(new WebApplicationFactoryClientOptions {AllowAutoRedirect = false});
         _mocker = _factory.Mocker;
@@ -41,29 +44,30 @@ public class CvPartnerTest :
         List<BemanningEmployee> bemanningEmployees)
     {
         // Arrange
+        cvPartnerUserDtos.FirstOrDefault().email = bemanningEmployees.FirstOrDefault().Email;
+        foreach (var VARIABLE in bemanningEmployees)
+        {
+            Console.WriteLine("LOOP B E: " + VARIABLE.Email);   
+            Console.WriteLine("LOOP B S: " + VARIABLE.StartDate);   
+        }
         var cvPartnerApiClientMock = _mocker.GetMock<ICvPartnerApiClient>();
-        cvPartnerApiClientMock.Setup(client => client.GetAllEmployee(It.IsAny<string>()))
-            .ReturnsAsync(cvPartnerUserDtos);
+        var returnCV  = cvPartnerApiClientMock.Setup(client => client.GetAllEmployee(It.IsAny<string>())).ReturnsAsync(cvPartnerUserDtos);
 
-        Mock<IBemanningApi> bemanningApiClientMock = _mocker.GetMock<IBemanningApi>();
-        bemanningApiClientMock.Setup(client => client.Get())
+        var bemanningRepositoryMock = _mocker.GetMock<IBemanningRepository>();
+        var returnBemanning = bemanningRepositoryMock.Setup(client => client.GetBemanningDataForEmployees())
             .ReturnsAsync(bemanningEmployees);
-        
-        // Act
-        HttpResponseMessage cvPartnerResponse = await _client.GetAsync("/CvPartner");
-        HttpResponseMessage bemanningResponse = await _client.GetAsync("/Bemanning");
-        HttpResponseMessage schedulerResponse = await _client.GetAsync("/Scheduler");
 
+        // Act
+        HttpResponseMessage schedulerResponse = await _client.GetAsync("/Scheduler");
         // Assert
-        cvPartnerResponse.IsSuccessStatusCode.Should().BeTrue();
-        bemanningResponse.IsSuccessStatusCode.Should().BeTrue();
         schedulerResponse.IsSuccessStatusCode.Should().BeTrue();
         
         using var scope = _factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<EmployeeContext>();
         db.Employees.Count().Should().Be(cvPartnerUserDtos.Count);
 
-        // Check_If_Employee_StartDate_Is_Updated(db.Employees).Should().BeTrue();
+        Check_If_Employee_StartDate_Is_Updated(db.Employees);
+        //Check_If_Employee_StartDate_Is_Updated(db.Employees).Should().BeTrue();
     }
 
     public Boolean Check_If_Employee_StartDate_Is_Updated(DbSet<EmployeeEntity> employees)
@@ -73,8 +77,11 @@ public class CvPartnerTest :
         {
             if (employee.StartDate != dateToCheck)
             {
-                return true;
+                Console.WriteLine("true");
             }
+
+            Console.WriteLine(employee.StartDate);
+            Console.WriteLine(employee.Email);
         }
 
         return false;
