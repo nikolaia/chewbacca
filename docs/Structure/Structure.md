@@ -27,5 +27,5 @@ vil den regne ut startsdatoen. Datoen knyttes til en employee ved å matche med 
 Employee er prosjektet som beskriver hvordan dataen som hentes inn på de interne tjenestene skal se ut.
 Employee har en metode for å få alle employees og lagre en employee til databasen.
 
-
+## Overordnet struktur
 ![Image over structure](../images/Structure.png)
