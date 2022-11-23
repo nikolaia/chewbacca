@@ -37,6 +37,12 @@ EF Code First er benyttet. Det betyr at man endrer i context og entities først,
 ```bash
 dotnet ef migrations add MigrationName
 ```
+For å kjøre opp lokalt trenger man å legge inn Connectionstrings og tokens. Man kan finne dette på
+azure under `chewbacca` Resource gruppen. man må inn på `chewie-kv-ld2ijhpvmb34c` og nøkklene ligger under
+`Secrets`. Connectionstringen til BlobStorage ligger under storage accounten `variantno` og du finner den i tabben
+`Access keys`
+
+lag en appsettings.local.json under [WebApi](src/WebApi) og kopier innholdet i appsettings.json for så å bytte ut replace_me_on_deploy
 
 ## Up and running med ekte integrasjoner
 
@@ -55,6 +61,9 @@ Work in progress. Se i `infrastructure`-mappa
 ```bash
 az deployment group create --resource-group my-test-group --template-file .\infrastructure\azuredeploy.bicep --location westeurope`
 ```
+
+## Struktur
+Skisse over hvordan applikasjonen er bygget opp finner man [her](./docs/Structure/Structure.md)
 
 ## Feilsøking
 
