@@ -1,6 +1,6 @@
 namespace Bemanning;
 
-public interface IBemanningReository
+public interface IBemanningRepository
 {
     Task<List<BemanningEmployee>> GetBemanningDataForEmployees();
 }

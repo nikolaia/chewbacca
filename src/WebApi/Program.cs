@@ -14,6 +14,9 @@ using Employees.Service;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.EntityFrameworkCore;
 
+using Orchestrator.Repositories;
+using Orchestrator.Service;
+
 using Refit;
 
 using Shared;
@@ -49,11 +52,15 @@ builder.Services.AddScoped<EmployeesService>();
 builder.Services.AddScoped<EmployeesRepository>();
 
 // Bemanning
-builder.Services.AddScoped<IBemanningReository, BemanningRepository>();
+builder.Services.AddScoped<IBemanningRepository, BemanningRepository>();
 
-//BlobStorage
+// BlobStorage
 builder.Services.AddScoped<BlobStorageService>();
 builder.Services.AddScoped<IBlobStorageRepository, BlobStorageRepository>();
+
+// Orchestrator
+builder.Services.AddScoped<OrchestratorService>();
+builder.Services.AddScoped<OrchestratorRepository>();
 
 // Refit
 builder.Services.AddRefitClient<ICvPartnerApiClient>()

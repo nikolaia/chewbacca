@@ -1,7 +1,6 @@
 ﻿using Bemanning;
 
 using BlobStorage.Repositories;
-using BlobStorage.Service;
 
 using CvPartner.Models;
 using CvPartner.Repositories;
@@ -44,7 +43,7 @@ public class CustomWebApplicationFactory<TStartup>
             services.Replace(ServiceDescriptor.Transient(_ => cvPartnerApiMock.Object));
             
             // Creates mock of Bemanning Repository
-            var bemanningRepositoryMock = Mocker.GetMock<IBemanningReository>();
+            var bemanningRepositoryMock = Mocker.GetMock<IBemanningRepository>();
             bemanningRepositoryMock.Setup(clinet => clinet.GetBemanningDataForEmployees()).ReturnsAsync(new List<BemanningEmployee>());
             services.Replace(ServiceDescriptor.Transient(_ => bemanningRepositoryMock.Object));
             
