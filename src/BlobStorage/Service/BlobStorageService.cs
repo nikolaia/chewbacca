@@ -1,11 +1,10 @@
 using BlobStorage.Repositories;
-
 namespace BlobStorage.Service;
 
 public class BlobStorageService
 {
-    private static IBlobStorageRepository _blobStorageRepository;
-    
+    private readonly IBlobStorageRepository _blobStorageRepository;
+
     /**
      * <summary>Class for delegating tasks for blob storage</summary>
      * <param name="blobStorageRepository">Class for handling blob storage</param>
@@ -14,17 +13,12 @@ public class BlobStorageService
     {
         _blobStorageRepository = blobStorageRepository;
     }
-    
+
     /**
      * <summary> Delegates a task to <see cref="BlobStorageRepository"/> to save employee image to blob storage</summary>
      */
-    public async Task<string> UploadStream(string employeeName, string employeeImageUri)
+    public async Task<string> SaveToBlob(string employeeName, string employeeImageUri, DateTime updatedAt)
     {
-        if (employeeImageUri != null)
-        {
-            return await _blobStorageRepository.SaveToBlob(employeeName, employeeImageUri);
-        }
-
-        return null;
+        return await _blobStorageRepository.SaveToBlob(employeeName, employeeImageUri, updatedAt);
     }
 }

@@ -12,6 +12,7 @@ public class EmployeesRepository
     {
         _db = db;
     }
+
     public async Task<IEnumerable<Employee>> GetAllEmployees()
     {
         var employees = await _db.Employees.ToListAsync();
@@ -35,6 +36,18 @@ public class EmployeesRepository
         {
             await _db.AddAsync(employee);
         }
+
         await _db.SaveChangesAsync();
+    }
+
+    public async Task EnsureEmployeeIsDeleted(string email)
+    {
+        EmployeeEntity? employee = await _db.Employees.SingleOrDefaultAsync(e => e.Email == email);
+
+        if (employee != null)
+        {
+            _db.Remove(employee);
+            await _db.SaveChangesAsync();
+        }
     }
 }

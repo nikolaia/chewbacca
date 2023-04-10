@@ -1,4 +1,6 @@
-﻿namespace CvPartner.Models;
+﻿// ReSharper disable InconsistentNaming
+#pragma warning disable CS8618
+namespace CvPartner.Models;
 
 public class FitThumb
 {

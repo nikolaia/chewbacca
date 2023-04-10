@@ -24,4 +24,9 @@ public class EmployeesService {
     {
         return _employeesRepository.AddToDatabase(employee);
     }
+
+    public async Task EnsureEmployeeIsDeleted(string email)
+    {
+        await _employeesRepository.EnsureEmployeeIsDeleted(email); 
+    }
 }

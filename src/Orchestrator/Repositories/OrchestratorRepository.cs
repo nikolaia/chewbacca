@@ -8,6 +8,11 @@ using CvPartner.Service;
 using Employees.Models;
 using Employees.Service;
 
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+
+using Shared;
+
 namespace Orchestrator.Repositories;
 
 public class OrchestratorRepository
@@ -16,62 +21,50 @@ public class OrchestratorRepository
     private readonly CvPartnerService _cvPartnerService;
     private readonly IBemanningRepository _bemanningRepository;
     private readonly BlobStorageService _blobStorageService;
+    private readonly ILogger<OrchestratorRepository> _logger;
 
-    public OrchestratorRepository(EmployeesService employeesService, CvPartnerService cvPartnerService, IBemanningRepository bemanningRepository,
-        BlobStorageService blobStorageService)
+    public OrchestratorRepository(EmployeesService employeesService, CvPartnerService cvPartnerService,
+        IBemanningRepository bemanningRepository,
+        BlobStorageService blobStorageService,
+        ILogger<OrchestratorRepository> logger)
     {
         _employeesService = employeesService;
         _cvPartnerService = cvPartnerService;
         _bemanningRepository = bemanningRepository;
         _blobStorageService = blobStorageService;
+        _logger = logger;
     }
 
     public async Task FetchMapAndSaveEmployeeData()
     {
-        var cvPartnerDTOs = await _cvPartnerService.GetCvPartnerEmployees();
-        var BemanningDTOs = await _bemanningRepository.GetBemanningDataForEmployees();
-        foreach (CVPartnerUserDTO cvPartnerDTO in cvPartnerDTOs)
-        {
-            cvPartnerDTO.image.url = await _blobStorageService.UploadStream(cvPartnerDTO.name, cvPartnerDTO.image.url);
+        _logger.LogInformation("OrchestratorRepository: FetchMapAndSaveEmployeeData: Started");
+        var bemanningEntries = await _bemanningRepository.GetBemanningDataForEmployees();
+        var cvEntries = await _cvPartnerService.GetCvPartnerEmployees();
 
-            var matchingEmployee = BemanningDTOs.Find(e => e.Email == cvPartnerDTO.email);
+        foreach (var bemanning in bemanningEntries)
+        {
+            var cv = cvEntries.Find(cv => cv.email.ToLower().Trim() == bemanning.Email.ToLower().Trim());
+
+            if (cv != null)
             {
-                if (matchingEmployee != null)
+                // TODO: Parse and validate phone number
+                await _employeesService.AddOrUpdateEmployee(new EmployeeEntity
                 {
-                    var employee = ConvertToEmployeeEntityWithStartDate(cvPartnerDTO, matchingEmployee.StartDate);
-                    await _employeesService.AddOrUpdateEmployee(employee);
-                }
-                else
-                {
-                    var employee = ConvertToEmployeeEntity(cvPartnerDTO);
-                    await _employeesService.AddOrUpdateEmployee(employee);
-                }
+                    Name = cv.name,
+                    Email = cv.email,
+                    Telephone = cv.telephone,
+                    ImageUrl = await _blobStorageService.SaveToBlob(cv.user_id, cv.image.url, cv.updated_at),
+                    OfficeName = cv.office_name,
+                    StartDate = bemanning.StartDate
+                });
+            }
+            else
+            {
+                // TODO: Fetch the image url from the database if the employee exists, and delete the image from blob storage if it exists.
+                await _employeesService.EnsureEmployeeIsDeleted(bemanning.Email);
             }
         }
-    }
 
-    private EmployeeEntity ConvertToEmployeeEntityWithStartDate(CVPartnerUserDTO cvPartnerUserDto, DateTime startDate)
-    {
-        return new EmployeeEntity
-        {
-            Name = cvPartnerUserDto.name,
-            Email = cvPartnerUserDto.email,
-            Telephone = cvPartnerUserDto.telephone,
-            ImageUrl = cvPartnerUserDto.image.url,
-            OfficeName = cvPartnerUserDto.office_name,
-            StartDate = startDate
-        };
-    }
-
-    private EmployeeEntity ConvertToEmployeeEntity(CVPartnerUserDTO cvPartnerUserDto)
-    {
-        return new EmployeeEntity
-        {
-            Name = cvPartnerUserDto.name,
-            Email = cvPartnerUserDto.email,
-            Telephone = cvPartnerUserDto.telephone,
-            ImageUrl = cvPartnerUserDto.image.url,
-            OfficeName = cvPartnerUserDto.office_name
-        };
+        _logger.LogInformation("OrchestratorRepository: FetchMapAndSaveEmployeeData: Finished");
     }
 }

@@ -18,18 +18,19 @@ public class BemanningRepository : IBemanningRepository
     }
 
     /**
-     * <summary>Returns a email and a start date</summary>
+     * <summary>Returns a email and a start date for employees currently working in Variant (not future or past employees)</summary>
      */
     public async Task<List<BemanningEmployee>> GetBemanningDataForEmployees()
     {
         await using var dataSource = NpgsqlDataSource.Create(_appSettings.Value.BemanningConnectionString);
 
         const string bemanningCommand = """"
-           SELECT c."Email" as email, MAX(s."YearWeek") as "startWeek" 
-           FROM "Consultant" as c
-           LEFT JOIN "Staffing" s ON c.id = s."ConsultantId" 
-           WHERE s."Hours" <> 0 AND s."EngagementId" = '6b402b81-44c7-40d2-8a89-3d2c7a57b777' AND c."EndDate" IS NULL
-           GROUP BY c.id
+            SELECT c."Email" as email, MAX(s."YearWeek") as "startWeek" 
+            FROM "Consultant" as c
+            LEFT JOIN "Staffing" s ON c.id = s."ConsultantId" AND s."Hours" <> 0 AND s."EngagementId" = '6b402b81-44c7-40d2-8a89-3d2c7a57b777'
+            WHERE (c."EndDate" IS NULL OR c."EndDate" > now()) 
+              AND c."Email" IS NOT NULL
+            GROUP BY c.id
            """";
 
         // Retrieve all rows
@@ -39,12 +40,14 @@ public class BemanningRepository : IBemanningRepository
         List<BemanningEmployee> bemanningEmployees = new();
         while (await reader.ReadAsync())
         {
+            var startWeekOrdinal = reader.GetOrdinal("startWeek");
+            var startWeek = reader.IsDBNull(startWeekOrdinal) ? 201820 : reader.GetInt32(startWeekOrdinal);
             bemanningEmployees.Add(
                 new BemanningEmployee(reader.GetString(reader.GetOrdinal("email")),
-                    FirstDateOfWeekISO8601(reader.GetInt32(reader.GetOrdinal("startWeek")))));
+                    FirstDateOfWeekISO8601(startWeek)));
         }
 
-        return bemanningEmployees;
+        return bemanningEmployees.ToList();
     }
 
     /**

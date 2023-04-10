@@ -44,6 +44,8 @@ var appSettingsSection = builder.Configuration
     .GetSection("AppSettings");
 var appSettings = appSettingsSection.Get<AppSettings>();
 
+if (appSettings == null) throw new Exception("Unable to load app settings");
+
 builder.Services.AddSingleton(new AzureServiceTokenProvider());
 
 builder.Services.AddScoped<CvPartnerService>();
