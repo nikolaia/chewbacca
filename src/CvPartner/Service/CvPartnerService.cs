@@ -16,7 +16,7 @@ public class CvPartnerService
      * <summary>Calls CvPartnerRepository's GetAllEmployee and converts them
      * to an employee. Adds to database.</summary>
      */
-    public async Task<IEnumerable<CVPartnerUserDTO>> GetCvPartnerEmployees()
+    public async Task<List<CVPartnerUserDTO>> GetCvPartnerEmployees()
     {
         return await _cvPartnerRepository.GetAllEmployees();
     }

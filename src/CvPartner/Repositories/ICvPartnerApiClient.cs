@@ -7,5 +7,5 @@ namespace CvPartner.Repositories;
 public interface ICvPartnerApiClient
 {
     [Get("/users")]
-    Task<IEnumerable<CVPartnerUserDTO>> GetAllEmployee([Authorize("Token")] string authorization);
+    Task<IApiResponse<IEnumerable<CVPartnerUserDTO>>> GetAllEmployee([Authorize("Token")] string authorization);
 }
