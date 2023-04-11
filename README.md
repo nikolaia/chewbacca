@@ -4,7 +4,7 @@
 
 </div>
 
-> Dette er en hårete løsning som håndterer mye. Men som Chewbacca fra Star Wars tar den de tunge løftene for vennene sine (les: andre internapplikasjoner) og er alltid til å stole på.
+> "La Chewbacca ta seg av de tekniske detaljene, mens du tar deg av datagalaksens utfordringer og triumfer!"
 
 Variant har mange internesystemer (UniEconomy, Harvest, CVPartner etc.) og denne løsningen fungerer som en proxy og cache for løsninger som ønsker å bruke data fra disse systemene.
 
