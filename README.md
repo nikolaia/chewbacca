@@ -12,38 +12,6 @@ Løsningen er bygget slik at arbeid på den gir relevant erfaring for hva vi mø
 
 Det er tatt noen avgjørelser rundt arkitektur og hvordan vi bruker skytjenester. De avgjørelsene kan du [lese mer om her](docs/architecture.md).
 
-## Up and running med mocked data
-
-Løsningen skal fungere lokalt uten noe ekstra oppsett, men alle integrasjoner vil da være _mocked_.
-
-Installer Docker for Windows/Mac fra dockers hjemmeside. Kjør opp SQL Server og installer entitiy framework tools:
-
-```bash
-# Installer tools for entity framework (ORMen)
-dotnet tool install --global dotnet-ef
-
-# Kjør opp en lokal database i docker
-docker run --cap-add SYS_PTRACE -e 'ACCEPT_EULA=1' -e 'MSSQL_SA_PASSWORD=yourStrong(!)Password' -p 1433:1433 --name azuresqledge -d mcr.microsoft.com/azure-sql-edge
-```
-
-Man kan da kjøre migrations fra cmd line:
-
-```bash
-dotnet ef database update -s ./src/WebApi/ -p ./src/Employee/
-```
-
-EF Code First er benyttet. Det betyr at man endrer i context og entities først, for så å automatisk generere migrations ved å kjøre følgende kommando i Database-prosjektet:
-
-```bash
-dotnet ef migrations add MigrationName
-```
-For å kjøre opp lokalt trenger man å legge inn Connectionstrings og tokens. Man kan finne dette på
-azure under `chewbacca` Resource gruppen. man må inn på `chewie-kv-ld2ijhpvmb34c` og nøkklene ligger under
-`Secrets`. Connectionstringen til BlobStorage ligger under storage accounten `variantno` og du finner den i tabben
-`Access keys`
-
-lag en appsettings.local.json under [WebApi](src/WebApi) og kopier innholdet i appsettings.json for så å bytte ut replace_me_on_deploy
-
 ## Up and running med ekte integrasjoner
 
 For å få tilgang til integrasjoner må man ha:
@@ -52,7 +20,7 @@ For å få tilgang til integrasjoner må man ha:
 2. Blitt lagt til i _developers_ gruppen i Azure AD
 3. Installert _Azure CLI_ og kjørt `az login`
 
-Man kan da få konfigurasjon og secrets fra azure uten noe ekstra oppsett.
+Man kan da få konfigurasjon og secrets fra azure uten noe ekstra oppsett gjennom Azure App Configuration. Når man utvikler kjører man opp SQL Server og Blob Storage lokalt, siden det er disse to tjenestene som skrives til - så de er grei å ha kontroll på selv. De er definert i `docker-compose.yml`. Installer Docker Desktop og kjør `docker-compose up -d`.
 
 ## Infrastructure
 

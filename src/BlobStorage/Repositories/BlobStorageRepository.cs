@@ -1,8 +1,6 @@
 using System.Globalization;
 
 using Azure.Storage.Blobs;
-using Azure.Storage.Blobs.Models;
-using Azure.Storage.Blobs.Specialized;
 
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -37,9 +35,12 @@ public class BlobStorageRepository : IBlobStorageRepository
         var updatedAtString = updatedAt.ToString(CultureInfo.InvariantCulture);
         Uri uri = new(employeeImageUri);
 
-        BlobContainerClient container = new(_appSettings.Value.BlobStorage.ConnectionString.ToString(),
-            _appSettings.Value.BlobStorage.ContainerName);
+        var connectionString = _appSettings.Value.BlobStorage.UseDevelopmentStorage
+            ? "UseDevelopmentStorage=true"
+            : _appSettings.Value.BlobStorage.ConnectionString.ToString();
+        BlobContainerClient container = new(connectionString, _appSettings.Value.BlobStorage.ContainerName);
         await container.CreateIfNotExistsAsync();
+
         var blockBlobClient = container.GetBlobClient($"{cvPartnerUserId}.png");
 
         if (await blockBlobClient.ExistsAsync())
@@ -63,7 +64,7 @@ public class BlobStorageRepository : IBlobStorageRepository
         await stream.WriteAsync(await new HttpClient().GetByteArrayAsync(uri));
         await stream.FlushAsync();
         await stream.DisposeAsync();
-        
+
         await blockBlobClient.SetMetadataAsync(new Dictionary<string, string>()
         {
             { "Name", cvPartnerUserId }, { "UpdatedAt", updatedAtString }
