@@ -1,5 +1,6 @@
 using System.Globalization;
 
+using Azure.Identity;
 using Azure.Storage.Blobs;
 
 using Microsoft.Extensions.Logging;
@@ -38,7 +39,7 @@ public class BlobStorageRepository : IBlobStorageRepository
 
         BlobContainerClient container = _appSettings.Value.BlobStorage.UseDevelopmentStorage
             ? new BlobContainerClient("UseDevelopmentStorage=true", "employees")
-            : new BlobContainerClient(_appSettings.Value.BlobStorage.Endpoint);
+            : new BlobContainerClient(_appSettings.Value.BlobStorage.Endpoint, new DefaultAzureCredential());
         
         await container.CreateIfNotExistsAsync();
 
