@@ -5,7 +5,7 @@ param name string = 'chewie'
 param location string = resourceGroup().location
 
 @description('The web site hosting plan')
-param sku string = 'S1'
+param sku string = 'B1'
 
 @description('Specifies sql admin password')
 @secure()
@@ -14,10 +14,13 @@ param sqlAdministratorPassword string = 'P${uniqueString(resourceGroup().id, '22
 var hostingPlanName = '${name}-sp-${uniqueString(resourceGroup().id)}'
 var applicationInsightsName = '${name}-insights-${uniqueString(resourceGroup().id)}'
 var webAppName = '${name}-webapp-${uniqueString(resourceGroup().id)}'
-var appConfName = '${name}-cfg-${uniqueString(resourceGroup().id)}'
+var appConfName = '${name}-appcfg-${uniqueString(resourceGroup().id)}'
 var sqlServerName = '${name}-sql-${uniqueString(resourceGroup().id)}'
 var sqlDatabaseName = '${name}-db-${uniqueString(resourceGroup().id)}'
 var keyVaultName = '${name}-kv-${uniqueString(resourceGroup().id)}'
+var storageAccountName = '${name}sa${uniqueString(resourceGroup().id)}'
+
+var variantDevelopersRoleObjectId = '0bb72d8f-2fc5-40e3-8d07-e1ffff1015a8'
 
 resource plan 'Microsoft.Web/serverfarms@2020-12-01' = {
   name: hostingPlanName
@@ -37,6 +40,16 @@ module config 'modules/config.bicep' = {
     appConfName: appConfName
     location: location
     keyVaultName: keyVaultName
+    webPrincipalId: web.identity.principalId
+    variantDevelopersRoleObjectId: variantDevelopersRoleObjectId
+  }
+}
+
+module storage 'modules/storage.bicep' = {
+  name: storageAccountName
+  params: {
+    storageAccountName: storageAccountName
+    location: location
     webPrincipalId: web.identity.principalId
   }
 }
@@ -101,6 +114,10 @@ resource webAppSettings 'Microsoft.Web/sites/config@2022-03-01' = {
       {
         name: 'AppSettings__AzureAppConfigUri'
         value: config.outputs.appConfigEndpoint
+      }
+      {
+        name: 'AppSettings__BlobStorage__Endpoint'
+        value: storage.outputs.employeeContainerEndpoint
       }
     ]
     connectionStrings: [

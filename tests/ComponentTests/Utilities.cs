@@ -9,14 +9,4 @@ public static class Utilities
         db.Employees.AddRange(Seed.GetSeedingEmployees());
         db.SaveChanges();
     }
-
-    public static void ReinitializeDbForTests(EmployeeContext db)
-    {
-        db.Employees.RemoveRange(db.Employees);
-        InitializeDbForTests(db);
-    }
-
-
-    
-
 }

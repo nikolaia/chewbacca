@@ -1,12 +1,8 @@
 param location string
 param appConfName string
-@allowed([
-  'free'
-  'standard'
-])
-param configSku string = 'standard'
 param keyVaultName string
 param webPrincipalId string
+param variantDevelopersRoleObjectId string
 
 resource kv 'Microsoft.KeyVault/vaults@2019-09-01' = {
   // Make sure the Key Vault name begins with a letter.
@@ -23,7 +19,6 @@ resource kv 'Microsoft.KeyVault/vaults@2019-09-01' = {
         tenantId: subscription().tenantId
         objectId: config.identity.principalId
         permissions: {
-          // Secrets are referenced by and enumerated in App Configuration so 'list' is not necessary.
           secrets: [
             'get'
           ]
@@ -38,12 +33,22 @@ resource kv 'Microsoft.KeyVault/vaults@2019-09-01' = {
           ]
         }
       }
+      {
+        tenantId: subscription().tenantId
+        objectId: variantDevelopersRoleObjectId
+        permissions: {
+          secrets: [
+            'get'
+          ]
+        }
+      }
     ]
   }
 }
 
 resource kvSecret 'Microsoft.KeyVault/vaults/secrets@2019-09-01' = {
-  name: '${kv.name}/healthchecksecret'
+  parent: kv
+  name: 'healthchecksecret'
   properties: {
     contentType: 'text/plain'
     value: 'true'
@@ -57,39 +62,65 @@ resource config 'Microsoft.AppConfiguration/configurationStores@2020-06-01' = {
     type: 'SystemAssigned'
   }
   sku: {
-    name: configSku
+    name: 'free'
   }
   
-  resource configValue 'keyValues@2020-07-01-preview' = {
-    // Store non-secrets in App Configuration e.g., client IDs, endpoints without secure tokens, etc.
+  resource configValueHealthcheck 'keyValues@2020-07-01-preview' = {
     name: 'AppSettings:Healthcheck:AppConfig'
     properties: {
       contentType: 'text/plain'
       value: 'true'
     }
-    
   }
 
-  resource configSecret 'keyValues@2020-07-01-preview' = {
-    // Store secrets in Key Vault with a reference to them in App Configuration e.g., client secrets, connection strings, etc.
+  resource configValueHealthcheckKeyVault 'keyValues@2020-07-01-preview' = {
     name: 'AppSettings:Healthcheck:KeyVault'
     properties: {
-      // Most often you will want to reference a secret without the version so the current value is always retrieved.
       contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
       value: '{"uri":"${kvSecret.properties.secretUri}"}'
     }
   }
+
+  // Secret is populated from elsewhere
+  resource configValueBemmaningConnectionString 'keyValues@2020-07-01-preview' = {
+    name: 'AppSettings:BemanningConnectionString'
+    properties: {
+      contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
+      value: '{"uri":"${kv.properties.vaultUri}secrets/BemanningConnectionString"}'
+    }
+  }
+
+  // Secret is populated from elsewhere
+  resource configValueCvPartnerToken 'keyValues@2020-07-01-preview' = {
+    name: 'AppSettings:CvPartner:Token'
+    properties: {
+      contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
+      value: '{"uri":"${kv.properties.vaultUri}secrets/CvPartnerApiKey"}'
+    }
+  }
 }
 
+// App Configuration Data Reader role
+param roleDefinitionId string = '516239f1-63e1-4d78-a4de-a74fb236a071' 
+
 // Let the web app principal id access app config using Managed Identity
-param roleDefinitionId string = '516239f1-63e1-4d78-a4de-a74fb236a071' // Default as App Configuration Data Reader role
 resource webAppConfigRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
   scope: config
-  name: guid('ra-logicapp-${roleDefinitionId}')
+  name: guid('chewie-webapp-${roleDefinitionId}')
   properties: {
     principalType: 'ServicePrincipal'
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleDefinitionId)
     principalId: webPrincipalId
+  }
+}
+
+resource variantDevelopersConfigRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
+  scope: config
+  name: guid('chewie-developers-${roleDefinitionId}')
+  properties: {
+    principalType: 'Group'
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleDefinitionId)
+    principalId: variantDevelopersRoleObjectId
   }
 }
 

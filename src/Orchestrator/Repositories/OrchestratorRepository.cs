@@ -45,7 +45,7 @@ public class OrchestratorRepository
         {
             var cv = cvEntries.Find(cv => cv.email.ToLower().Trim() == bemanning.Email.ToLower().Trim());
 
-            if (cv != null)
+            if (cv is { image.url: not null })
             {
                 // TODO: Parse and validate phone number
                 await _employeesService.AddOrUpdateEmployee(new EmployeeEntity
@@ -53,7 +53,7 @@ public class OrchestratorRepository
                     Name = cv.name,
                     Email = cv.email,
                     Telephone = cv.telephone,
-                    ImageUrl = await _blobStorageService.SaveToBlob(cv.user_id, cv.image.url, cv.updated_at),
+                    ImageUrl = await _blobStorageService.SaveToBlob(cv.user_id, cv.image.url),
                     OfficeName = cv.office_name,
                     StartDate = bemanning.StartDate
                 });
