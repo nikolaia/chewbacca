@@ -9,7 +9,7 @@ public class FitThumb
 
 public class Image
 {
-    public string url { get; set; }
+    public string? url { get; set; }
     public Thumb thumb { get; set; }
     public FitThumb fit_thumb { get; set; }
     public Large large { get; set; }

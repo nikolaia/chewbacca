@@ -2,5 +2,5 @@ namespace BlobStorage.Repositories;
 
 public interface IBlobStorageRepository
 {
-    public Task<string> SaveToBlob(string cvPartnerUserId, string employeeImageUri, DateTime updatedAt);
+    public Task<string> SaveToBlob(string cvPartnerUserId, string employeeImageUri);
 }

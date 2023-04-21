@@ -29,6 +29,7 @@ public class CustomWebApplicationFactory<TStartup>
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        builder.UseEnvironment("Test");
         builder.ConfigureServices(services =>
         {
             var descriptor = services.SingleOrDefault(
@@ -57,7 +58,7 @@ public class CustomWebApplicationFactory<TStartup>
             // Creates mock of BlobStorageRepository and replaces it in program.cs. Returns string "test"
             var blobStorageServiceMock = Mocker.GetMock<IBlobStorageRepository>();
             blobStorageServiceMock.Setup(client =>
-                    client.SaveToBlob(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<DateTime>()))
+                    client.SaveToBlob(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync("test");
             services.Replace(ServiceDescriptor.Transient(_ => blobStorageServiceMock.Object));
         });

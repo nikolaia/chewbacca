@@ -13,8 +13,7 @@ public record CvPartnerConfig
 
 public record BlobStorageConfig
 {
-    public Uri ConnectionString { get; set; }
-    public string ContainerName { get; set; }
+    public Uri Endpoint { get; set; }
     public bool UseDevelopmentStorage { get; set; } = false;
 }
 

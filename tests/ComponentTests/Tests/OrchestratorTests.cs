@@ -70,7 +70,7 @@ public class OrchestratorTest :
 
         // Check if blobService runs x amount of times
         var blobStorageServiceMocker = _mocker.GetMock<IBlobStorageRepository>();
-        blobStorageServiceMocker.Verify(x => x.SaveToBlob(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<DateTime>()),
+        blobStorageServiceMocker.Verify(x => x.SaveToBlob(It.IsAny<string>(), It.IsAny<string>()),
             Times.Exactly(cvPartnerUserDtos.Count));
     }
 }
