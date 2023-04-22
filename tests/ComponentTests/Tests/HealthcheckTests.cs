@@ -1,4 +1,3 @@
-using Employees.Models;
 using Employees.Repositories;
 
 using FluentAssertions;
@@ -8,14 +7,16 @@ using Microsoft.Extensions.DependencyInjection;
 
 using Newtonsoft.Json;
 
+using Shared;
+
 namespace IntegrationTests.Tests;
 
-public class EmployeeTest :
+public class HealthcheckTest :
     IClassFixture<CustomWebApplicationFactory<Program>>
 {
     private readonly HttpClient _client;
 
-    public EmployeeTest()
+    public HealthcheckTest()
     {
         var factory = new CustomWebApplicationFactory<Program>();
 
@@ -30,20 +31,17 @@ public class EmployeeTest :
     }
 
     [Fact]
-    public async void Given_EmployeeExists_When_CallingEmployeeControllerGET_Then_ReturnsSampleData()
+    public async void HealthcheckEndpoint_Should_Return()
     {
-        // Arrange
-        var knownSeedData = Seed.GetSeedingEmployees();
-
         // Act
-        var employeeResponse = await _client.GetAsync("/employees");
-        var content =
-            JsonConvert.DeserializeObject<EmployeeList>(await employeeResponse.Content
-                .ReadAsStringAsync());
-
+        var healthcheckResponse = await _client.GetAsync("/healthcheck");
+        var content = JsonConvert.DeserializeObject<HealthcheckResponse>(await healthcheckResponse.Content
+            .ReadAsStringAsync());
+        
         // Assert
-        content!.Employees.Should().BeEquivalentTo(knownSeedData, options =>
-            options.Excluding(employee => employee.Id)
-        );
+        content.Should().NotBeNull();
+        content.Database.Should().Be(true);
+        content.AppConfig.Should().Be(false);
+        content.KeyVault.Should().Be(false);
     }
 }

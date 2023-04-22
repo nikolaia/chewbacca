@@ -18,7 +18,7 @@ public class OrchestratorController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> Get()
     {
-        await _orchestratorService.AddEmployeeToDatabase();
+        await _orchestratorService.FetchMapAndSaveEmployeeData();
         return Ok();
     }
 }

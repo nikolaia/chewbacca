@@ -26,7 +26,7 @@ public class CvPartnerRepository
     {
         var apiResponse = await _cvPartnerApiClient.GetAllEmployee(_appSettings.Value.CvPartner.Token);
         
-        if (apiResponse is {IsSuccessStatusCode: true, Content: { }})
+        if (apiResponse is {IsSuccessStatusCode: true, Content: not null })
         {
             return apiResponse.Content.ToList();
         }

@@ -14,7 +14,7 @@ public record EmployeeEntity
     public string Name { get; set; }
     [StringLength(maximumLength: 100)]
     public string Email { get; set; }
-    public string Telephone { get; set; }
+    public string? Telephone { get; set; }
     public string? ImageUrl { get; set; }
     public string OfficeName { get; set; }
     public DateTime StartDate { get; set; }

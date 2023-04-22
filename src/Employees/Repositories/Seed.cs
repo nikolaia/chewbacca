@@ -10,9 +10,17 @@ public static class Seed
         {
             new()
             {
-                Email = "test@example.com",
+                Email = "test@variant.no",
                 Name = "Navn",
-                Telephone = "123982131",
+                Telephone = "81529332",
+                ImageUrl = "https://example.com/image.png",
+                OfficeName = "Oslo"
+            },
+            new()
+            {
+                Email = "test@variant.se",
+                Name = "Navn",
+                Telephone = "81529332",
                 ImageUrl = "https://example.com/image.png",
                 OfficeName = "Oslo"
             }

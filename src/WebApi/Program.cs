@@ -11,10 +11,11 @@ using CvPartner.Service;
 using Employees.Repositories;
 using Employees.Service;
 
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
-using Orchestrator.Repositories;
 using Orchestrator.Service;
 
 using Refit;
@@ -42,9 +43,9 @@ builder.Configuration
 // Bind configuration "TestApp:Settings" section to the Settings object
 var appSettingsSection = builder.Configuration
     .GetSection("AppSettings");
-var appSettings = appSettingsSection.Get<AppSettings>();
+var initialAppSettings = appSettingsSection.Get<AppSettings>();
 
-if (appSettings == null) throw new Exception("Unable to load app settings");
+if (initialAppSettings == null) throw new Exception("Unable to load app settings");
 
 builder.Services.AddSingleton(new AzureServiceTokenProvider());
 
@@ -62,18 +63,18 @@ builder.Services.AddScoped<IBlobStorageRepository, BlobStorageRepository>();
 
 // Orchestrator
 builder.Services.AddScoped<OrchestratorService>();
-builder.Services.AddScoped<OrchestratorRepository>();
+builder.Services.AddScoped<OrchestratorService>();
 
 // Refit
 builder.Services.AddRefitClient<ICvPartnerApiClient>()
-    .ConfigureHttpClient(c => c.BaseAddress = appSettings.CvPartner.Uri);
+    .ConfigureHttpClient(c => c.BaseAddress = initialAppSettings.CvPartner.Uri);
 
-if (appSettings.UseAzureAppConfig)
+if (initialAppSettings.UseAzureAppConfig)
 {
     builder.Services.AddAzureAppConfiguration();
     // Load configuration from Azure App Configuration
     builder.Configuration.AddAzureAppConfiguration(options => options
-        .Connect(appSettings.AzureAppConfigUri, new DefaultAzureCredential()).ConfigureKeyVault(
+        .Connect(initialAppSettings.AzureAppConfigUri, new DefaultAzureCredential()).ConfigureKeyVault(
             vaultOptions =>
             {
                 vaultOptions.SetCredential(new DefaultAzureCredential());
@@ -110,7 +111,7 @@ using (var scope = app.Services.CreateScope())
 app.UseSwagger();
 app.UseSwaggerUI();
 
-if (appSettings.UseAzureAppConfig)
+if (initialAppSettings.UseAzureAppConfig)
 {
     app.UseAzureAppConfiguration();
 }
@@ -119,6 +120,23 @@ app.UseAuthorization();
 
 app.MapGet("/", () => "Hello World!");
 app.MapControllers();
+
+// Example of Minimal API instead of using Controllers
+app.MapGet("/healthcheck",
+    async ([FromServices] EmployeeContext db, [FromServices] IOptionsSnapshot<AppSettings> appSettings) =>
+    {
+        app.Logger.LogInformation("Getting employees from database");
+
+        var dbCanConnect = await db.Database.CanConnectAsync();
+        var healthcheck = appSettings.Value.Healthcheck;
+
+        var response = new HealthcheckResponse()
+        {
+            Database = dbCanConnect, KeyVault = healthcheck.KeyVault, AppConfig = healthcheck.AppConfig
+        };
+
+        return response;
+    });
 
 app.Run();
 
