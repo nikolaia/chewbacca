@@ -39,7 +39,7 @@ public class OrchestratorService
 
         var phoneNumberUtil = PhoneNumbers.PhoneNumberUtil.GetInstance();
 
-        foreach (var bemanning in bemanningEntries)
+        foreach (var bemanning in bemanningEntries.Where(IsActiveEmployee))
         {
             var cv = cvEntries.Find(cv => cv.email.ToLower().Trim() == bemanning.Email.ToLower().Trim());
 
@@ -59,16 +59,40 @@ public class OrchestratorService
                     Telephone = phoneNumber,
                     ImageUrl = await _blobStorageService.SaveToBlob(cv.user_id, cv.image.url),
                     OfficeName = cv.office_name,
-                    StartDate = bemanning.StartDate
+                    StartDate = bemanning.StartDate,
+                    EndDate = bemanning.EndDate
                 });
             }
             else
             {
-                // TODO: Fetch the image url from the database if the employee exists, and delete the image from blob storage if it exists.
-                await _employeesService.EnsureEmployeeIsDeleted(bemanning.Email);
+                // If the employee does not exist in CV Partner, only in Bemanning, we should ensure the employee is not in the database.
+                _logger.LogInformation(
+                    "Deleting employee with email {BemanningEmail} from database, since it does not exist in CV Partner",
+                    bemanning.Email);
+                var blobUrlToBeDeleted = await _employeesService.EnsureEmployeeIsDeleted(bemanning.Email);
+                if (blobUrlToBeDeleted != null)
+                {
+                    _logger.LogInformation("Deleting blob with url {BlobUrlToBeDeleted}", blobUrlToBeDeleted);
+                    await _blobStorageService.DeleteBlob(blobUrlToBeDeleted);
+                }
+            }
+        }
+
+        var blobUrlsToBeDeleted = await _employeesService.EnsureEmployeesWithEndDateBeforeTodayAreDeleted();
+        foreach (var blobUrlToBeDeleted in blobUrlsToBeDeleted)
+        {
+            _logger.LogInformation("Deleting blob with url {BlobUrlToBeDeleted}", blobUrlToBeDeleted);
+            if (blobUrlToBeDeleted != null)
+            {
+                await _blobStorageService.DeleteBlob(blobUrlToBeDeleted);
             }
         }
 
         _logger.LogInformation("OrchestratorRepository: FetchMapAndSaveEmployeeData: Finished");
+    }
+
+    private static bool IsActiveEmployee(BemanningEmployee bemanning)
+    {
+        return DateTime.Now >= bemanning.StartDate && (bemanning.EndDate == null || DateTime.Now <= bemanning.EndDate);
     }
 }

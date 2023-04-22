@@ -14,7 +14,9 @@ public static class Seed
                 Name = "Navn",
                 Telephone = "81529332",
                 ImageUrl = "https://example.com/image.png",
-                OfficeName = "Oslo"
+                OfficeName = "Oslo",
+                StartDate = new DateTime(2018, 8, 1),
+                EndDate = null
             },
             new()
             {
@@ -22,7 +24,9 @@ public static class Seed
                 Name = "Navn",
                 Telephone = "81529332",
                 ImageUrl = "https://example.com/image.png",
-                OfficeName = "Oslo"
+                OfficeName = "Oslo",
+                StartDate = new DateTime(2018, 8, 1),
+                EndDate = null
             }
         };
     }

@@ -3,8 +3,8 @@ using Employees.Repositories;
 
 namespace Employees.Service;
 
-public class EmployeesService {
-
+public class EmployeesService
+{
     private readonly EmployeesRepository _employeesRepository;
 
     public EmployeesService(EmployeesRepository employeesRepository)
@@ -12,12 +12,21 @@ public class EmployeesService {
         this._employeesRepository = employeesRepository;
     }
 
+    private static bool IsEmployeeActive(EmployeeEntity employee)
+    {
+        return DateTime.Now > employee.StartDate &&
+               (employee.EndDate == null || DateTime.Now < employee.EndDate);
+    }
+
     /**
      * <returns>list of employees from database</returns>
      */
-    public Task<IEnumerable<Employee>> GetAllEmployees() 
+    public async Task<IEnumerable<Employee>> GetAllActiveEmployees()
     {
-        return _employeesRepository.GetAllEmployees();
+        var employees = await _employeesRepository.GetAllEmployees();
+        return employees
+            .Where(IsEmployeeActive)
+            .Select(ModelConverters.ToEmployee);
     }
 
     public Task AddOrUpdateEmployee(EmployeeEntity employee)
@@ -25,8 +34,13 @@ public class EmployeesService {
         return _employeesRepository.AddToDatabase(employee);
     }
 
-    public async Task EnsureEmployeeIsDeleted(string email)
+    public Task<string?> EnsureEmployeeIsDeleted(string email)
     {
-        await _employeesRepository.EnsureEmployeeIsDeleted(email); 
+        return _employeesRepository.EnsureEmployeeIsDeleted(email);
+    }
+
+    public Task<IEnumerable<string?>> EnsureEmployeesWithEndDateBeforeTodayAreDeleted()
+    {
+        return _employeesRepository.EnsureEmployeesWithEndDateBeforeTodayAreDeleted();
     }
 }

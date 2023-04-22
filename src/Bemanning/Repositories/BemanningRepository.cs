@@ -25,11 +25,10 @@ public class BemanningRepository : IBemanningRepository
         await using var dataSource = NpgsqlDataSource.Create(_appSettings.Value.BemanningConnectionString);
 
         const string bemanningCommand = """"
-            SELECT c."Email" as email, MAX(s."YearWeek") as "startWeek" 
+            SELECT c."Email" as email, MAX(s."YearWeek") as "startWeek", c."EndDate" as endDate
             FROM "Consultant" as c
             LEFT JOIN "Staffing" s ON c.id = s."ConsultantId" AND s."Hours" <> 0 AND s."EngagementId" = '6b402b81-44c7-40d2-8a89-3d2c7a57b777'
-            WHERE (c."EndDate" IS NULL OR c."EndDate" > now()) 
-              AND c."Email" IS NOT NULL
+            WHERE c."Email" IS NOT NULL
             GROUP BY c.id
            """";
 
@@ -42,9 +41,13 @@ public class BemanningRepository : IBemanningRepository
         {
             var startWeekOrdinal = reader.GetOrdinal("startWeek");
             var startWeek = reader.IsDBNull(startWeekOrdinal) ? 201820 : reader.GetInt32(startWeekOrdinal);
+
+            var endDateOrdinal = reader.GetOrdinal("endDate");
+            var endDate = reader.IsDBNull(endDateOrdinal) ? (DateTime?)null : reader.GetDateTime(endDateOrdinal);
+
             bemanningEmployees.Add(
                 new BemanningEmployee(reader.GetString(reader.GetOrdinal("email")),
-                    FirstDateOfWeekISO8601(startWeek)));
+                    FirstDateOfWeekISO8601(startWeek), endDate));
         }
 
         return bemanningEmployees.ToList();
@@ -90,4 +93,4 @@ public class BemanningRepository : IBemanningRepository
  * <param name="Email">Users email</param>
  * <param name="StartDate">Users start date</param>
  */
-public record BemanningEmployee(string Email, DateTime StartDate);
+public record BemanningEmployee(string Email, DateTime StartDate, DateTime? EndDate);

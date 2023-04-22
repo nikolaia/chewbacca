@@ -13,10 +13,9 @@ public class EmployeesRepository
         _db = db;
     }
 
-    public async Task<IEnumerable<Employee>> GetAllEmployees()
+    public async Task<List<EmployeeEntity>> GetAllEmployees()
     {
-        var employees = await _db.Employees.ToListAsync();
-        return employees.Select(ModelConverters.ToEmployee);
+        return await _db.Employees.ToListAsync();
     }
 
     public async Task AddToDatabase(EmployeeEntity employee)
@@ -31,6 +30,7 @@ public class EmployeesRepository
             updateEmployee.Telephone = employee.Telephone;
             updateEmployee.OfficeName = employee.OfficeName;
             updateEmployee.StartDate = employee.StartDate;
+            updateEmployee.EndDate = employee.EndDate;
         }
         else
         {
@@ -40,14 +40,39 @@ public class EmployeesRepository
         await _db.SaveChangesAsync();
     }
 
-    public async Task EnsureEmployeeIsDeleted(string email)
+    /// <summary>
+    /// Deletes the employee from the database, if they exist, and returns the image url to the employees image blob that needs to be cleaned up
+    /// </summary>
+    /// <param name="email">Email of the employee</param>
+    /// <returns>The image url to the employees image blob that needs to be cleaned up</returns>
+    public async Task<string?> EnsureEmployeeIsDeleted(string email)
     {
         EmployeeEntity? employee = await _db.Employees.SingleOrDefaultAsync(e => e.Email == email);
 
-        if (employee != null)
+        if (employee == null)
         {
-            _db.Remove(employee);
-            await _db.SaveChangesAsync();
+            return null;
         }
+
+        _db.Remove(employee);
+        await _db.SaveChangesAsync();
+
+        return employee.ImageUrl;
+    }
+
+    public async Task<IEnumerable<string?>> EnsureEmployeesWithEndDateBeforeTodayAreDeleted()
+    {
+        var employees = await _db.Employees.Where(e => e.EndDate < DateTime.Now).ToListAsync();
+
+        if (!employees.Any())
+        {
+            return Array.Empty<string>();
+        }
+
+        _db.RemoveRange(employees);
+        await _db.SaveChangesAsync();
+            
+        return employees.Select(employee => employee.ImageUrl);
+
     }
 }

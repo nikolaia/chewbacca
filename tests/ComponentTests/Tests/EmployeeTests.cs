@@ -38,12 +38,16 @@ public class EmployeeTest :
         // Act
         var employeeResponse = await _client.GetAsync("/employees");
         var content =
-            JsonConvert.DeserializeObject<EmployeeList>(await employeeResponse.Content
+            JsonConvert.DeserializeObject<EmployeesJson>(await employeeResponse.Content
                 .ReadAsStringAsync());
 
         // Assert
-        content!.Employees.Should().BeEquivalentTo(knownSeedData, options =>
-            options.Excluding(employee => employee.Id)
+        content!.Employees.Should().BeEquivalentTo(knownSeedData, config =>
+            {
+                config.Excluding(employee => employee.Id);
+                config.Excluding(employee => employee.EndDate);
+                return config;
+            }
         );
     }
 }

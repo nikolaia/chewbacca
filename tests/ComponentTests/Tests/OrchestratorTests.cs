@@ -43,7 +43,7 @@ public class OrchestratorTest :
             List<CVPartnerUserDTO> cvPartnerUserDtos)
     {
         var bemanningEmployees =
-            cvPartnerUserDtos.Select(dto => new BemanningEmployee(dto.email, DateTime.UtcNow.AddDays(-3))).ToList();
+            cvPartnerUserDtos.Select(dto => new BemanningEmployee(dto.email, DateTime.UtcNow.AddDays(-3), null)).ToList();
         
         // Arrange
         var cvPartnerApiClientMock = _mocker.GetMock<ICvPartnerApiClient>();
@@ -65,6 +65,7 @@ public class OrchestratorTest :
 
         // Check if added
         db.Employees.Count().Should().Be(cvPartnerUserDtos.Count);
+        
         //Check if updated date from Bemanning
         db.Employees.FirstOrDefault()!.StartDate.Should().NotBe(new DateTime(2018, 1, 1));
 

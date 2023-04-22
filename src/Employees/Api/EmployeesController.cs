@@ -23,12 +23,12 @@ public class EmployeesController : ControllerBase
      */
     [HttpGet]
     [OutputCache(Duration = 60)]
-    public async Task<EmployeeList> Get()
+    public async Task<EmployeesJson> Get()
     {
-        var employees = await _employeeService.GetAllEmployees();
-        return new EmployeeList
+        var employees = await _employeeService.GetAllActiveEmployees();
+        return new EmployeesJson
         {
-            Employees = employees.Where(employee => employee.StartDate < DateTime.Now)
+            Employees = employees.Select(ModelConverters.ToEmployeeJson)
         };
     }
 }

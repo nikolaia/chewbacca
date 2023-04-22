@@ -18,4 +18,5 @@ public record EmployeeEntity
     public string? ImageUrl { get; set; }
     public string OfficeName { get; set; }
     public DateTime StartDate { get; set; }
+    public DateTime? EndDate { get; set; }
 }

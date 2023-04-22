@@ -37,11 +37,7 @@ public class BlobStorageRepository : IBlobStorageRepository
     {
         Uri uri = new(employeeImageUri);
 
-        BlobContainerClient container = _appSettings.Value.BlobStorage.UseDevelopmentStorage
-            ? new BlobContainerClient("UseDevelopmentStorage=true", "employees")
-            : new BlobContainerClient(_appSettings.Value.BlobStorage.Endpoint, new DefaultAzureCredential());
-        
-        await container.CreateIfNotExistsAsync();
+        var container = await GetBlobContainerClient();
 
         var blockBlobClient = container.GetBlobClient($"{cvPartnerUserId}.png");
 
@@ -79,5 +75,23 @@ public class BlobStorageRepository : IBlobStorageRepository
         });
 
         return blockBlobClient.Uri.AbsoluteUri;
+    }
+
+    private async Task<BlobContainerClient> GetBlobContainerClient()
+    {
+        BlobContainerClient container = _appSettings.Value.BlobStorage.UseDevelopmentStorage
+            ? new BlobContainerClient("UseDevelopmentStorage=true", "employees")
+            : new BlobContainerClient(_appSettings.Value.BlobStorage.Endpoint, new DefaultAzureCredential());
+
+        await container.CreateIfNotExistsAsync();
+        return container;
+    }
+
+    public async Task DeleteBlob(string blobUrlToBeDeleted)
+    {
+        var container = await GetBlobContainerClient();
+        var blobName = blobUrlToBeDeleted.Split('/').Last();
+        var blobClient = container.GetBlobClient(blobName);
+        await blobClient.DeleteIfExistsAsync();
     }
 }
