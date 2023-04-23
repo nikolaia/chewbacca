@@ -7,9 +7,13 @@ param location string = resourceGroup().location
 @description('The web site hosting plan')
 param sku string = 'B1'
 
+
+@description('Specifies sql admin login')
+@secure()
+param sqlAdministratorLogin string = newGuid()
 @description('Specifies sql admin password')
 @secure()
-param sqlAdministratorPassword string = 'P${uniqueString(resourceGroup().id, '224F5A8B-51DB-46A3-A7C8-59B0DD584A41')}x!'
+param sqlAdministratorPassword string = newGuid()
 
 var hostingPlanName = '${name}-sp-${uniqueString(resourceGroup().id)}'
 var applicationInsightsName = '${name}-insights-${uniqueString(resourceGroup().id)}'
@@ -79,10 +83,9 @@ module sql 'modules/sql.bicep' = {
     sqlServerName: sqlServerName
     sqlDatabaseName: sqlDatabaseName
     location: location
-    sqlAdministratorLogin: 'l${uniqueString(resourceGroup().id, '9A08DDB9-95A1-495F-9263-D89738ED4205')}'
+    sqlAdministratorLogin: sqlAdministratorLogin
     sqlAdministratorPassword: sqlAdministratorPassword
     adminIdentitySid: web.identity.principalId
-    tenant: web.identity.tenantId
   }
 }
 

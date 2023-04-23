@@ -11,7 +11,6 @@ param sqlAdministratorLogin string
 param sqlAdministratorPassword string
 
 param adminIdentitySid string
-param tenant string
 
 @description('Specifies database name')
 param sqlDatabaseName string
@@ -23,6 +22,13 @@ resource sqlserver 'Microsoft.Sql/servers@2020-11-01-preview' = {
     administratorLogin: sqlAdministratorLogin
     administratorLoginPassword: sqlAdministratorPassword
     version: '12.0'
+    administrators: {
+      administratorType: 'ActiveDirectory'
+      login: 'webappAppLogin'
+      sid: adminIdentitySid
+      tenantId: subscription().tenantId
+      azureADOnlyAuthentication: true
+    }
   }
 
   resource database 'databases@2020-08-01-preview' = {
@@ -44,17 +50,6 @@ resource sqlserver 'Microsoft.Sql/servers@2020-11-01-preview' = {
       startIpAddress: '0.0.0.0'
     }
   }
-
-  resource administrators 'administrators@2022-05-01-preview' = {
-    name: 'ActiveDirectory'
-    properties: {
-      administratorType: 'ActiveDirectory'
-      login: 'webappAppLogin'
-      sid: adminIdentitySid
-      tenantId: tenant
-    }
-  }
-
 }
 
 output sqlConnectionString string = 'Server=tcp:${reference(sqlServerName).fullyQualifiedDomainName},1433; Initial Catalog=${sqlDatabaseName};Persist Security Info=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False'
