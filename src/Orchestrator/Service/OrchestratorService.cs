@@ -70,11 +70,13 @@ public class OrchestratorService
                     "Deleting employee with email {BemanningEmail} from database, since it does not exist in CV Partner",
                     bemanning.Email);
                 var blobUrlToBeDeleted = await _employeesService.EnsureEmployeeIsDeleted(bemanning.Email);
-                if (blobUrlToBeDeleted != null)
+                if (blobUrlToBeDeleted == null)
                 {
-                    _logger.LogInformation("Deleting blob with url {BlobUrlToBeDeleted}", blobUrlToBeDeleted);
-                    await _blobStorageService.DeleteBlob(blobUrlToBeDeleted);
+                    continue;
                 }
+
+                _logger.LogInformation("Deleting blob with url {BlobUrlToBeDeleted}", blobUrlToBeDeleted);
+                await _blobStorageService.DeleteBlob(blobUrlToBeDeleted);
             }
         }
 
