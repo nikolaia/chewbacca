@@ -18,6 +18,11 @@ public class EmployeesRepository
         return await _db.Employees.ToListAsync();
     }
 
+    public async Task<EmployeeEntity?> GetEmployeeAsync(string name, string country)
+    {
+        return await _db.Employees.Where(emp => emp.Email == $"{name}@variant.{country}").SingleOrDefaultAsync();
+    }
+
     public async Task AddToDatabase(EmployeeEntity employee)
     {
         EmployeeEntity? updateEmployee = await _db.Employees.SingleOrDefaultAsync(e => e.Email == employee.Email);
@@ -71,7 +76,7 @@ public class EmployeesRepository
 
         _db.RemoveRange(employees);
         await _db.SaveChangesAsync();
-            
+
         return employees.Select(employee => employee.ImageUrl);
 
     }
