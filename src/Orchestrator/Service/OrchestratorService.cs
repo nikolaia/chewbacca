@@ -45,10 +45,10 @@ public class OrchestratorService
 
             if (cv is { image.url: not null })
             {
-                var defaultPhoneNumberRegion = cv.email.ToLower().EndsWith(".se") ? "SE" : "NO";
+                var countryCode = cv.email.ToLower().EndsWith(".se") ? "SE" : "NO";
 
-                var phoneNumber = phoneNumberUtil.IsPossibleNumber(cv.telephone, defaultPhoneNumberRegion)
-                    ? phoneNumberUtil.Format(phoneNumberUtil.Parse(cv.telephone, defaultPhoneNumberRegion),
+                var phoneNumber = phoneNumberUtil.IsPossibleNumber(cv.telephone, countryCode)
+                    ? phoneNumberUtil.Format(phoneNumberUtil.Parse(cv.telephone, countryCode),
                         PhoneNumbers.PhoneNumberFormat.E164)
                     : null;
 
@@ -60,7 +60,8 @@ public class OrchestratorService
                     ImageUrl = await _blobStorageService.SaveToBlob(cv.user_id, cv.image.url),
                     OfficeName = cv.office_name,
                     StartDate = bemanning.StartDate,
-                    EndDate = bemanning.EndDate
+                    EndDate = bemanning.EndDate,
+                    CountryCode = countryCode.ToLower()
                 });
             }
             else

@@ -36,6 +36,7 @@ public class EmployeesRepository
             updateEmployee.OfficeName = employee.OfficeName;
             updateEmployee.StartDate = employee.StartDate;
             updateEmployee.EndDate = employee.EndDate;
+            updateEmployee.CountryCode = employee.CountryCode;
         }
         else
         {
