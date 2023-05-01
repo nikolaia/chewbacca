@@ -12,7 +12,7 @@ namespace Employees.Api;
 public class EmployeesController : ControllerBase
 {
     private readonly EmployeesService _employeeService;
-    
+
     public EmployeesController(EmployeesService employeeService)
     {
         this._employeeService = employeeService;
@@ -30,5 +30,20 @@ public class EmployeesController : ControllerBase
         {
             Employees = employees.Select(ModelConverters.ToEmployeeJson)
         };
+    }
+
+    /**
+     * <returns>a call to Service's GetByNameAndCountry</returns>
+     */
+    [HttpGet("{country}/{alias}")]
+    [OutputCache(Duration = 60)]
+    public async Task<ActionResult<EmployeeJson>> GetByName(string country, string alias)
+    {
+        var employee = await _employeeService.GetByAliasAndCountry(alias, country);
+        if (employee == null)
+        {
+            return NotFound();
+        }
+        return ModelConverters.ToEmployeeJson(employee);
     }
 }

@@ -50,4 +50,36 @@ public class EmployeeTest :
             }
         );
     }
+
+    [Fact]
+    public async void Given_EmployeeExists_When_CallingEmployeeControllerGETEmployee_Then_ReturnsSampleData()
+    {
+        // Arrange
+        var knownSeedData = Seed.GetSeedingEmployees();
+
+        // Act
+        var employeeResponse = await _client.GetAsync("/employees/no/test");
+        var content =
+            JsonConvert.DeserializeObject<EmployeeJson>(await employeeResponse.Content
+                .ReadAsStringAsync());
+
+        // Assert
+        content!.Email.Should().BeEquivalentTo(knownSeedData[0].Email);
+    }
+
+    [Fact]
+    public async void Given_EmployeeDoesNotExists_When_CallingEmployeeControllerGETEmployee_Then_ReturnsNull()
+    {
+        // Arrange
+        var knownSeedData = Seed.GetSeedingEmployees();
+
+        // Act
+        var employeeResponse = await _client.GetAsync("/employees/not-valid-country/test");
+        var content =
+            JsonConvert.DeserializeObject<EmployeeJson>(await employeeResponse.Content
+                .ReadAsStringAsync());
+
+        // Assert
+        employeeResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
+    }
 }
