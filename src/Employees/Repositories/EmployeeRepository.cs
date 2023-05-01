@@ -18,9 +18,9 @@ public class EmployeesRepository
         return await _db.Employees.ToListAsync();
     }
 
-    public async Task<EmployeeEntity?> GetEmployeeAsync(string name, string country)
+    public async Task<EmployeeEntity?> GetEmployeeAsync(string alias, string country)
     {
-        return await _db.Employees.Where(emp => emp.Email == $"{name}@variant.{country}").SingleOrDefaultAsync();
+        return await _db.Employees.Where(emp => emp.Email == $"{alias}@variant.{country}").SingleOrDefaultAsync();
     }
 
     public async Task AddToDatabase(EmployeeEntity employee)

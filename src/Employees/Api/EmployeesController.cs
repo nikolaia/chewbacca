@@ -35,11 +35,11 @@ public class EmployeesController : ControllerBase
     /**
      * <returns>a call to Service's GetByNameAndCountry</returns>
      */
-    [HttpGet("{country}/{name}")]
+    [HttpGet("{country}/{alias}")]
     [OutputCache(Duration = 60)]
-    public async Task<ActionResult<EmployeeJson>> GetByName(string country, string name)
+    public async Task<ActionResult<EmployeeJson>> GetByName(string country, string alias)
     {
-        var employee = await _employeeService.GetByNameAndCountry(name, country);
+        var employee = await _employeeService.GetByAliasAndCountry(alias, country);
         if (employee == null)
         {
             return NotFound();

@@ -29,9 +29,9 @@ public class EmployeesService
             .Select(ModelConverters.ToEmployee);
     }
 
-    public async Task<Employee?> GetByNameAndCountry(string name, string country)
+    public async Task<Employee?> GetByAliasAndCountry(string alias, string country)
     {
-        var employee = await _employeesRepository.GetEmployeeAsync(name, country);
+        var employee = await _employeesRepository.GetEmployeeAsync(alias, country);
         return employee == null ? null : ModelConverters.ToEmployee(employee);
     }
 
