@@ -6,9 +6,11 @@ namespace Employees.Service;
 public class EmployeesService
 {
     private readonly EmployeesRepository _employeesRepository;
+    private readonly CountryContextAccessor _countryContext;
 
-    public EmployeesService(EmployeesRepository employeesRepository)
+    public EmployeesService(CountryContextAccessor countryContext, EmployeesRepository employeesRepository)
     {
+        this._countryContext = countryContext;
         this._employeesRepository = employeesRepository;
     }
 
@@ -29,9 +31,20 @@ public class EmployeesService
             .Select(ModelConverters.ToEmployee);
     }
 
-    public async Task<Employee?> GetByAliasAndCountry(string alias, string country)
+    /**
+     * <returns>list of employees from database</returns>
+     */
+    public async Task<IEnumerable<Employee>> GetActiveEmployeesInCountry()
     {
-        var employee = await _employeesRepository.GetEmployeeAsync(alias, country);
+        var employees = await _employeesRepository.GetEmployeesByCountry(this._countryContext.Country);
+        return employees
+            .Where(IsEmployeeActive)
+            .Select(ModelConverters.ToEmployee);
+    }
+
+    public async Task<Employee?> GetByAliasAndCountry(string alias)
+    {
+        var employee = await _employeesRepository.GetEmployeeAsync(alias, this._countryContext.Country);
         return employee == null ? null : ModelConverters.ToEmployee(employee);
     }
 

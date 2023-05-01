@@ -47,8 +47,15 @@ var initialAppSettings = appSettingsSection.Get<AppSettings>();
 
 if (initialAppSettings == null) throw new Exception("Unable to load app settings");
 
+builder.Services.AddHttpContextAccessor();
+builder.Services.Configure<RouteOptions>(options =>
+{
+    options.ConstraintMap.Add("country", typeof(CountryRouteConstraint));
+});
+
 builder.Services.AddSingleton(new AzureServiceTokenProvider());
 
+builder.Services.AddScoped<CountryContextAccessor>();
 builder.Services.AddScoped<CvPartnerService>();
 builder.Services.AddScoped<CvPartnerRepository>();
 builder.Services.AddScoped<EmployeesService>();
@@ -132,7 +139,9 @@ app.MapGet("/healthcheck",
 
         var response = new HealthcheckResponse()
         {
-            Database = dbCanConnect, KeyVault = healthcheck.KeyVault, AppConfig = healthcheck.AppConfig
+            Database = dbCanConnect,
+            KeyVault = healthcheck.KeyVault,
+            AppConfig = healthcheck.AppConfig
         };
 
         return response;

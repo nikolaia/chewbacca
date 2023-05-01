@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.OutputCaching;
 namespace Employees.Api;
 
 [ApiController]
-[Route("[controller]")]
+[Route("{country}/[controller]")]
 public class EmployeesController : ControllerBase
 {
     private readonly EmployeesService _employeeService;
@@ -25,7 +25,7 @@ public class EmployeesController : ControllerBase
     [OutputCache(Duration = 60)]
     public async Task<EmployeesJson> Get()
     {
-        var employees = await _employeeService.GetAllActiveEmployees();
+        var employees = await _employeeService.GetActiveEmployeesInCountry();
         return new EmployeesJson
         {
             Employees = employees.Select(ModelConverters.ToEmployeeJson)
@@ -35,11 +35,11 @@ public class EmployeesController : ControllerBase
     /**
      * <returns>a call to Service's GetByNameAndCountry</returns>
      */
-    [HttpGet("{country}/{alias}")]
+    [HttpGet("{alias}")]
     [OutputCache(Duration = 60)]
-    public async Task<ActionResult<EmployeeJson>> GetByName(string country, string alias)
+    public async Task<ActionResult<EmployeeJson>> GetByName(string alias)
     {
-        var employee = await _employeeService.GetByAliasAndCountry(alias, country);
+        var employee = await _employeeService.GetByAliasAndCountry(alias);
         if (employee == null)
         {
             return NotFound();
