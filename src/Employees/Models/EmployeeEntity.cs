@@ -17,6 +17,8 @@ public record EmployeeEntity
     public string? Telephone { get; set; }
     public string? ImageUrl { get; set; }
     public string OfficeName { get; set; }
+    [StringLength(maximumLength: 3)]
+    public string CountryCode { get; set; }
     public DateTime StartDate { get; set; }
     public DateTime? EndDate { get; set; }
 }

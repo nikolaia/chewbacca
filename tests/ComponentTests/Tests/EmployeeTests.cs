@@ -46,6 +46,30 @@ public class EmployeeTest :
             {
                 config.Excluding(employee => employee.Id);
                 config.Excluding(employee => employee.EndDate);
+                config.Excluding(employee => employee.CountryCode);
+                return config;
+            }
+        );
+    }
+
+    [Fact]
+    public async void Given_EmployeeExists_When_CallingEmployeeControllerGETByCountry_Then_ReturnsSampleData()
+    {
+        // Arrange
+        var knownSeedData = Seed.GetSeedingEmployees();
+
+        // Act
+        var employeeResponse = await _client.GetAsync("/employees?country=no");
+        var content =
+            JsonConvert.DeserializeObject<EmployeesJson>(await employeeResponse.Content
+                .ReadAsStringAsync());
+
+        // Assert
+        content!.Employees.Should().BeEquivalentTo(knownSeedData.Where(emp => emp.CountryCode == "no"), config =>
+            {
+                config.Excluding(employee => employee.Id);
+                config.Excluding(employee => employee.EndDate);
+                config.Excluding(employee => employee.CountryCode);
                 return config;
             }
         );
@@ -58,7 +82,7 @@ public class EmployeeTest :
         var knownSeedData = Seed.GetSeedingEmployees();
 
         // Act
-        var employeeResponse = await _client.GetAsync("/employees/no/test");
+        var employeeResponse = await _client.GetAsync("/employees/test?country=no");
         var content =
             JsonConvert.DeserializeObject<EmployeeJson>(await employeeResponse.Content
                 .ReadAsStringAsync());
@@ -74,12 +98,12 @@ public class EmployeeTest :
         var knownSeedData = Seed.GetSeedingEmployees();
 
         // Act
-        var employeeResponse = await _client.GetAsync("/employees/not-valid-country/test");
+        var employeeResponse = await _client.GetAsync("/employees/test");
         var content =
             JsonConvert.DeserializeObject<EmployeeJson>(await employeeResponse.Content
                 .ReadAsStringAsync());
 
         // Assert
-        employeeResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
+        employeeResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
     }
 }

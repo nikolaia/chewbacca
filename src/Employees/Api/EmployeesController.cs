@@ -23,9 +23,9 @@ public class EmployeesController : ControllerBase
      */
     [HttpGet]
     [OutputCache(Duration = 60)]
-    public async Task<EmployeesJson> Get()
+    public async Task<EmployeesJson> Get([FromQuery] string? country = null)
     {
-        var employees = await _employeeService.GetAllActiveEmployees();
+        var employees = await _employeeService.GetActiveEmployees(country);
         return new EmployeesJson
         {
             Employees = employees.Select(ModelConverters.ToEmployeeJson)
@@ -35,9 +35,9 @@ public class EmployeesController : ControllerBase
     /**
      * <returns>a call to Service's GetByNameAndCountry</returns>
      */
-    [HttpGet("{country}/{alias}")]
+    [HttpGet("{alias}")]
     [OutputCache(Duration = 60)]
-    public async Task<ActionResult<EmployeeJson>> GetByName(string country, string alias)
+    public async Task<ActionResult<EmployeeJson>> GetByAlias(string alias, [FromQuery] string country)
     {
         var employee = await _employeeService.GetByAliasAndCountry(alias, country);
         if (employee == null)

@@ -21,9 +21,12 @@ public class EmployeesService
     /**
      * <returns>list of employees from database</returns>
      */
-    public async Task<IEnumerable<Employee>> GetAllActiveEmployees()
+    public async Task<IEnumerable<Employee>> GetActiveEmployees(string? country = null)
     {
-        var employees = await _employeesRepository.GetAllEmployees();
+        var employees = await (string.IsNullOrEmpty(country)
+            ? _employeesRepository.GetAllEmployees()
+            : _employeesRepository.GetEmployeesByCountry(country));
+
         return employees
             .Where(IsEmployeeActive)
             .Select(ModelConverters.ToEmployee);

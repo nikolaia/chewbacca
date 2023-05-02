@@ -132,7 +132,9 @@ app.MapGet("/healthcheck",
 
         var response = new HealthcheckResponse()
         {
-            Database = dbCanConnect, KeyVault = healthcheck.KeyVault, AppConfig = healthcheck.AppConfig
+            Database = dbCanConnect,
+            KeyVault = healthcheck.KeyVault,
+            AppConfig = healthcheck.AppConfig
         };
 
         return response;

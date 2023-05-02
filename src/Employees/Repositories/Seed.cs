@@ -14,6 +14,7 @@ public static class Seed
                 Name = "Navn",
                 Telephone = "81529332",
                 ImageUrl = "https://example.com/image.png",
+                CountryCode = "no",
                 OfficeName = "Oslo",
                 StartDate = new DateTime(2018, 8, 1),
                 EndDate = null
@@ -24,6 +25,7 @@ public static class Seed
                 Name = "Navn",
                 Telephone = "81529332",
                 ImageUrl = "https://example.com/image.png",
+                CountryCode = "se",
                 OfficeName = "Oslo",
                 StartDate = new DateTime(2018, 8, 1),
                 EndDate = null
