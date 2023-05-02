@@ -13,7 +13,8 @@ namespace Employees.Migrations
             migrationBuilder.AddColumn<string>(
                 name: "CountryCode",
                 table: "Employees",
-                type: "nvarchar(max)",
+                type: "nvarchar(3)",
+                maxLength: 3,
                 nullable: false,
                 defaultValue: "");
         }

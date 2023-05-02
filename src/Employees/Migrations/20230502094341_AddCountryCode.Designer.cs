@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Employees.Migrations
 {
     [DbContext(typeof(EmployeeContext))]
-    [Migration("20230501191059_AddCountryCode")]
+    [Migration("20230502094341_AddCountryCode")]
     partial class AddCountryCode
     {
         /// <inheritdoc />
@@ -33,7 +33,8 @@ namespace Employees.Migrations
 
                     b.Property<string>("CountryCode")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(3)
+                        .HasColumnType("nvarchar(3)");
 
                     b.Property<string>("Email")
                         .IsRequired()
