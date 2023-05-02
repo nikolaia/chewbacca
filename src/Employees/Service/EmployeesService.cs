@@ -6,11 +6,9 @@ namespace Employees.Service;
 public class EmployeesService
 {
     private readonly EmployeesRepository _employeesRepository;
-    private readonly CountryContextAccessor _countryContext;
 
-    public EmployeesService(CountryContextAccessor countryContext, EmployeesRepository employeesRepository)
+    public EmployeesService(EmployeesRepository employeesRepository)
     {
-        this._countryContext = countryContext;
         this._employeesRepository = employeesRepository;
     }
 
@@ -23,28 +21,20 @@ public class EmployeesService
     /**
      * <returns>list of employees from database</returns>
      */
-    public async Task<IEnumerable<Employee>> GetAllActiveEmployees()
+    public async Task<IEnumerable<Employee>> GetActiveEmployees(string? country = null)
     {
-        var employees = await _employeesRepository.GetAllEmployees();
+        var employees = await (string.IsNullOrEmpty(country)
+            ? _employeesRepository.GetAllEmployees()
+            : _employeesRepository.GetEmployeesByCountry(country));
+
         return employees
             .Where(IsEmployeeActive)
             .Select(ModelConverters.ToEmployee);
     }
 
-    /**
-     * <returns>list of employees from database</returns>
-     */
-    public async Task<IEnumerable<Employee>> GetActiveEmployeesInCountry()
+    public async Task<Employee?> GetByAliasAndCountry(string alias, string country)
     {
-        var employees = await _employeesRepository.GetEmployeesByCountry(this._countryContext.Country);
-        return employees
-            .Where(IsEmployeeActive)
-            .Select(ModelConverters.ToEmployee);
-    }
-
-    public async Task<Employee?> GetByAliasAndCountry(string alias)
-    {
-        var employee = await _employeesRepository.GetEmployeeAsync(alias, this._countryContext.Country);
+        var employee = await _employeesRepository.GetEmployeeAsync(alias, country);
         return employee == null ? null : ModelConverters.ToEmployee(employee);
     }
 
