@@ -13,6 +13,8 @@ using CvPartner.Service;
 using Employees.Repositories;
 using Employees.Service;
 
+using Invoicing;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.EntityFrameworkCore;
@@ -31,7 +33,6 @@ using WebApi;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -70,10 +71,16 @@ builder.Services.AddScoped<IBlobStorageRepository, BlobStorageRepository>();
 
 // Orchestrator
 builder.Services.AddScoped<OrchestratorService>();
+builder.Services.AddScoped<OrchestratorService>();
+
+// Invoicing
+builder.Services.AddScoped<HarvestService>();
 
 // Refit
 builder.Services.AddRefitClient<ICvPartnerApiClient>()
     .ConfigureHttpClient(c => c.BaseAddress = initialAppSettings.CvPartner.Uri);
+builder.Services.AddRefitClient<IHarvestApiClient>()
+    .ConfigureHttpClient(c => c.BaseAddress = initialAppSettings.Invoicing.Uri);
 
 if (initialAppSettings.UseAzureAppConfig)
 {
@@ -95,6 +102,8 @@ builder.Services.AddDbContextPool<EmployeeContext>(options =>
     // https://devblogs.microsoft.com/azure-sdk/azure-identity-with-sql-graph-ef/
     options.AddInterceptors(new AzureAdAuthenticationDbConnectionInterceptor());
 });
+
+builder.Services.AddRazorPages();
 
 builder.Services.AddScheduler(ctx =>
 {
@@ -133,6 +142,7 @@ using (var scope = app.Services.CreateScope())
 // Configure the HTTP request pipeline.
 app.UseSwagger();
 app.UseSwaggerUI();
+app.UseStaticFiles();
 
 if (initialAppSettings.UseAzureAppConfig)
 {
@@ -143,6 +153,7 @@ app.UseAuthorization();
 
 app.MapGet("/", () => "Hello World!");
 app.MapControllers();
+app.MapRazorPages();
 
 // Example of Minimal API instead of using Controllers
 app.MapGet("/healthcheck",

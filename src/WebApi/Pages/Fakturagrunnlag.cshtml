@@ -1,0 +1,63 @@
+﻿@page
+@model WebApi.Pages.Fakturagrunnlag
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html lang="no">
+<head>
+    <title>Fakturagrunnlag</title>
+    <link href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/fakturagrunnlag.css"/>
+</head>
+<body>
+<page size="A4" layout="landscape">
+    <div class="container">
+        <div class="header">
+            <h1>
+                <b>Timerapport</b>
+            </h1>
+            <h2>Kundenavn: @Model.Project.project.client.name</h2>
+            <h2>Prosjekt: @Model.Project.project.name</h2>
+            <h3>Periode: @Model.MonthReadable</h3>
+        </div>
+        <div class="imageContainer">
+            <img src="images/variant.png" alt="Variant logo"/>
+        </div>
+    </div>
+    <table>
+        <tr>
+            <th>Navn</th>
+            @foreach (var day in Model.Dates)
+            {
+                <th class="@(Model.WeekendDates.Any(weekendDate => weekendDate.Day == day.Day) ? "weekend" : "")">@day.Day</th>
+            }
+            <th>Sum</th>
+        </tr>
+        <tr class="users">
+            @foreach (var entries in Model.Project.monthly_entries)
+            {
+                <td>@entries.user.name</td>
+                @foreach (var tasks in Model.Dates.Select(day => entries.spent_hours_by_date.Where(x => x.spent_date.Day == day.Day).ToList()))
+                {
+                    <td>@(tasks.Any() ? $"{tasks.Sum(hours => hours.spent_hours)}" : "-")</td>
+                }
+                <td class="sum">@entries.sum</td>
+            }
+        </tr>
+        <tr class="lastRow">
+            <td>Sum</td>
+            @foreach (var entry in Model.Dates.Select(date => Model.Project.monthly_entries.SelectMany(x => x.spent_hours_by_date).Where(x => x.spent_date.Day == date.Day).ToList()))
+            {
+                <td>@(entry.Any() ? $"{entry.Sum(hours => hours.spent_hours)}" : "-")</td>
+            }
+            <td class="sum">@Model.Project.monthly_entries.Sum(hours => hours.sum)</td>
+            }
+        </tr>
+    </table>
+</page>
+</body>
+</html>

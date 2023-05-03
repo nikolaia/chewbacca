@@ -18,6 +18,20 @@ public record BlobStorageConfig
     public bool UseDevelopmentStorage { get; set; } = false;
 }
 
+public record InvoicingConfig
+{
+    public Uri Uri { get; set; }
+    public HarvestConfig Oslo { get; set; }
+    public HarvestConfig Trondheim { get; set; }
+    public HarvestConfig Bergen { get; set; }
+}
+
+public record HarvestConfig
+{
+    public string AccountId { get; set; }
+    public string AccessToken { get; set; }
+}
+
 public record AppSettings
 {
     public Uri AzureAppConfigUri { get; set; } = null!;
@@ -27,4 +41,5 @@ public record AppSettings
     public string FilteredUids { get; set; } = null!;
     public string BemanningConnectionString { get; set; } = null!;
     public BlobStorageConfig BlobStorage { get; set; } = null!;
+    public InvoicingConfig Invoicing { get; set; }
 }
