@@ -64,12 +64,13 @@ public class BlobStorageRepository : IBlobStorageRepository
                 cvPartnerUserId);
             return blockBlobClient.Uri.AbsoluteUri;
         }
+
         if (!response.IsSuccessStatusCode)
         {
             // No need to update the blob
-            _logger.LogInformation(
-                "No cv image found for {CvPartnerUserId}.",
-                cvPartnerUserId);
+            _logger.LogError(
+                "Error fetching image {CvPartnerUserId}. Status Code: {StatusCode}.",
+                cvPartnerUserId, response.StatusCode);
             return null;
         }
 

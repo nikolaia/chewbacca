@@ -43,7 +43,7 @@ public class OrchestratorService
         {
             var cv = cvEntries.Find(cv => cv.email.ToLower().Trim() == bemanning.Email.ToLower().Trim());
 
-            if (cv is { image.url: not null })
+            if (cv != null)
             {
                 var countryCode = cv.email.ToLower().EndsWith(".se") ? "SE" : "NO";
 
@@ -57,7 +57,7 @@ public class OrchestratorService
                     Name = cv.name,
                     Email = cv.email,
                     Telephone = phoneNumber,
-                    ImageUrl = await _blobStorageService.SaveToBlob(cv.user_id, cv.image.url),
+                    ImageUrl = cv.image?.url != null ? await _blobStorageService.SaveToBlob(cv.user_id, cv.image.url) : null,
                     OfficeName = cv.office_name,
                     StartDate = bemanning.StartDate,
                     EndDate = bemanning.EndDate,
