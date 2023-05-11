@@ -94,14 +94,8 @@ public class EmployeeTest :
     [Fact]
     public async void Given_EmployeeDoesNotExists_When_CallingEmployeeControllerGETEmployee_Then_ReturnsNull()
     {
-        // Arrange
-        var knownSeedData = Seed.GetSeedingEmployees();
-
         // Act
         var employeeResponse = await _client.GetAsync("/employees/test");
-        var content =
-            JsonConvert.DeserializeObject<EmployeeJson>(await employeeResponse.Content
-                .ReadAsStringAsync());
 
         // Assert
         employeeResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);

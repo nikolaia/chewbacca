@@ -1,4 +1,4 @@
-using Bemanning;
+using Bemanning.Repositories;
 
 using BlobStorage.Service;
 
@@ -57,7 +57,10 @@ public class OrchestratorService
                     Name = cv.name,
                     Email = cv.email,
                     Telephone = phoneNumber,
-                    ImageUrl = cv.image?.url != null ? await _blobStorageService.SaveToBlob(cv.user_id, cv.image.url) : null,
+                    ImageUrl =
+                        cv.image.url != null
+                            ? await _blobStorageService.SaveToBlob(cv.user_id, cv.image.url)
+                            : null,
                     OfficeName = cv.office_name,
                     StartDate = bemanning.StartDate,
                     EndDate = bemanning.EndDate,

@@ -11,14 +11,18 @@ public record EmployeeEntity
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Guid Id { get; set; }
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
+
     [StringLength(maximumLength: 100)]
-    public string Email { get; set; }
+    public string Email { get; set; } = null!;
+
     public string? Telephone { get; set; }
     public string? ImageUrl { get; set; }
-    public string OfficeName { get; set; }
+    public string OfficeName { get; set; } = null!;
+
     [StringLength(maximumLength: 3)]
-    public string CountryCode { get; set; }
+    public string CountryCode { get; set; } = null!;
+
     public DateTime StartDate { get; set; }
     public DateTime? EndDate { get; set; }
 }

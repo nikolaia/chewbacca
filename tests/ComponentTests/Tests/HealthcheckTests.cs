@@ -40,8 +40,8 @@ public class HealthcheckTest :
         
         // Assert
         content.Should().NotBeNull();
-        content.Database.Should().Be(true);
-        content.AppConfig.Should().Be(false);
-        content.KeyVault.Should().Be(false);
+        content?.Database.Should().Be(true);
+        content?.AppConfig.Should().Be(false);
+        content?.KeyVault.Should().Be(false);
     }
 }

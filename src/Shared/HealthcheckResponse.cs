@@ -2,7 +2,7 @@
 
 public record HealthcheckResponse
 {
-    public bool Database { get; set; }
-    public bool KeyVault { get; set; }
-    public bool AppConfig { get; set; }
+    public bool Database { get; init; }
+    public bool KeyVault { get; init; }
+    public bool AppConfig { get; init; }
 }

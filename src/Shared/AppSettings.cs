@@ -7,22 +7,22 @@ public record Healthcheck {
 
 public record CvPartnerConfig
 {
-    public Uri Uri { get; set; }
-    public string Token { get; set; }
+    public Uri Uri { get; set; } = null!;
+    public string Token { get; set; } = null!;
 }
 
-public record BlobStorageConfig
+public  record BlobStorageConfig
 {
-    public Uri Endpoint { get; set; }
+    public Uri Endpoint { get; set; } = null!;
     public bool UseDevelopmentStorage { get; set; } = false;
 }
 
 public record AppSettings
 {
-    public Uri AzureAppConfigUri { get; set; }
+    public Uri AzureAppConfigUri { get; set; } = null!;
     public bool UseAzureAppConfig { get; set; }
-    public Healthcheck Healthcheck { get; set; }
-    public CvPartnerConfig CvPartner { get; set; }
-    public string BemanningConnectionString { get; set; }
-    public BlobStorageConfig BlobStorage { get; set; }
+    public Healthcheck Healthcheck { get; set; } = null!;
+    public CvPartnerConfig CvPartner { get; set; } = null!;
+    public string BemanningConnectionString { get; set; } = null!;
+    public BlobStorageConfig BlobStorage { get; set; } = null!;
 }
