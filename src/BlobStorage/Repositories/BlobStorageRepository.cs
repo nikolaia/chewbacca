@@ -49,14 +49,10 @@ public class BlobStorageRepository : IBlobStorageRepository
         if (await blockBlobClient.ExistsAsync())
         {
             var props = await blockBlobClient.GetPropertiesAsync();
-            if (props.HasValue && props.Value.Metadata.TryGetValue(BlobMetadataLastModifiedKey, out string? blobLastModified))
-            {
-                if (!string.IsNullOrEmpty(blobLastModified)
-                        && DateTimeOffset.TryParse(blobLastModified, out DateTimeOffset blobLastModifiedDate))
-                {
-                    message.Headers.IfModifiedSince = blobLastModifiedDate;
-                }
-            }
+            message.Headers.IfModifiedSince =
+                DateTimeOffset.TryParse(props.Value?.Metadata?[BlobMetadataLastModifiedKey], out DateTimeOffset blobLastModifiedDate)
+                    ? blobLastModifiedDate
+                    : null;
         }
 
         var response = await client.SendAsync(message);
