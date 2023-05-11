@@ -5,6 +5,8 @@ using Bemanning;
 using BlobStorage.Repositories;
 using BlobStorage.Service;
 
+using CronScheduler.Extensions.Scheduler;
+
 using CvPartner.Repositories;
 using CvPartner.Service;
 
@@ -22,6 +24,8 @@ using Refit;
 
 using Shared;
 using Shared.AzureIdentity;
+
+using WebApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -63,7 +67,6 @@ builder.Services.AddScoped<IBlobStorageRepository, BlobStorageRepository>();
 
 // Orchestrator
 builder.Services.AddScoped<OrchestratorService>();
-builder.Services.AddScoped<OrchestratorService>();
 
 // Refit
 builder.Services.AddRefitClient<ICvPartnerApiClient>()
@@ -88,6 +91,23 @@ builder.Services.AddDbContextPool<EmployeeContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("EmployeeDatabase"));
     // https://devblogs.microsoft.com/azure-sdk/azure-identity-with-sql-graph-ef/
     options.AddInterceptors(new AzureAdAuthenticationDbConnectionInterceptor());
+});
+
+builder.Services.AddScheduler(ctx =>
+{
+    const string jobName = nameof(OrchestratorJob);
+    ctx.AddJob(
+        sp =>
+        {
+            var options = sp.GetRequiredService<IOptionsMonitor<SchedulerOptions>>().Get(jobName);
+            return new OrchestratorJob(sp, options);
+        },
+        options =>
+        {
+            options.CronSchedule = "0 * * * *";
+            options.RunImmediately = true;
+        },
+        jobName: jobName);
 });
 
 var app = builder.Build();
@@ -132,9 +152,7 @@ app.MapGet("/healthcheck",
 
         var response = new HealthcheckResponse()
         {
-            Database = dbCanConnect,
-            KeyVault = healthcheck.KeyVault,
-            AppConfig = healthcheck.AppConfig
+            Database = dbCanConnect, KeyVault = healthcheck.KeyVault, AppConfig = healthcheck.AppConfig
         };
 
         return response;
