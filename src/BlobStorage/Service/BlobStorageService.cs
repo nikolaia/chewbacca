@@ -17,7 +17,7 @@ public class BlobStorageService
     /**
      * <summary> Delegates a task to <see cref="BlobStorageRepository"/> to save employee image to blob storage</summary>
      */
-    public Task<string> SaveToBlob(string employeeName, string employeeImageUri)
+    public Task<string?> SaveToBlob(string employeeName, string employeeImageUri)
     {
         return _blobStorageRepository.SaveToBlob(employeeName, employeeImageUri);
     }

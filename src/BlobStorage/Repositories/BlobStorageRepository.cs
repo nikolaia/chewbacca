@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Net;
 
 using Azure.Identity;
 using Azure.Storage.Blobs;
@@ -14,7 +15,7 @@ public class BlobStorageRepository : IBlobStorageRepository
 {
     private readonly IOptionsSnapshot<AppSettings> _appSettings;
     private ILogger<BlobStorageRepository> _logger;
-    
+
     private const string BlobMetadataLastModifiedKey = "lastModified";
 
     /**
@@ -33,7 +34,7 @@ public class BlobStorageRepository : IBlobStorageRepository
      * <param name="employeeImageUri">URL to the employee image. Used to copy it to the blob storage</param>
      * <param name="updatedAt">Last time the CV was updated. A naive way of uploading pictures to blob less often</param>
      */
-    public async Task<string> SaveToBlob(string cvPartnerUserId, string employeeImageUri)
+    public async Task<string?> SaveToBlob(string cvPartnerUserId, string employeeImageUri)
     {
         Uri uri = new(employeeImageUri);
 
@@ -41,31 +42,41 @@ public class BlobStorageRepository : IBlobStorageRepository
 
         var blockBlobClient = container.GetBlobClient($"{cvPartnerUserId}.png");
 
+
         using var client = new HttpClient();
-        var message = new HttpRequestMessage(HttpMethod.Options, uri);
-        var response = await client.SendAsync(message);
-        var lastModified = response.Content.Headers.LastModified.ToString() ?? DateTimeOffset.Now.ToString(CultureInfo.InvariantCulture);
+        var message = new HttpRequestMessage(HttpMethod.Get, uri);
 
         if (await blockBlobClient.ExistsAsync())
         {
             var props = await blockBlobClient.GetPropertiesAsync();
-            if (props.HasValue)
-            {
-                props.Value.Metadata.TryGetValue(BlobMetadataLastModifiedKey, out string? blobLastModified);
-
-                if (blobLastModified != null && blobLastModified == lastModified)
-                {
-                    // No need to update the blob
-                    _logger.LogInformation(
-                        "No need to update the blob for {CvPartnerUserId} as the image has not changed",
-                        cvPartnerUserId);
-                    return blockBlobClient.Uri.AbsoluteUri;
-                }
-            }
+            message.Headers.IfModifiedSince =
+                DateTimeOffset.TryParse(props.Value?.Metadata?[BlobMetadataLastModifiedKey], out DateTimeOffset blobLastModifiedDate)
+                    ? blobLastModifiedDate
+                    : null;
         }
 
+        var response = await client.SendAsync(message);
+        if (response.StatusCode == HttpStatusCode.NotModified)
+        {
+            // No need to update the blob
+            _logger.LogInformation(
+                "No need to update the blob for {CvPartnerUserId} as the image has not changed",
+                cvPartnerUserId);
+            return blockBlobClient.Uri.AbsoluteUri;
+        }
+
+        if (!response.IsSuccessStatusCode)
+        {
+            // No need to update the blob
+            _logger.LogError(
+                "Error fetching image {CvPartnerUserId}. Status Code: {StatusCode}.",
+                cvPartnerUserId, response.StatusCode);
+            return null;
+        }
+
+        var lastModified = response.Content.Headers.LastModified.ToString() ?? DateTimeOffset.Now.ToString(CultureInfo.InvariantCulture);
         var stream = await blockBlobClient.OpenWriteAsync(true);
-        await stream.WriteAsync(await new HttpClient().GetByteArrayAsync(uri));
+        await response.Content.CopyToAsync(stream);
         await stream.FlushAsync();
         await stream.DisposeAsync();
 
