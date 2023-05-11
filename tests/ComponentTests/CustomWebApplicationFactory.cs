@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-using Bemanning;
+using Bemanning.Repositories;
 
 using BlobStorage.Repositories;
 

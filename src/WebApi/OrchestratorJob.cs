@@ -1,10 +1,6 @@
-﻿using System.Security.Claims;
-
-using Cronos;
+﻿using Cronos;
 
 using CronScheduler.Extensions.Scheduler;
-
-using Microsoft.Extensions.Options;
 
 using Orchestrator.Service;
 

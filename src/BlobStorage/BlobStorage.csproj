@@ -5,12 +5,11 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <RootNamespace>Test</RootNamespace>
         <LangVersion>11</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Azure.Storage.Blobs" Version="12.15.0" />
+      <PackageReference Include="Azure.Storage.Blobs" Version="12.16.0" />
       <PackageReference Include="Microsoft.Extensions.Options" Version="7.0.1" />
     </ItemGroup>
 

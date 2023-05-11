@@ -1,8 +1,8 @@
 using System.Net;
 
-using AutoFixture.Xunit2;
+using AutoFixture;
 
-using Bemanning;
+using Bemanning.Repositories;
 
 using BlobStorage.Repositories;
 
@@ -37,20 +37,23 @@ public class OrchestratorTest :
         _mocker = _factory.Mocker;
     }
 
-    [Theory, AutoData]
+    [Fact]
     public async void
-        Given_CvPartnerEmployeesReturned_When_CallingCvPartnerControllerGET_Then_EnsureSavedToEmployeeDatabase(
-            List<CVPartnerUserDTO> cvPartnerUserDtos)
+        Given_CvPartnerEmployeesReturned_When_CallingCvPartnerControllerGET_Then_EnsureSavedToEmployeeDatabase()
     {
-        var bemanningEmployees =
-            cvPartnerUserDtos.Select(dto => new BemanningEmployee(dto.email, DateTime.UtcNow.AddDays(-3), null)).ToList();
-        
+
         // Arrange
+        var fixture = new Fixture();
+        var cvPartnerUserDTOs = fixture.CreateMany<CVPartnerUserDTO>().ToList();
+
         var cvPartnerApiClientMock = _mocker.GetMock<ICvPartnerApiClient>();
         cvPartnerApiClientMock.Setup(client => client.GetAllEmployee(It.IsAny<string>()))
             .ReturnsAsync(new ApiResponse<IEnumerable<CVPartnerUserDTO>>(new HttpResponseMessage(HttpStatusCode.OK),
-                cvPartnerUserDtos, new RefitSettings()));
+                cvPartnerUserDTOs, new RefitSettings()));
 
+        var bemanningEmployees =
+            cvPartnerUserDTOs.Select(dto => new BemanningEmployee(dto.email, DateTime.UtcNow.AddDays(-3), null))
+                .ToList();
         Mock<IBemanningRepository> bemanningRepositoryMock = _mocker.GetMock<IBemanningRepository>();
         bemanningRepositoryMock.Setup(client => client.GetBemanningDataForEmployees())
             .ReturnsAsync(bemanningEmployees);
@@ -60,18 +63,19 @@ public class OrchestratorTest :
 
         // Assert
         employeeResponse.IsSuccessStatusCode.Should().BeTrue();
+
         using var scope = _factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<EmployeeContext>();
-
-        // Check if added
-        db.Employees.Count().Should().Be(cvPartnerUserDtos.Count);
         
+        // Check if added
+        db.Employees.Count().Should().Be(cvPartnerUserDTOs.Count);
+
         //Check if updated date from Bemanning
         db.Employees.FirstOrDefault()!.StartDate.Should().NotBe(new DateTime(2018, 1, 1));
 
         // Check if blobService runs x amount of times
         var blobStorageServiceMocker = _mocker.GetMock<IBlobStorageRepository>();
         blobStorageServiceMocker.Verify(x => x.SaveToBlob(It.IsAny<string>(), It.IsAny<string>()),
-            Times.Exactly(cvPartnerUserDtos.Count));
+            Times.Exactly(cvPartnerUserDTOs.Count));
     }
 }

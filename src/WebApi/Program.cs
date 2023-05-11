@@ -1,6 +1,6 @@
 using Azure.Identity;
 
-using Bemanning;
+using Bemanning.Repositories;
 
 using BlobStorage.Repositories;
 using BlobStorage.Service;
@@ -26,6 +26,7 @@ using Shared;
 using Shared.AzureIdentity;
 
 using WebApi;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -104,7 +105,7 @@ builder.Services.AddScheduler(ctx =>
         },
         options =>
         {
-            options.CronSchedule = "0 * * * *";
+            options.CronSchedule = "0 4 * * *";
             options.RunImmediately = true;
         },
         jobName: jobName);

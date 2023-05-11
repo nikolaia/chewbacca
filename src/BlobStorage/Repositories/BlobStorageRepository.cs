@@ -21,6 +21,7 @@ public class BlobStorageRepository : IBlobStorageRepository
     /**
      * <summary> Class for handling blob storage </summary>
      * <param name="appSettings"> Options for connection string and which container to add to </param>
+     * <param name="logger">ILogger interface for logging</param>
      */
     public BlobStorageRepository(IOptionsSnapshot<AppSettings> appSettings, ILogger<BlobStorageRepository> logger)
     {
@@ -32,7 +33,6 @@ public class BlobStorageRepository : IBlobStorageRepository
      * <summary>Copies the image at employeeImageUri and streams it into a Blob Block in Azure</summary>
      * <param name="cvPartnerUserId">Name of the employee. Will be the name of the file in the blob storage</param>
      * <param name="employeeImageUri">URL to the employee image. Used to copy it to the blob storage</param>
-     * <param name="updatedAt">Last time the CV was updated. A naive way of uploading pictures to blob less often</param>
      */
     public async Task<string?> SaveToBlob(string cvPartnerUserId, string employeeImageUri)
     {
@@ -69,7 +69,7 @@ public class BlobStorageRepository : IBlobStorageRepository
         {
             // No need to update the blob
             _logger.LogError(
-                "Error fetching image {CvPartnerUserId}. Status Code: {StatusCode}.",
+                "Error fetching image {CvPartnerUserId}. Status Code: {StatusCode}",
                 cvPartnerUserId, response.StatusCode);
             return null;
         }

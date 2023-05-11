@@ -6,7 +6,7 @@ using Npgsql;
 
 using Shared;
 
-namespace Bemanning;
+namespace Bemanning.Repositories;
 
 public class BemanningRepository : IBemanningRepository
 {

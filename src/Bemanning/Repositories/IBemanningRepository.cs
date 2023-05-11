@@ -1,4 +1,4 @@
-namespace Bemanning;
+namespace Bemanning.Repositories;
 
 public interface IBemanningRepository
 {
