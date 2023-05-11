@@ -64,6 +64,14 @@ public class BlobStorageRepository : IBlobStorageRepository
                 cvPartnerUserId);
             return blockBlobClient.Uri.AbsoluteUri;
         }
+        if (!response.IsSuccessStatusCode)
+        {
+            // No need to update the blob
+            _logger.LogInformation(
+                "No cv image found for {CvPartnerUserId}.",
+                cvPartnerUserId);
+            return null;
+        }
 
         var lastModified = response.Content.Headers.LastModified.ToString() ?? DateTimeOffset.Now.ToString(CultureInfo.InvariantCulture);
         var stream = await blockBlobClient.OpenWriteAsync(true);
