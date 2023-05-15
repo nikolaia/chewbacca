@@ -59,6 +59,8 @@ builder.Services.AddScoped<CvPartnerRepository>();
 builder.Services.AddScoped<EmployeesService>();
 builder.Services.AddScoped<EmployeesRepository>();
 
+builder.Services.AddScoped<FilteredUids>();
+
 // Bemanning
 builder.Services.AddScoped<IBemanningRepository, BemanningRepository>();
 
@@ -153,7 +155,9 @@ app.MapGet("/healthcheck",
 
         var response = new HealthcheckResponse()
         {
-            Database = dbCanConnect, KeyVault = healthcheck.KeyVault, AppConfig = healthcheck.AppConfig
+            Database = dbCanConnect,
+            KeyVault = healthcheck.KeyVault,
+            AppConfig = healthcheck.AppConfig
         };
 
         return response;
