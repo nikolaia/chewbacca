@@ -18,10 +18,12 @@ public class OrchestratorService
     private readonly IBemanningRepository _bemanningRepository;
     private readonly BlobStorageService _blobStorageService;
     private readonly ILogger<OrchestratorService> _logger;
+    private readonly FilteredUids _filteredUids;
 
     public OrchestratorService(EmployeesService employeesService, CvPartnerService cvPartnerService,
         IBemanningRepository bemanningRepository,
         BlobStorageService blobStorageService,
+        FilteredUids filteredUids,
         ILogger<OrchestratorService> logger)
     {
         _employeesService = employeesService;
@@ -29,6 +31,7 @@ public class OrchestratorService
         _bemanningRepository = bemanningRepository;
         _blobStorageService = blobStorageService;
         _logger = logger;
+        _filteredUids = filteredUids;
     }
 
     public async Task FetchMapAndSaveEmployeeData()
@@ -52,11 +55,13 @@ public class OrchestratorService
                         PhoneNumbers.PhoneNumberFormat.E164)
                     : null;
 
+                var isFilteredPhone = _filteredUids.Uids.Contains(cv.user_id);
+
                 await _employeesService.AddOrUpdateEmployee(new EmployeeEntity
                 {
                     Name = cv.name,
                     Email = cv.email,
-                    Telephone = phoneNumber,
+                    Telephone = isFilteredPhone ? null : phoneNumber,
                     ImageUrl =
                         cv.image.url != null
                             ? await _blobStorageService.SaveToBlob(cv.user_id, cv.image.url)
