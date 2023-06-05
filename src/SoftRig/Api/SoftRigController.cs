@@ -1,4 +1,3 @@
-
 using SoftRig.Models;
 using SoftRig.Service;
 
