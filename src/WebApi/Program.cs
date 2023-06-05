@@ -27,6 +27,12 @@ using Shared.AzureIdentity;
 
 using WebApi;
 
+using SoftRig.Repositories;
+using SoftRig.Service;
+
+using System.Diagnostics;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -58,6 +64,8 @@ builder.Services.AddScoped<CvPartnerService>();
 builder.Services.AddScoped<CvPartnerRepository>();
 builder.Services.AddScoped<EmployeesService>();
 builder.Services.AddScoped<EmployeesRepository>();
+builder.Services.AddScoped<SoftRigRepository>();
+builder.Services.AddScoped<SoftRigService>();
 
 builder.Services.AddScoped<FilteredUids>();
 
@@ -74,6 +82,8 @@ builder.Services.AddScoped<OrchestratorService>();
 // Refit
 builder.Services.AddRefitClient<ICvPartnerApiClient>()
     .ConfigureHttpClient(c => c.BaseAddress = initialAppSettings.CvPartner.Uri);
+builder.Services.AddRefitClient<ISoftRigApiClient>()
+    .ConfigureHttpClient(c => c.BaseAddress = initialAppSettings.SoftRig.APIBaseUrl);
 
 if (initialAppSettings.UseAzureAppConfig)
 {
