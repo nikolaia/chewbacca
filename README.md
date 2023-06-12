@@ -12,6 +12,14 @@ Løsningen er bygget slik at arbeid på den gir relevant erfaring for hva vi mø
 
 Det er tatt noen avgjørelser rundt arkitektur og hvordan vi bruker skytjenester. De avgjørelsene kan du [lese mer om her](docs/architecture.md).
 
+## Kommandoer
+
+For å kjøre
+```dotnet run --project src/WebApi```
+
+For å kjøre migrering til Employees-databasen
+```dotnet ef migrations add <navn på migrasjon> --project src/Employees --startup-project src/WebApi``` 
+
 ## Up and running med ekte integrasjoner
 
 For å få tilgang til integrasjoner må man ha:
