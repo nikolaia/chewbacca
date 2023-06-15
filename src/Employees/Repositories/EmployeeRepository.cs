@@ -116,4 +116,30 @@ public class EmployeesRepository
 
         await _db.SaveChangesAsync();
     }
+
+    public async Task<EmergencyContactEntity?> GetEmergencyContactAsync(EmployeeEntity employee)
+    {
+        return await _db.EmergencyContacts
+            .Where(emp => emp.Employee.Equals(employee))
+            .SingleOrDefaultAsync();
+    }
+
+    public async Task AddToDatabase(EmergencyContactEntity emergencyContact)
+    {
+        EmergencyContactEntity? updateEmergencyContact = await _db.EmergencyContacts.SingleOrDefaultAsync(e => e.Employee == emergencyContact.Employee);
+
+        if (updateEmergencyContact != null)
+        {
+            updateEmergencyContact.Name = emergencyContact.Name;
+            updateEmergencyContact.Phone = emergencyContact.Phone;
+            updateEmergencyContact.Relation = emergencyContact.Relation;
+            updateEmergencyContact.Comment = emergencyContact.Comment;
+        }
+        else
+        {
+            await _db.AddAsync(emergencyContact);
+        }
+
+        await _db.SaveChangesAsync();
+    }
 }

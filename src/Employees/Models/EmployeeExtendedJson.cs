@@ -11,4 +11,5 @@ public record EmployeeExtendedJson
     public DateTime StartDate { get; set; }
 
     public EmployeeInformation? Information { get; set; } = null!;
+    public EmergencyContact? EmergencyContact { get; set; } = null!;
 }
