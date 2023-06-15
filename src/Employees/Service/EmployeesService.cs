@@ -86,4 +86,26 @@ public class EmployeesService
         }
     }
 
+    public async Task<EmergencyContact?> GetEmergencyContactByEmployee(EmployeeEntity employee)
+    {
+        var emergencyContact = await _employeesRepository.GetEmergencyContactAsync(employee);
+
+        return emergencyContact == null ? null : ModelConverters.ToEmergencyContact(emergencyContact);
+    }
+
+    public Task AddOrUpdateEmergencyContact(EmployeeEntity employee, EmergencyContact employeeInformation)
+    {
+        {
+            EmergencyContactEntity entity = new EmergencyContactEntity
+            {
+                Employee = employee,
+                Name = employeeInformation.Name,
+                Phone = employeeInformation.Phone,
+                Relation = employeeInformation.Relation,
+                Comment = employeeInformation.Comment,
+            };
+
+            return _employeesRepository.AddToDatabase(entity);
+        }
+    }
 }

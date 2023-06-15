@@ -29,7 +29,7 @@ public static class ModelConverters
         };
     }
 
-    public static EmployeeExtendedJson ToEmployeeExtendedJson(EmployeeEntity employee, EmployeeInformation? employeeInformation)
+    public static EmployeeExtendedJson ToEmployeeExtendedJson(EmployeeEntity employee, EmployeeInformation? employeeInformation, EmergencyContact? emergencyContact)
     {
         return new EmployeeExtendedJson
         {
@@ -38,7 +38,8 @@ public static class ModelConverters
             Telephone = employee.Telephone,
             ImageUrl = employee.ImageUrl,
             OfficeName = employee.OfficeName,
-            Information = employeeInformation
+            Information = employeeInformation,
+            EmergencyContact = emergencyContact
         };
     }
 
@@ -51,6 +52,17 @@ public static class ModelConverters
             Adress = employeeInformation.Adress,
             ZipCode = employeeInformation.ZipCode,
             City = employeeInformation.City,
+        };
+    }
+
+    public static EmergencyContact ToEmergencyContact(EmergencyContactEntity emergencyContact)
+    {
+        return new EmergencyContact
+        {
+            Name = emergencyContact.Name,
+            Phone = emergencyContact.Phone,
+            Relation = emergencyContact.Relation,
+            Comment = emergencyContact.Comment,
         };
     }
 }

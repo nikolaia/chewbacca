@@ -12,4 +12,5 @@ public class EmployeeContext : DbContext
 
     public DbSet<EmployeeEntity> Employees { get; set; } = null!;
     public DbSet<EmployeeInformationEntity> EmployeeInformations { get; set; } = null!;
+    public DbSet<EmergencyContactEntity> EmergencyContacts { get; set; } = null!;
 }

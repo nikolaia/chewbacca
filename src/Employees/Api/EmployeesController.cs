@@ -52,16 +52,17 @@ public class EmployeesController : ControllerBase
         if (extended)
         {
             var employeeInformation = await _employeeService.GetInformationByEmployee(employee);
+            var emergencyContact = await _employeeService.GetEmergencyContactByEmployee(employee);
 
-            return ModelConverters.ToEmployeeExtendedJson(employee, employeeInformation);
+            return ModelConverters.ToEmployeeExtendedJson(employee, employeeInformation, emergencyContact);
         }
         else
         {
-            return ModelConverters.ToEmployeeExtendedJson(employee, null);
+            return ModelConverters.ToEmployeeExtendedJson(employee, null, null);
         }
     }
 
-    [HttpPost("{country}/{alias}")]
+    [HttpPost("information/{country}/{alias}")]
     public async Task UpdateEmployeeInformation(string alias, string country, [FromBody] EmployeeInformation employeeInformation)
     {
         var employee = await _employeeService.GetEntityByAliasAndCountry(alias, "no");
@@ -73,6 +74,21 @@ public class EmployeesController : ControllerBase
         else
         {
             await _employeeService.AddOrUpdateEmployeeInformation(employee, employeeInformation);
+        }
+    }
+
+    [HttpPost("emergencyContact/{country}/{alias}")]
+    public async Task UpdateEmergencyContact(string alias, string country, [FromBody] EmergencyContact emergencyContact)
+    {
+        var employee = await _employeeService.GetEntityByAliasAndCountry(alias, "no");
+
+        if (employee == null)
+        {
+            _logger.LogError("Can't update EmergencyContact because there is no matching Employee to alias {alias} and country {country}", alias, country);
+        }
+        else
+        {
+            await _employeeService.AddOrUpdateEmergencyContact(employee, emergencyContact);
         }
     }
 }
