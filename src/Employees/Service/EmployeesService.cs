@@ -38,6 +38,13 @@ public class EmployeesService
         return employee == null ? null : ModelConverters.ToEmployee(employee);
     }
 
+    public async Task<EmployeeEntity?> GetEntityByAliasAndCountry(string alias, string country)
+    {
+        var employee = await _employeesRepository.GetEmployeeAsync(alias, country);
+
+        return employee;
+    }
+
     public Task AddOrUpdateEmployee(EmployeeEntity employee)
     {
         return _employeesRepository.AddToDatabase(employee);
@@ -52,4 +59,31 @@ public class EmployeesService
     {
         return _employeesRepository.EnsureEmployeesWithEndDateBeforeTodayAreDeleted();
     }
+
+    public async Task<EmployeeInformation?> GetInformationByEmployee(EmployeeEntity employee)
+    {
+        var employeeInformation = await _employeesRepository.GetEmployeeInformationAsync(employee);
+
+        return employeeInformation == null ? null : ModelConverters.ToEmployeeInformation(employeeInformation);
+    }
+
+
+    public Task AddOrUpdateEmployeeInformation(EmployeeEntity employee, EmployeeInformation employeeInformation)
+    {
+        {
+            EmployeeInformationEntity entity = new EmployeeInformationEntity
+            {
+                Employee = employee,
+                Phone = employeeInformation.Phone,
+                AccountNr = employeeInformation.AccountNr,
+                Adress = employeeInformation.Adress,
+                ZipCode = employeeInformation.ZipCode,
+                City = employeeInformation.City,
+            };
+
+            return _employeesRepository.AddToDatabase(entity);
+
+        }
+    }
+
 }

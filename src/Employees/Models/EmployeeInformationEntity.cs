@@ -16,6 +16,6 @@ public record EmployeeInformationEntity
     public string Phone { get; set; } = null!;
     public string AccountNr { get; set; } = null!;
     public string Adress { get; set; } = null!;
-    public int PostalCode { get; set; }
+    public string ZipCode { get; set; } = null!;
     public string City { get; set; } = null!;
 }

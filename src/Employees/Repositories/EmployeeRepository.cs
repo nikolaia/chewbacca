@@ -89,4 +89,31 @@ public class EmployeesRepository
         return employees.Select(employee => employee.ImageUrl);
 
     }
+
+    public async Task<EmployeeInformationEntity?> GetEmployeeInformationAsync(EmployeeEntity employee)
+    {
+        return await _db.EmployeeInformations
+            .Where(emp => emp.Employee.Equals(employee))
+            .SingleOrDefaultAsync();
+    }
+
+    public async Task AddToDatabase(EmployeeInformationEntity employeeInformation)
+    {
+        EmployeeInformationEntity? updateEmployeeInformation = await _db.EmployeeInformations.SingleOrDefaultAsync(e => e.Employee == employeeInformation.Employee);
+
+        if (updateEmployeeInformation != null)
+        {
+            updateEmployeeInformation.Phone = employeeInformation.Phone;
+            updateEmployeeInformation.AccountNr = employeeInformation.AccountNr;
+            updateEmployeeInformation.Adress = employeeInformation.Adress;
+            updateEmployeeInformation.ZipCode = employeeInformation.ZipCode;
+            updateEmployeeInformation.City = employeeInformation.City;
+        }
+        else
+        {
+            await _db.AddAsync(employeeInformation);
+        }
+
+        await _db.SaveChangesAsync();
+    }
 }
