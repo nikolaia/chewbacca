@@ -27,6 +27,8 @@ using Shared.AzureIdentity;
 
 using WebApi;
 
+using SoftRig.Repositories;
+using SoftRig.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -67,6 +69,12 @@ builder.Services.AddScoped<IBemanningRepository, BemanningRepository>();
 // BlobStorage
 builder.Services.AddScoped<BlobStorageService>();
 builder.Services.AddScoped<IBlobStorageRepository, BlobStorageRepository>();
+
+// SoftRig
+builder.Services.AddScoped<SoftRigRepository>();
+builder.Services.AddScoped<SoftRigService>();
+builder.Services.AddRefitClient<ISoftRigApiClient>()
+    .ConfigureHttpClient(c => c.BaseAddress = initialAppSettings.SoftRig.APIBaseUrl);
 
 // Orchestrator
 builder.Services.AddScoped<OrchestratorService>();
