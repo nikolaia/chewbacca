@@ -51,6 +51,14 @@ builder.Configuration
     .AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true)
     .AddEnvironmentVariables();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("MyCorsPolicy", builder =>
+    {
+        builder.AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod();
+    });
+});
+
 // Bind configuration "TestApp:Settings" section to the Settings object
 var appSettingsSection = builder.Configuration
     .GetSection("AppSettings");
@@ -131,6 +139,8 @@ builder.Services.AddScheduler(ctx =>
 
 var app = builder.Build();
 
+app.UseCors("MyCorsPolicy");
+
 /*
  * Migrate the database.
  * Ideally the app shouldn't have access to alter the database schema, but we do it for simplicity's sake,
@@ -139,6 +149,12 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<EmployeeContext>();
+
+    if (app.Environment.IsDevelopment())
+    {
+        db.Database.EnsureCreated();
+    }
+
     var isInMemoryDatabase = db.Database.ProviderName?.StartsWith("Microsoft.EntityFrameworkCore.InMemory") ?? false;
     if (!isInMemoryDatabase)
     {
