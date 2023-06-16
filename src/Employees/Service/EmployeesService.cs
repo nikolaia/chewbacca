@@ -82,7 +82,6 @@ public class EmployeesService
             };
 
             return _employeesRepository.AddToDatabase(entity);
-
         }
     }
 

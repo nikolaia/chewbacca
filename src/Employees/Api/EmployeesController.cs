@@ -65,7 +65,7 @@ public class EmployeesController : ControllerBase
     [HttpPost("information/{country}/{alias}")]
     public async Task UpdateEmployeeInformation(string alias, string country, [FromBody] EmployeeInformation employeeInformation)
     {
-        var employee = await _employeeService.GetEntityByAliasAndCountry(alias, "no");
+        var employee = await _employeeService.GetEntityByAliasAndCountry(alias, country);
 
         if (employee == null)
         {
@@ -80,7 +80,7 @@ public class EmployeesController : ControllerBase
     [HttpPost("emergencyContact/{country}/{alias}")]
     public async Task UpdateEmergencyContact(string alias, string country, [FromBody] EmergencyContact emergencyContact)
     {
-        var employee = await _employeeService.GetEntityByAliasAndCountry(alias, "no");
+        var employee = await _employeeService.GetEntityByAliasAndCountry(alias, country);
 
         if (employee == null)
         {
