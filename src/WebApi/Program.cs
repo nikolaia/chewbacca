@@ -27,6 +27,9 @@ using Shared.AzureIdentity;
 
 using WebApi;
 
+using SoftRig.Repositories;
+using SoftRig.Service;
+
 var builder = WebApplication.CreateBuilder(args);
 
 
