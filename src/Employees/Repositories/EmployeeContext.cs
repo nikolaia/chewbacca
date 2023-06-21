@@ -12,4 +12,7 @@ public class EmployeeContext : DbContext
 
     public DbSet<EmployeeEntity> Employees { get; set; } = null!;
     public DbSet<EmergencyContactEntity> EmergencyContacts { get; set; } = null!;
+    public DbSet<EmployeeDefaultAllergyEntity> EmployeeDefaultAllergies { get; set; } = null!;
+    public DbSet<EmployeeOtherAllergyEntity> EmployeeOtherAllergies { get; set; } = null!;
+    public DbSet<EmployeeDietaryPreferenceEntity> EmployeeDietaryPreferences { get; set; } = null!;
 }
