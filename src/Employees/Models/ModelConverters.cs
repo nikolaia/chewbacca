@@ -81,4 +81,19 @@ public static class ModelConverters
             Comment = emergencyContact.Comment,
         };
     }
+
+    public static EmployeeExtendedJson ToEmployeeExtendedJson(
+        EmployeeEntity employee,
+        AllergiesAndDietaryPreferences allergiesAndDietaryPreferences)
+    {
+        return new EmployeeExtendedJson
+        {
+            Name = employee.Name,
+            Email = employee.Email,
+            Telephone = employee.Telephone,
+            ImageUrl = employee.ImageUrl,
+            OfficeName = employee.OfficeName,
+            AllergiesAndDietaryPreferences = allergiesAndDietaryPreferences
+        };
+    }
 }

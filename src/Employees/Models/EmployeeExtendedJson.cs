@@ -1,6 +1,5 @@
 namespace Employees.Models;
 
-
 public record EmployeeExtendedJson
 {
     public string Email { get; init; } = null!;
@@ -16,4 +15,5 @@ public record EmployeeExtendedJson
     public string? Address { get; init; }
     public string? ZipCode { get; init; }
     public string? City { get; init; }
+    public AllergiesAndDietaryPreferences AllergiesAndDietaryPreferences { get; set; } = null!;
 }

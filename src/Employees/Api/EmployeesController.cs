@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Employees.Service;
 
 using Microsoft.AspNetCore.OutputCaching;
+using Microsoft.Extensions.Logging;
 
 namespace Employees.Api;
 
@@ -14,6 +15,7 @@ public class EmployeesController : ControllerBase
 {
     private readonly EmployeesService _employeeService;
     private readonly ILogger<EmployeesController> _logger;
+
 
     public EmployeesController(EmployeesService employeeService, ILogger<EmployeesController> logger)
     {
@@ -51,8 +53,9 @@ public class EmployeesController : ControllerBase
         }
 
         var emergencyContact = await _employeeService.GetEmergencyContactByEmployee(employee);
+        var allergiesAndDietaryPreferences = await _employeeService.GetAllergiesAndDietaryPreferencesByEmployee(employee);
 
-        return ModelConverters.ToEmployeeExtendedJson(employee, emergencyContact);
+        return ModelConverters.ToEmployeeExtendedJson(employee, emergencyContact, allergiesAndDietaryPreferences);
     }
 
     /**
@@ -113,6 +116,47 @@ public class EmployeesController : ControllerBase
         else
         {
             await _employeeService.AddOrUpdateEmergencyContact(employee, emergencyContact);
+            return NoContent();
+        }
+    }
+
+    /**
+     * <returns>A list of the allergies as strings</returns>
+     */
+    [HttpGet("allergies")]
+    [OutputCache(Duration = 60)]
+    public List<string> GetAllergies()
+    {
+        List<DefaultAllergyEnum> allergies = _employeeService.GetDefaultAllergies();
+        return allergies.Select(a => a.ToString()).ToList();
+    }
+
+    /**
+     * <returns>A list of the dietary preferences as strings</returns>
+     */
+    [HttpGet("dietaryPreferences")]
+    [OutputCache(Duration = 60)]
+    public List<string> GetDietaryPreferences()
+    {
+        var dietaryPreferences = _employeeService.GetDietaryPreferences();
+        return dietaryPreferences.Select(a => a.ToString()).ToList();
+    }
+
+    // TODO: add CORS
+    [HttpPost("allergiesAndDietaryPreferences/{country}/{alias}")]
+    public async Task<IActionResult> UpdateAllergiesAndDietaryPreferences(string alias, string country, [FromBody] AllergiesAndDietaryPreferences allergiesAndDietaryPreferences)
+    {
+        var employee = await _employeeService.GetEntityByAliasAndCountry(alias, country);
+
+        if (employee == null)
+        {
+            _logger.LogError("Can't update allergies and dietary preferences because there is no matching Employee to alias {alias} and country {country}", alias, country);
+            return NotFound();
+        }
+        else
+        {
+            await _employeeService.UpdateAllergies(employee, allergiesAndDietaryPreferences.DefaultAllergies, allergiesAndDietaryPreferences.OtherAllergies);
+            await _employeeService.UpdateDietaryPreferences(employee, allergiesAndDietaryPreferences.DietaryPreferences);
             return NoContent();
         }
     }
