@@ -12,4 +12,8 @@ public record EmployeeExtendedJson
 
     public EmployeeInformation? Information { get; set; } = null!;
     public EmergencyContact? EmergencyContact { get; set; } = null!;
+    public string? AccountNumber { get; init; }
+    public string? Address { get; init; }
+    public string? ZipCode { get; init; }
+    public string? City { get; init; }
 }

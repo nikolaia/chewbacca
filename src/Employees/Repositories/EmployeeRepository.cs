@@ -45,6 +45,10 @@ public class EmployeesRepository
             updateEmployee.StartDate = employee.StartDate;
             updateEmployee.EndDate = employee.EndDate;
             updateEmployee.CountryCode = employee.CountryCode;
+            employee.Address = employee.Address;
+            employee.AccountNumber = employee.AccountNumber;
+            employee.ZipCode = employee.ZipCode;
+            employee.City = employee.City;
         }
         else
         {
@@ -90,33 +94,6 @@ public class EmployeesRepository
 
     }
 
-    public async Task<EmployeeInformationEntity?> GetEmployeeInformationAsync(EmployeeEntity employee)
-    {
-        return await _db.EmployeeInformations
-            .Where(emp => emp.Employee.Equals(employee))
-            .SingleOrDefaultAsync();
-    }
-
-    public async Task AddToDatabase(EmployeeInformationEntity employeeInformation)
-    {
-        EmployeeInformationEntity? updateEmployeeInformation = await _db.EmployeeInformations.SingleOrDefaultAsync(e => e.Employee == employeeInformation.Employee);
-
-        if (updateEmployeeInformation != null)
-        {
-            updateEmployeeInformation.Phone = employeeInformation.Phone;
-            updateEmployeeInformation.AccountNr = employeeInformation.AccountNr;
-            updateEmployeeInformation.Adress = employeeInformation.Adress;
-            updateEmployeeInformation.ZipCode = employeeInformation.ZipCode;
-            updateEmployeeInformation.City = employeeInformation.City;
-        }
-        else
-        {
-            await _db.AddAsync(employeeInformation);
-        }
-
-        await _db.SaveChangesAsync();
-    }
-
     public async Task<EmergencyContactEntity?> GetEmergencyContactAsync(EmployeeEntity employee)
     {
         return await _db.EmergencyContacts
@@ -126,7 +103,7 @@ public class EmployeesRepository
 
     public async Task AddToDatabase(EmergencyContactEntity emergencyContact)
     {
-        EmergencyContactEntity? updateEmergencyContact = await _db.EmergencyContacts.SingleOrDefaultAsync(e => e.Employee == emergencyContact.Employee);
+        var updateEmergencyContact = await _db.EmergencyContacts.SingleOrDefaultAsync(e => e.Employee == emergencyContact.Employee);
 
         if (updateEmergencyContact != null)
         {

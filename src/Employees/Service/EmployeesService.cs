@@ -40,9 +40,7 @@ public class EmployeesService
 
     public async Task<EmployeeEntity?> GetEntityByAliasAndCountry(string alias, string country)
     {
-        var employee = await _employeesRepository.GetEmployeeAsync(alias, country);
-
-        return employee;
+        return await _employeesRepository.GetEmployeeAsync(alias, country);
     }
 
     public Task AddOrUpdateEmployee(EmployeeEntity employee)
@@ -60,29 +58,15 @@ public class EmployeesService
         return _employeesRepository.EnsureEmployeesWithEndDateBeforeTodayAreDeleted();
     }
 
-    public async Task<EmployeeInformation?> GetInformationByEmployee(EmployeeEntity employee)
+    public Task UpdateEmployeeInformation(EmployeeEntity employee, EmployeeInformation employeeInformation)
     {
-        var employeeInformation = await _employeesRepository.GetEmployeeInformationAsync(employee);
+        employee.Telephone = employeeInformation.Phone;
+        employee.Address = employeeInformation.Address;
+        employee.AccountNumber = employeeInformation.AccountNumber;
+        employee.ZipCode = employeeInformation.ZipCode;
+        employee.City = employeeInformation.City;
 
-        return employeeInformation == null ? null : ModelConverters.ToEmployeeInformation(employeeInformation);
-    }
-
-
-    public Task AddOrUpdateEmployeeInformation(EmployeeEntity employee, EmployeeInformation employeeInformation)
-    {
-        {
-            EmployeeInformationEntity entity = new EmployeeInformationEntity
-            {
-                Employee = employee,
-                Phone = employeeInformation.Phone,
-                AccountNr = employeeInformation.AccountNr,
-                Adress = employeeInformation.Adress,
-                ZipCode = employeeInformation.ZipCode,
-                City = employeeInformation.City,
-            };
-
-            return _employeesRepository.AddToDatabase(entity);
-        }
+        return _employeesRepository.AddToDatabase(employee);
     }
 
     public async Task<EmergencyContact?> GetEmergencyContactByEmployee(EmployeeEntity employee)
@@ -95,7 +79,7 @@ public class EmployeesService
     public Task AddOrUpdateEmergencyContact(EmployeeEntity employee, EmergencyContact employeeInformation)
     {
         {
-            EmergencyContactEntity entity = new EmergencyContactEntity
+            var entity = new EmergencyContactEntity
             {
                 Employee = employee,
                 Name = employeeInformation.Name,

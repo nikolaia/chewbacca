@@ -25,4 +25,9 @@ public record EmployeeEntity
 
     public DateTime StartDate { get; set; }
     public DateTime? EndDate { get; set; }
+
+    public string? AccountNumber { get; set; }
+    public string? Address { get; set; }
+    public string? ZipCode { get; set; }
+    public string? City { get; set; }
 }

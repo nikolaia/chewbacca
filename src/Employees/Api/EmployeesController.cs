@@ -51,44 +51,48 @@ public class EmployeesController : ControllerBase
 
         if (extended)
         {
-            var employeeInformation = await _employeeService.GetInformationByEmployee(employee);
             var emergencyContact = await _employeeService.GetEmergencyContactByEmployee(employee);
 
-            return ModelConverters.ToEmployeeExtendedJson(employee, employeeInformation, emergencyContact);
+            return ModelConverters.ToEmployeeExtendedJson(employee, emergencyContact);
         }
         else
         {
-            return ModelConverters.ToEmployeeExtendedJson(employee, null, null);
+            return ModelConverters.ToEmployeeExtendedJson(employee, null);
         }
     }
 
     [HttpPost("information/{country}/{alias}")]
-    public async Task UpdateEmployeeInformation(string alias, string country, [FromBody] EmployeeInformation employeeInformation)
+    public async Task<ActionResult> UpdateEmployeeInformation(string alias, string country, [FromBody] EmployeeInformation employeeInformation)
     {
         var employee = await _employeeService.GetEntityByAliasAndCountry(alias, country);
 
         if (employee == null)
         {
             _logger.LogError("Can't update EmployeeInformation because there is no matching Employee to alias {alias} and country {country}", alias, country);
+            return NotFound();
         }
         else
         {
-            await _employeeService.AddOrUpdateEmployeeInformation(employee, employeeInformation);
+            await _employeeService.UpdateEmployeeInformation(employee, employeeInformation);
+
+            return NoContent();
         }
     }
 
     [HttpPost("emergencyContact/{country}/{alias}")]
-    public async Task UpdateEmergencyContact(string alias, string country, [FromBody] EmergencyContact emergencyContact)
+    public async Task<ActionResult> UpdateEmergencyContact(string alias, string country, [FromBody] EmergencyContact emergencyContact)
     {
         var employee = await _employeeService.GetEntityByAliasAndCountry(alias, country);
 
         if (employee == null)
         {
             _logger.LogError("Can't update EmergencyContact because there is no matching Employee to alias {alias} and country {country}", alias, country);
+            return NotFound();
         }
         else
         {
             await _employeeService.AddOrUpdateEmergencyContact(employee, emergencyContact);
+            return NoContent();
         }
     }
 }
