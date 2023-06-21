@@ -29,6 +29,19 @@ public static class ModelConverters
         };
     }
 
+    public static EmployeeJson ToEmployeeJson(EmployeeEntity employee)
+    {
+        return new EmployeeJson
+        {
+            Name = employee.Name,
+            Email = employee.Email,
+            Telephone = employee.Telephone,
+            ImageUrl = employee.ImageUrl,
+            OfficeName = employee.OfficeName,
+            StartDate = employee.StartDate,
+        };
+    }
+
     public static EmployeeExtendedJson ToEmployeeExtendedJson(EmployeeEntity employee, EmergencyContact? emergencyContact)
     {
         return new EmployeeExtendedJson
