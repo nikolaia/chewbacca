@@ -29,6 +29,29 @@ using WebApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+builder.Services.AddCors(options =>
+{
+    if (builder.Environment.EnvironmentName.Equals("Development"))
+    {
+        options.AddPolicy("DashCorsPolicy",
+        policy =>
+        {
+            policy.AllowAnyMethod().AllowAnyHeader().WithOrigins("https://dash.variant.no", "http://localhost:3000");
+        });
+    }
+    else
+    {
+        {
+            options.AddPolicy("DashCorsPolicy",
+            policy =>
+            {
+                policy.AllowAnyMethod().AllowAnyHeader().WithOrigins("https://dash.variant.no");
+            });
+        }
+    }
+});
+
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -44,13 +67,7 @@ builder.Configuration
     .AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true)
     .AddEnvironmentVariables();
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("MyCorsPolicy", builder =>
-    {
-        builder.AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod();
-    });
-});
+
 
 // Bind configuration "TestApp:Settings" section to the Settings object
 var appSettingsSection = builder.Configuration
@@ -128,7 +145,7 @@ builder.Services.AddScheduler(ctx =>
 
 var app = builder.Build();
 
-app.UseCors("MyCorsPolicy");
+app.UseCors();
 
 /*
  * Migrate the database.

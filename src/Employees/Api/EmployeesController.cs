@@ -36,11 +36,12 @@ public class EmployeesController : ControllerBase
     }
 
     /**
- * <returns>a call to Service's GetByNameAndCountry</returns>
- */
+    * <returns>a call to Service's GetByNameAndCountry</returns>
+    */
+    [Microsoft.AspNetCore.Cors.EnableCors("DashCorsPolicy")]
     [HttpGet("{alias}/extended")]
     [OutputCache(Duration = 60)]
-    public async Task<ActionResult<EmployeeExtendedJson>> GetExtededByAlias(string alias, [FromQuery] string country)
+    public async Task<ActionResult<EmployeeExtendedJson>> GetExtendedByAlias(string alias, [FromQuery] string country)
     {
         var employee = await _employeeService.GetEntityByAliasAndCountry(alias, country);
 
@@ -74,6 +75,7 @@ public class EmployeesController : ControllerBase
     }
 
 
+    [Microsoft.AspNetCore.Cors.EnableCors("DashCorsPolicy")]
     [HttpPost("information/{country}/{alias}")]
     public async Task<ActionResult> UpdateEmployeeInformation(string alias, string country, [FromBody] EmployeeInformation employeeInformation)
     {
@@ -92,6 +94,7 @@ public class EmployeesController : ControllerBase
         }
     }
 
+    [Microsoft.AspNetCore.Cors.EnableCors("DashCorsPolicy")]
     [HttpPost("emergencyContact/{country}/{alias}")]
     public async Task<ActionResult> UpdateEmergencyContact(string alias, string country, [FromBody] EmergencyContact emergencyContact)
     {
