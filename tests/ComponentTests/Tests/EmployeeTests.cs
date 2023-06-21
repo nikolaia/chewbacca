@@ -47,6 +47,11 @@ public class EmployeeTest :
                 config.Excluding(employee => employee.Id);
                 config.Excluding(employee => employee.EndDate);
                 config.Excluding(employee => employee.CountryCode);
+                config.Excluding(employee => employee.AccountNumber);
+                config.Excluding(employee => employee.Address);
+                config.Excluding(employee => employee.ZipCode);
+                config.Excluding(employee => employee.City);
+
                 return config;
             }
         );
@@ -70,6 +75,11 @@ public class EmployeeTest :
                 config.Excluding(employee => employee.Id);
                 config.Excluding(employee => employee.EndDate);
                 config.Excluding(employee => employee.CountryCode);
+                config.Excluding(employee => employee.AccountNumber);
+                config.Excluding(employee => employee.Address);
+                config.Excluding(employee => employee.ZipCode);
+                config.Excluding(employee => employee.City);
+
                 return config;
             }
         );
@@ -85,6 +95,22 @@ public class EmployeeTest :
         var employeeResponse = await _client.GetAsync("/employees/test?country=no");
         var content =
             JsonConvert.DeserializeObject<EmployeeJson>(await employeeResponse.Content
+                .ReadAsStringAsync());
+
+        // Assert
+        content!.Email.Should().BeEquivalentTo(knownSeedData[0].Email);
+    }
+
+    [Fact]
+    public async void Given_EmployeeExists_When_CallingEmployeeControllerGETEmployeeExtended_Then_ReturnsSampleData()
+    {
+        // Arrange
+        var knownSeedData = Seed.GetSeedingEmployees();
+
+        // Act
+        var employeeResponse = await _client.GetAsync("/employees/test/extended?country=no");
+        var content =
+            JsonConvert.DeserializeObject<EmployeeExtendedJson>(await employeeResponse.Content
                 .ReadAsStringAsync());
 
         // Assert

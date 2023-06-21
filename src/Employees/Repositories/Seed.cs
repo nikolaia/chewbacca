@@ -17,7 +17,11 @@ public static class Seed
                 CountryCode = "no",
                 OfficeName = "Oslo",
                 StartDate = new DateTime(2018, 8, 1),
-                EndDate = null
+                EndDate = null,
+                AccountNumber = null,
+                Address = null,
+                ZipCode = null,
+                City = null
             },
             new()
             {
@@ -28,7 +32,11 @@ public static class Seed
                 CountryCode = "se",
                 OfficeName = "Oslo",
                 StartDate = new DateTime(2018, 8, 1),
-                EndDate = null
+                EndDate = null,
+                AccountNumber = null,
+                Address = null,
+                ZipCode = null,
+                City = null
             }
         };
     }
