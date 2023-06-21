@@ -36,11 +36,11 @@ public class EmployeesController : ControllerBase
     }
 
     /**
-     * <returns>a call to Service's GetByNameAndCountry</returns>
-     */
-    [HttpGet("{alias}")]
+ * <returns>a call to Service's GetByNameAndCountry</returns>
+ */
+    [HttpGet("{alias}/extended")]
     [OutputCache(Duration = 60)]
-    public async Task<ActionResult<EmployeeExtendedJson>> GetByAlias(string alias, [FromQuery] string country, [FromQuery] Boolean extended)
+    public async Task<ActionResult<EmployeeExtendedJson>> GetExtededByAlias(string alias, [FromQuery] string country)
     {
         var employee = await _employeeService.GetEntityByAliasAndCountry(alias, country);
 
@@ -49,17 +49,30 @@ public class EmployeesController : ControllerBase
             return NotFound();
         }
 
-        if (extended)
-        {
-            var emergencyContact = await _employeeService.GetEmergencyContactByEmployee(employee);
+        var emergencyContact = await _employeeService.GetEmergencyContactByEmployee(employee);
 
-            return ModelConverters.ToEmployeeExtendedJson(employee, emergencyContact);
+        return ModelConverters.ToEmployeeExtendedJson(employee, emergencyContact);
+    }
+
+    /**
+     * <returns>a call to Service's GetByNameAndCountry</returns>
+     */
+    [HttpGet("{alias}")]
+    [OutputCache(Duration = 60)]
+    public async Task<ActionResult<EmployeeJson>> GetByAlias(string alias, [FromQuery] string country)
+    {
+        var employee = await _employeeService.GetEntityByAliasAndCountry(alias, country);
+
+        if (employee == null)
+        {
+            return NotFound();
         }
         else
         {
-            return ModelConverters.ToEmployeeExtendedJson(employee, null);
+            return ModelConverters.ToEmployeeJson(employee);
         }
     }
+
 
     [HttpPost("information/{country}/{alias}")]
     public async Task<ActionResult> UpdateEmployeeInformation(string alias, string country, [FromBody] EmployeeInformation employeeInformation)
