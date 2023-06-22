@@ -27,8 +27,30 @@ using Shared.AzureIdentity;
 
 using WebApi;
 
-
 var builder = WebApplication.CreateBuilder(args);
+
+
+builder.Services.AddCors(options =>
+{
+    if (builder.Environment.EnvironmentName.Equals("Development"))
+    {
+        options.AddPolicy("DashCorsPolicy",
+        policy =>
+        {
+            policy.AllowAnyMethod().AllowAnyHeader().WithOrigins("https://dash.variant.no", "http://localhost:3000");
+        });
+    }
+    else
+    {
+        {
+            options.AddPolicy("DashCorsPolicy",
+            policy =>
+            {
+                policy.AllowAnyMethod().AllowAnyHeader().WithOrigins("https://dash.variant.no");
+            });
+        }
+    }
+});
 
 // Add services to the container.
 
@@ -44,6 +66,8 @@ builder.Configuration
     // appsettings.Local.json is in the .gitignore. Using a local config instead of userSecrets to avoid references in the .csproj:
     .AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true)
     .AddEnvironmentVariables();
+
+
 
 // Bind configuration "TestApp:Settings" section to the Settings object
 var appSettingsSection = builder.Configuration
@@ -115,6 +139,8 @@ builder.Services.AddScheduler(ctx =>
 
 var app = builder.Build();
 
+app.UseCors();
+
 /*
  * Migrate the database.
  * Ideally the app shouldn't have access to alter the database schema, but we do it for simplicity's sake,
@@ -123,6 +149,12 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<EmployeeContext>();
+
+    if (app.Environment.IsDevelopment())
+    {
+        db.Database.EnsureCreated();
+    }
+
     var isInMemoryDatabase = db.Database.ProviderName?.StartsWith("Microsoft.EntityFrameworkCore.InMemory") ?? false;
     if (!isInMemoryDatabase)
     {

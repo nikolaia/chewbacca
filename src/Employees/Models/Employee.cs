@@ -9,4 +9,8 @@ public record Employee
     public string OfficeName { get; init; } = null!;
     public DateTime StartDate { get; init; }
     public DateTime? EndDate { get; set; }
+    public string? AccountNumber { get; init; }
+    public string? Address { get; init; }
+    public string? ZipCode { get; init; }
+    public string? City { get; init; }
 }

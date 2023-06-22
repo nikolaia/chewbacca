@@ -45,6 +45,10 @@ public class EmployeesRepository
             updateEmployee.StartDate = employee.StartDate;
             updateEmployee.EndDate = employee.EndDate;
             updateEmployee.CountryCode = employee.CountryCode;
+            employee.Address = employee.Address;
+            employee.AccountNumber = employee.AccountNumber;
+            employee.ZipCode = employee.ZipCode;
+            employee.City = employee.City;
         }
         else
         {
@@ -88,5 +92,31 @@ public class EmployeesRepository
 
         return employees.Select(employee => employee.ImageUrl);
 
+    }
+
+    public async Task<EmergencyContactEntity?> GetEmergencyContactAsync(EmployeeEntity employee)
+    {
+        return await _db.EmergencyContacts
+            .Where(emp => emp.Employee.Equals(employee))
+            .SingleOrDefaultAsync();
+    }
+
+    public async Task AddToDatabase(EmergencyContactEntity emergencyContact)
+    {
+        var updateEmergencyContact = await _db.EmergencyContacts.SingleOrDefaultAsync(e => e.Employee == emergencyContact.Employee);
+
+        if (updateEmergencyContact != null)
+        {
+            updateEmergencyContact.Name = emergencyContact.Name;
+            updateEmergencyContact.Phone = emergencyContact.Phone;
+            updateEmergencyContact.Relation = emergencyContact.Relation;
+            updateEmergencyContact.Comment = emergencyContact.Comment;
+        }
+        else
+        {
+            await _db.AddAsync(emergencyContact);
+        }
+
+        await _db.SaveChangesAsync();
     }
 }
