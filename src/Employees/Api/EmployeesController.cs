@@ -13,12 +13,12 @@ namespace Employees.Api;
 public class EmployeesController : ControllerBase
 {
     private readonly EmployeesService _employeeService;
-    private ILogger<EmployeesController> _logger;
+    private readonly ILogger<EmployeesController> _logger;
 
     public EmployeesController(EmployeesService employeeService, ILogger<EmployeesController> logger)
     {
         this._employeeService = employeeService;
-        _logger = logger;
+        this._logger = logger;
     }
 
     /**
