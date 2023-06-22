@@ -42,7 +42,7 @@ public static class ModelConverters
         };
     }
 
-    public static EmployeeExtendedJson ToEmployeeExtendedJson(EmployeeEntity employee, EmergencyContact? emergencyContact)
+    public static EmployeeExtendedJson ToEmployeeExtendedJson(EmployeeEntity employee, EmergencyContact? emergencyContact, AllergiesAndDietaryPreferences allergiesAndDietaryPreferences)
     {
         return new EmployeeExtendedJson
         {
@@ -55,7 +55,8 @@ public static class ModelConverters
             Address = employee.Address,
             ZipCode = employee.ZipCode,
             City = employee.City,
-            EmergencyContact = emergencyContact
+            EmergencyContact = emergencyContact,
+            AllergiesAndDietaryPreferences = allergiesAndDietaryPreferences
         };
     }
 
