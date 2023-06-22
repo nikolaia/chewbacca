@@ -76,19 +76,22 @@ public class EmployeesService
         return emergencyContact == null ? null : ModelConverters.ToEmergencyContact(emergencyContact);
     }
 
-    public Task AddOrUpdateEmergencyContact(EmployeeEntity employee, EmergencyContact employeeInformation)
+    public Task AddOrUpdateEmergencyContact(EmployeeEntity employee, EmergencyContact emergencyContact)
     {
+        var entity = new EmergencyContactEntity
         {
-            var entity = new EmergencyContactEntity
-            {
-                Employee = employee,
-                Name = employeeInformation.Name,
-                Phone = employeeInformation.Phone,
-                Relation = employeeInformation.Relation,
-                Comment = employeeInformation.Comment,
-            };
+            Employee = employee,
+            Name = emergencyContact.Name,
+            Phone = emergencyContact.Phone,
+            Relation = emergencyContact.Relation == "" ? null : emergencyContact.Relation,
+            Comment = emergencyContact.Comment == "" ? null : emergencyContact.Comment,
+        };
 
-            return _employeesRepository.AddToDatabase(entity);
-        }
+        return _employeesRepository.AddToDatabase(entity);
+    }
+
+    public Boolean isValid(EmergencyContact emergencyContact)
+    {
+        return emergencyContact.Name.Length >= 2 && emergencyContact.Phone.Length > 8;
     }
 }

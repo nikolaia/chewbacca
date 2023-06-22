@@ -98,6 +98,11 @@ public class EmployeesController : ControllerBase
     [HttpPost("emergencyContact/{country}/{alias}")]
     public async Task<ActionResult> UpdateEmergencyContact(string alias, string country, [FromBody] EmergencyContact emergencyContact)
     {
+        if (!_employeeService.isValid(emergencyContact))
+        {
+            return StatusCode(500, "Invalid data");
+        }
+
         var employee = await _employeeService.GetEntityByAliasAndCountry(alias, country);
 
         if (employee == null)
