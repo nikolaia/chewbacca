@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging;
 using Employees.Service;
 
 using Microsoft.AspNetCore.OutputCaching;
-using Microsoft.Extensions.Logging;
 
 namespace Employees.Api;
 
@@ -142,7 +141,7 @@ public class EmployeesController : ControllerBase
         return dietaryPreferences.Select(a => a.ToString()).ToList();
     }
 
-    // TODO: add CORS
+    [Microsoft.AspNetCore.Cors.EnableCors("DashCorsPolicy")]
     [HttpPost("allergiesAndDietaryPreferences/{country}/{alias}")]
     public async Task<IActionResult> UpdateAllergiesAndDietaryPreferences(string alias, string country, [FromBody] AllergiesAndDietaryPreferences allergiesAndDietaryPreferences)
     {
