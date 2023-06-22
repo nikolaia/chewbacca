@@ -92,6 +92,6 @@ public class EmployeesService
 
     public Boolean isValid(EmergencyContact emergencyContact)
     {
-        return emergencyContact.Name.Length >= 2 && emergencyContact.Phone.Length > 8;
+        return emergencyContact.Name.Length >= 2 && emergencyContact.Phone.Length >= 8;
     }
 }
