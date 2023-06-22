@@ -48,14 +48,12 @@ public class EmployeeOtherAllergiesRepository
         _db.SaveChanges();
     }
 
-    public async Task DeleteByEmployeeAndAllergy(EmployeeEntity employee, string otherAllergy)
+    public async Task Delete(EmployeeOtherAllergyEntity employeeAllergy)
     {
-        EmployeeOtherAllergyEntity? employeeAllergy = await GetAsync(employee, otherAllergy);
-
         if (employeeAllergy != null)
         {
             _db.Remove(employeeAllergy);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
         }
     }
 }

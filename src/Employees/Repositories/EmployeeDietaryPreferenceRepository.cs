@@ -42,16 +42,9 @@ public class EmployeeDietaryPreferencesRepository
         _db.SaveChanges();
     }
 
-    public async Task DeleteByEmployeeAndDietaryPreference(EmployeeEntity employee, DietaeryPreferenceEnum dietaryPreference)
+    public async Task Delete(EmployeeDietaryPreferenceEntity employeeDietaryPreferenceEntity)
     {
-        EmployeeDietaryPreferenceEntity? employeeDietaryPreferenceEntity = await GetAsync(employee, dietaryPreference);
-
-        if (employeeDietaryPreferenceEntity != null)
-        {
-            _db.Remove(employeeDietaryPreferenceEntity);
-            _db.SaveChanges();
-
-            Console.WriteLine("Delete EmployeeDietaryPreference: " + employeeDietaryPreferenceEntity.DietaryPreference);
-        }
+        _db.Remove(employeeDietaryPreferenceEntity);
+        await _db.SaveChangesAsync();
     }
 }

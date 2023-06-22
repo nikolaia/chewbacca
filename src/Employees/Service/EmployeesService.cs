@@ -6,10 +6,19 @@ namespace Employees.Service;
 public class EmployeesService
 {
     private readonly EmployeesRepository _employeesRepository;
+    private readonly EmployeeDefaultAllergiesRepository _employeeDefaultAllergiesRepository;
+    private readonly EmployeeOtherAllergiesRepository _employeeOtherAllergiesRepository;
+    private readonly EmployeeDietaryPreferencesRepository _employeeDietaryPreferencesRepository;
 
-    public EmployeesService(EmployeesRepository employeesRepository)
+    public EmployeesService(EmployeesRepository employeesRepository,
+        EmployeeDefaultAllergiesRepository employeeDefaultAllergiesRepository,
+        EmployeeOtherAllergiesRepository employeeOtherAllergiesRepository,
+        EmployeeDietaryPreferencesRepository employeeDietaryPreferenceRepository)
     {
         this._employeesRepository = employeesRepository;
+        this._employeeDefaultAllergiesRepository = employeeDefaultAllergiesRepository;
+        this._employeeOtherAllergiesRepository = employeeOtherAllergiesRepository;
+        this._employeeDietaryPreferencesRepository = employeeDietaryPreferenceRepository;
     }
 
     private static bool IsEmployeeActive(EmployeeEntity employee)
@@ -93,5 +102,121 @@ public class EmployeesService
     public Boolean isValid(EmergencyContact emergencyContact)
     {
         return emergencyContact.Name.Length >= 2 && emergencyContact.Phone.Length >= 8;
+    }
+
+    public List<DefaultAllergyEnum> GetDefaultAllergies()
+    {
+        return Enum.GetValues(typeof(DefaultAllergyEnum)).Cast<DefaultAllergyEnum>().ToList();
+    }
+
+    public List<DietaeryPreferenceEnum> GetDietaryPreferences()
+    {
+        return Enum.GetValues(typeof(DietaeryPreferenceEnum)).Cast<DietaeryPreferenceEnum>().ToList();
+    }
+
+    public async Task<AllergiesAndDietaryPreferences> GetAllergiesAndDietaryPreferencesByEmployee(EmployeeEntity employee)
+    {
+        List<EmployeeDefaultAllergyEntity> defaultAllergies = await _employeeDefaultAllergiesRepository.GetByEmployee(employee);
+        List<EmployeeOtherAllergyEntity> otherAllergies = await _employeeOtherAllergiesRepository.GetByEmployee(employee);
+        List<EmployeeDietaryPreferenceEntity> dietaryPreferences = await _employeeDietaryPreferencesRepository.GetByEmployee(employee);
+
+        return new AllergiesAndDietaryPreferences
+        {
+            DefaultAllergies = defaultAllergies.Select(a => a.DefaultAllergy.ToString()).ToList(),
+            OtherAllergies = otherAllergies.Select(a => a.OtherAllergy).ToList(),
+            DietaryPreferences = dietaryPreferences.Select(dp => dp.DietaryPreference.ToString()).ToList()
+        };
+    }
+
+    public async Task UpdateDietaryPreferences(EmployeeEntity employee, List<string> dietaryPreferences)
+    {
+        List<DietaeryPreferenceEnum> selectedDietaryPreferences = dietaryPreferences.ConvertAll(delegate (string dp) { return (DietaeryPreferenceEnum)Enum.Parse(typeof(DietaeryPreferenceEnum), dp); });
+        List<EmployeeDietaryPreferenceEntity> existingDietaryPreferences = await _employeeDietaryPreferencesRepository.GetByEmployee(employee);
+
+        foreach (var dietaryPreference in GetDietaryPreferences())
+        {
+            var existingDietaryPreference = existingDietaryPreferences.Find(existingDietaryPreference => existingDietaryPreference.DietaryPreference == dietaryPreference);
+
+            if (existingDietaryPreference != null && !selectedDietaryPreferences.Contains(dietaryPreference))
+            {
+                await _employeeDietaryPreferencesRepository.Delete(existingDietaryPreference);
+            }
+            else if (existingDietaryPreference == null && selectedDietaryPreferences.Contains(dietaryPreference))
+            {
+                await AddEmployeeDietaryPreference(employee, dietaryPreference);
+            }
+        }
+    }
+
+    private async Task AddEmployeeDietaryPreference(EmployeeEntity employee, DietaeryPreferenceEnum dietaryPreference)
+    {
+        EmployeeDietaryPreferenceEntity entity = new EmployeeDietaryPreferenceEntity
+        {
+            Employee = employee,
+            DietaryPreference = dietaryPreference
+        };
+
+        await _employeeDietaryPreferencesRepository.AddToDatabase(entity);
+    }
+
+    public async Task UpdateAllergies(EmployeeEntity employee, List<string> defaultAllergies, List<string> otherAllergies)
+    {
+        List<DefaultAllergyEnum> selectedDefaultAllergies = defaultAllergies.ConvertAll(delegate (string allergy) { return (DefaultAllergyEnum)Enum.Parse(typeof(DefaultAllergyEnum), allergy); });
+        List<EmployeeDefaultAllergyEntity> existingDefaultAllergies = await _employeeDefaultAllergiesRepository.GetByEmployee(employee);
+        List<EmployeeOtherAllergyEntity> existingOtherAllergiesToEmployee = await _employeeOtherAllergiesRepository.GetByEmployee(employee);
+
+        foreach (var defaultAllergy in GetDefaultAllergies())
+        {
+            var existingDefaultAllergy = existingDefaultAllergies.Find(allergy => allergy.DefaultAllergy == defaultAllergy);
+
+            if (existingDefaultAllergy != null && !defaultAllergies.Contains(defaultAllergy.ToString()))
+            {
+                await _employeeDefaultAllergiesRepository.Delete(existingDefaultAllergy);
+            }
+            else if (existingDefaultAllergy == null && defaultAllergies.Contains(defaultAllergy.ToString()))
+            {
+                await AddEmployeeDefaultAllergy(employee, defaultAllergy);
+            }
+        }
+
+        foreach (var otherAllergy in otherAllergies)
+        {
+            var existingOtherAllergy = existingOtherAllergiesToEmployee.Find(allergy => allergy.OtherAllergy == otherAllergy);
+
+            if (existingOtherAllergy == null)
+            {
+                await AddEmployeeOtherAllergy(employee, otherAllergy);
+            }
+        }
+
+        foreach (var existingOtherAllergy in existingOtherAllergiesToEmployee)
+        {
+            if (!otherAllergies.Contains(existingOtherAllergy.OtherAllergy))
+            {
+                await _employeeOtherAllergiesRepository.Delete(existingOtherAllergy);
+            }
+        }
+    }
+
+    private async Task AddEmployeeDefaultAllergy(EmployeeEntity employee, DefaultAllergyEnum defaultAllergy)
+    {
+        EmployeeDefaultAllergyEntity entity = new EmployeeDefaultAllergyEntity
+        {
+            Employee = employee,
+            DefaultAllergy = defaultAllergy
+        };
+
+        await _employeeDefaultAllergiesRepository.AddToDatabase(entity);
+    }
+
+    private async Task AddEmployeeOtherAllergy(EmployeeEntity employee, string otherAllergy)
+    {
+        EmployeeOtherAllergyEntity entity = new EmployeeOtherAllergyEntity
+        {
+            Employee = employee,
+            OtherAllergy = otherAllergy
+        };
+
+        await _employeeOtherAllergiesRepository.AddToDatabase(entity);
     }
 }
