@@ -125,7 +125,7 @@ public class EmployeesService
             DefaultAllergies = defaultAllergies.Select(a => a.DefaultAllergy.ToString()).ToList(),
             OtherAllergies = otherAllergies.Select(a => a.OtherAllergy).ToList(),
             DietaryPreferences = dietaryPreferences.Select(dp => dp.DietaryPreference.ToString()).ToList(),
-            Comment = employee.AllergyComment
+            Comment = employee.AllergyComment == null ? "" : employee.AllergyComment
         };
     }
 

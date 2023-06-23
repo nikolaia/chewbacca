@@ -76,7 +76,6 @@ public class EmployeesController : ControllerBase
         }
     }
 
-
     [Microsoft.AspNetCore.Cors.EnableCors("DashCorsPolicy")]
     [HttpPost("information/{country}/{alias}")]
     public async Task<ActionResult> UpdateEmployeeInformation(string alias, string country, [FromBody] EmployeeInformation employeeInformation)
@@ -126,8 +125,7 @@ public class EmployeesController : ControllerBase
     [OutputCache(Duration = 60)]
     public List<string> GetAllergies()
     {
-        List<DefaultAllergyEnum> allergies = _employeeService.GetDefaultAllergies();
-        return allergies.Select(a => a.ToString()).ToList();
+        return _employeeService.GetDefaultAllergies().Select(a => a.ToString()).ToList();
     }
 
     /**
@@ -137,8 +135,7 @@ public class EmployeesController : ControllerBase
     [OutputCache(Duration = 60)]
     public List<string> GetDietaryPreferences()
     {
-        var dietaryPreferences = _employeeService.GetDietaryPreferences();
-        return dietaryPreferences.Select(a => a.ToString()).ToList();
+        return _employeeService.GetDietaryPreferences().Select(a => a.ToString()).ToList();
     }
 
     [Microsoft.AspNetCore.Cors.EnableCors("DashCorsPolicy")]
