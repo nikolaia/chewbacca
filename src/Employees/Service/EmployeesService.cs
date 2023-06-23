@@ -144,14 +144,9 @@ public class EmployeesService
             }
             else if (existingDietaryPreference == null && selectedDietaryPreferences.Contains(dietaryPreference))
             {
-                await AddEmployeeDietaryPreference(employee, dietaryPreference);
+                await _employeeDietaryPreferencesRepository.AddToDatabase(employee, dietaryPreference);
             }
         }
-    }
-
-    private async Task AddEmployeeDietaryPreference(EmployeeEntity employee, DietaryPreferenceEnum dietaryPreference)
-    {
-        await _employeeDietaryPreferencesRepository.AddToDatabase(employee, dietaryPreference);
     }
 
     public async Task UpdateAllergies(EmployeeEntity employee, List<string> defaultAllergies, List<string> otherAllergies)
@@ -170,7 +165,7 @@ public class EmployeesService
             }
             else if (existingDefaultAllergy == null && defaultAllergies.Contains(defaultAllergy.ToString()))
             {
-                await AddEmployeeDefaultAllergy(employee, defaultAllergy);
+                await _employeeDefaultAllergiesRepository.AddToDatabase(employee, defaultAllergy);
             }
         }
 
@@ -180,7 +175,7 @@ public class EmployeesService
 
             if (existingOtherAllergy == null)
             {
-                await AddEmployeeOtherAllergy(employee, otherAllergy);
+                await _employeeOtherAllergiesRepository.AddToDatabase(employee, otherAllergy);
             }
         }
 
@@ -193,15 +188,6 @@ public class EmployeesService
         }
     }
 
-    private async Task AddEmployeeDefaultAllergy(EmployeeEntity employee, DefaultAllergyEnum defaultAllergy)
-    {
-        await _employeeDefaultAllergiesRepository.AddToDatabase(employee, defaultAllergy);
-    }
-
-    private async Task AddEmployeeOtherAllergy(EmployeeEntity employee, string otherAllergy)
-    {
-        await _employeeOtherAllergiesRepository.AddToDatabase(employee, otherAllergy);
-    }
 
     public Task AddOrUpdateEmployeeAllergyComment(EmployeeEntity employee, string comment)
     {
