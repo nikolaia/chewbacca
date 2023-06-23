@@ -159,11 +159,11 @@ public class EmployeesService
         {
             var existingDefaultAllergy = existingDefaultAllergies.Find(allergy => allergy.DefaultAllergy == defaultAllergy);
 
-            if (existingDefaultAllergy != null && !defaultAllergies.Contains(defaultAllergy.ToString()))
+            if (existingDefaultAllergy != null && !selectedDefaultAllergies.Contains(defaultAllergy))
             {
                 await _employeeDefaultAllergiesRepository.Delete(existingDefaultAllergy);
             }
-            else if (existingDefaultAllergy == null && defaultAllergies.Contains(defaultAllergy.ToString()))
+            else if (existingDefaultAllergy == null && selectedDefaultAllergies.Contains(defaultAllergy))
             {
                 await _employeeDefaultAllergiesRepository.AddToDatabase(employee, defaultAllergy);
             }
