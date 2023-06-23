@@ -60,18 +60,6 @@ public static class ModelConverters
         };
     }
 
-    public static EmployeeInformation ToEmployeeInformation(EmployeeEntity employee)
-    {
-        return new EmployeeInformation
-        {
-            Phone = employee.Telephone,
-            AccountNumber = employee.AccountNumber,
-            Address = employee.Address,
-            ZipCode = employee.ZipCode,
-            City = employee.City,
-        };
-    }
-
     public static EmergencyContact ToEmergencyContact(EmergencyContactEntity emergencyContact)
     {
         return new EmergencyContact
@@ -80,21 +68,6 @@ public static class ModelConverters
             Phone = emergencyContact.Phone,
             Relation = emergencyContact.Relation,
             Comment = emergencyContact.Comment,
-        };
-    }
-
-    public static EmployeeExtendedJson ToEmployeeExtendedJson(
-        EmployeeEntity employee,
-        AllergiesAndDietaryPreferences allergiesAndDietaryPreferences)
-    {
-        return new EmployeeExtendedJson
-        {
-            Name = employee.Name,
-            Email = employee.Email,
-            Telephone = employee.Telephone,
-            ImageUrl = employee.ImageUrl,
-            OfficeName = employee.OfficeName,
-            AllergiesAndDietaryPreferences = allergiesAndDietaryPreferences
         };
     }
 }

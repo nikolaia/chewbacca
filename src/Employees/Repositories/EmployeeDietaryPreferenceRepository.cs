@@ -36,7 +36,6 @@ public class EmployeeDietaryPreferencesRepository
         if (existingEmployeeDietaryPreference == null)
         {
             _db.Add(employeeDietaryPreferenceEntity);
-            Console.WriteLine("Adding EmployeeDietaryPreference: " + employeeDietaryPreferenceEntity.DietaryPreference);
         }
 
         _db.SaveChanges();
