@@ -124,7 +124,8 @@ public class EmployeesService
         {
             DefaultAllergies = defaultAllergies.Select(a => a.DefaultAllergy.ToString()).ToList(),
             OtherAllergies = otherAllergies.Select(a => a.OtherAllergy).ToList(),
-            DietaryPreferences = dietaryPreferences.Select(dp => dp.DietaryPreference.ToString()).ToList()
+            DietaryPreferences = dietaryPreferences.Select(dp => dp.DietaryPreference.ToString()).ToList(),
+            Comment = employee.AllergyComment
         };
     }
 
@@ -218,5 +219,11 @@ public class EmployeesService
         };
 
         await _employeeOtherAllergiesRepository.AddToDatabase(entity);
+    }
+
+    public Task AddOrUpdateEmployeeAllergyComment(EmployeeEntity employee, string comment)
+    {
+        employee.AllergyComment = comment;
+        return _employeesRepository.AddToDatabase(employee);
     }
 }

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Employees.Migrations
 {
     /// <inheritdoc />
-    public partial class CreateEmployeeAllergiesAndDietaryPreferences : Migration
+    public partial class CreateEmployeeAllergyAndDietaryPreference : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

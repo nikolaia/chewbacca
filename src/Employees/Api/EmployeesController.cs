@@ -156,6 +156,8 @@ public class EmployeesController : ControllerBase
         {
             await _employeeService.UpdateAllergies(employee, allergiesAndDietaryPreferences.DefaultAllergies, allergiesAndDietaryPreferences.OtherAllergies);
             await _employeeService.UpdateDietaryPreferences(employee, allergiesAndDietaryPreferences.DietaryPreferences);
+            await _employeeService.AddOrUpdateEmployeeAllergyComment(employee, allergiesAndDietaryPreferences.Comment);
+
             return NoContent();
         }
     }

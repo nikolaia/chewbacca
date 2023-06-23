@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Employees.Migrations
 {
     [DbContext(typeof(EmployeeContext))]
-    [Migration("20230621123018_CreateEmployeeAllergiesAndDietaryPreferences")]
-    partial class CreateEmployeeAllergiesAndDietaryPreferences
+    [Migration("20230623105627_AddEmployeeAllergyComment")]
+    partial class AddEmployeeAllergyComment
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,36 @@ namespace Employees.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("Employees.Models.EmergencyContactEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Comment")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("EmployeeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Relation")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.ToTable("EmergencyContacts");
+                });
 
             modelBuilder.Entity("Employees.Models.EmployeeDefaultAllergyEntity", b =>
                 {
@@ -69,6 +99,18 @@ namespace Employees.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("AccountNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AllergyComment")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("City")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("CountryCode")
                         .IsRequired()
                         .HasMaxLength(3)
@@ -99,6 +141,9 @@ namespace Employees.Migrations
                     b.Property<string>("Telephone")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ZipCode")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Email")
@@ -125,6 +170,17 @@ namespace Employees.Migrations
                     b.HasIndex("EmployeeId");
 
                     b.ToTable("EmployeeOtherAllergies");
+                });
+
+            modelBuilder.Entity("Employees.Models.EmergencyContactEntity", b =>
+                {
+                    b.HasOne("Employees.Models.EmployeeEntity", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
                 });
 
             modelBuilder.Entity("Employees.Models.EmployeeDefaultAllergyEntity", b =>
