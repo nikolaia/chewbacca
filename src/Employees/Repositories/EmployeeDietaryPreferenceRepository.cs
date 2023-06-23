@@ -13,7 +13,7 @@ public class EmployeeDietaryPreferencesRepository
         _db = db;
     }
 
-    private async Task<EmployeeDietaryPreferenceEntity?> GetAsync(EmployeeEntity employee, DietaeryPreferenceEnum dietaryPreference)
+    private async Task<EmployeeDietaryPreferenceEntity?> GetAsync(EmployeeEntity employee, DietaryPreferenceEnum dietaryPreference)
     {
         return await _db.EmployeeDietaryPreferences
             .Where(e => e.Employee.Equals(employee))
@@ -29,13 +29,19 @@ public class EmployeeDietaryPreferencesRepository
             .ToListAsync();
     }
 
-    public async Task AddToDatabase(EmployeeDietaryPreferenceEntity employeeDietaryPreferenceEntity)
+    public async Task AddToDatabase(EmployeeEntity employee, DietaryPreferenceEnum dietaryPreference)
     {
-        EmployeeDietaryPreferenceEntity? existingEmployeeDietaryPreference = await GetAsync(employeeDietaryPreferenceEntity.Employee, employeeDietaryPreferenceEntity.DietaryPreference);
+        EmployeeDietaryPreferenceEntity? existingEmployeeDietaryPreference = await GetAsync(employee, dietaryPreference);
 
         if (existingEmployeeDietaryPreference == null)
         {
-            _db.Add(employeeDietaryPreferenceEntity);
+            var employeeDietaryPreference = new EmployeeDietaryPreferenceEntity
+            {
+                Employee = employee,
+                DietaryPreference = dietaryPreference
+            };
+
+            _db.Add(employeeDietaryPreference);
         }
 
         _db.SaveChanges();

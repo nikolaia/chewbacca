@@ -13,14 +13,6 @@ public class EmployeeDefaultAllergiesRepository
         _db = db;
     }
 
-    private async Task<EmployeeDefaultAllergyEntity?> GetAsync(EmployeeDefaultAllergyEntity allergy)
-    {
-        return await _db.EmployeeDefaultAllergies
-            .Where(e => e.Employee.Equals(allergy.Employee))
-            .Where(e => e.DefaultAllergy.Equals(allergy.DefaultAllergy))
-            .SingleOrDefaultAsync();
-    }
-
     private async Task<EmployeeDefaultAllergyEntity?> GetAsync(EmployeeEntity employee, DefaultAllergyEnum allergy)
     {
         return await _db.EmployeeDefaultAllergies
@@ -36,12 +28,18 @@ public class EmployeeDefaultAllergiesRepository
             .ToListAsync();
     }
 
-    public async Task AddToDatabase(EmployeeDefaultAllergyEntity employeeAllergy)
+    public async Task AddToDatabase(EmployeeEntity employee, DefaultAllergyEnum allergy)
     {
-        EmployeeDefaultAllergyEntity? existingEmployeeDefaultAllergies = await GetAsync(employeeAllergy);
+        EmployeeDefaultAllergyEntity? existingEmployeeDefaultAllergies = await GetAsync(employee, allergy);
 
         if (existingEmployeeDefaultAllergies == null)
         {
+            var employeeAllergy = new EmployeeDefaultAllergyEntity
+            {
+                Employee = employee,
+                DefaultAllergy = allergy
+            };
+
             _db.Add(employeeAllergy);
         }
 

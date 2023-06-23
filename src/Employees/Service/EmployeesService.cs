@@ -109,9 +109,9 @@ public class EmployeesService
         return Enum.GetValues(typeof(DefaultAllergyEnum)).Cast<DefaultAllergyEnum>().ToList();
     }
 
-    public List<DietaeryPreferenceEnum> GetDietaryPreferences()
+    public List<DietaryPreferenceEnum> GetDietaryPreferences()
     {
-        return Enum.GetValues(typeof(DietaeryPreferenceEnum)).Cast<DietaeryPreferenceEnum>().ToList();
+        return Enum.GetValues(typeof(DietaryPreferenceEnum)).Cast<DietaryPreferenceEnum>().ToList();
     }
 
     public async Task<AllergiesAndDietaryPreferences> GetAllergiesAndDietaryPreferencesByEmployee(EmployeeEntity employee)
@@ -131,7 +131,7 @@ public class EmployeesService
 
     public async Task UpdateDietaryPreferences(EmployeeEntity employee, List<string> dietaryPreferences)
     {
-        List<DietaeryPreferenceEnum> selectedDietaryPreferences = dietaryPreferences.ConvertAll(delegate (string dp) { return (DietaeryPreferenceEnum)Enum.Parse(typeof(DietaeryPreferenceEnum), dp); });
+        List<DietaryPreferenceEnum> selectedDietaryPreferences = dietaryPreferences.ConvertAll(delegate (string dp) { return (DietaryPreferenceEnum)Enum.Parse(typeof(DietaryPreferenceEnum), dp); });
         List<EmployeeDietaryPreferenceEntity> existingDietaryPreferences = await _employeeDietaryPreferencesRepository.GetByEmployee(employee);
 
         foreach (var dietaryPreference in GetDietaryPreferences())
@@ -149,15 +149,9 @@ public class EmployeesService
         }
     }
 
-    private async Task AddEmployeeDietaryPreference(EmployeeEntity employee, DietaeryPreferenceEnum dietaryPreference)
+    private async Task AddEmployeeDietaryPreference(EmployeeEntity employee, DietaryPreferenceEnum dietaryPreference)
     {
-        EmployeeDietaryPreferenceEntity entity = new EmployeeDietaryPreferenceEntity
-        {
-            Employee = employee,
-            DietaryPreference = dietaryPreference
-        };
-
-        await _employeeDietaryPreferencesRepository.AddToDatabase(entity);
+        await _employeeDietaryPreferencesRepository.AddToDatabase(employee, dietaryPreference);
     }
 
     public async Task UpdateAllergies(EmployeeEntity employee, List<string> defaultAllergies, List<string> otherAllergies)
@@ -201,24 +195,12 @@ public class EmployeesService
 
     private async Task AddEmployeeDefaultAllergy(EmployeeEntity employee, DefaultAllergyEnum defaultAllergy)
     {
-        EmployeeDefaultAllergyEntity entity = new EmployeeDefaultAllergyEntity
-        {
-            Employee = employee,
-            DefaultAllergy = defaultAllergy
-        };
-
-        await _employeeDefaultAllergiesRepository.AddToDatabase(entity);
+        await _employeeDefaultAllergiesRepository.AddToDatabase(employee, defaultAllergy);
     }
 
     private async Task AddEmployeeOtherAllergy(EmployeeEntity employee, string otherAllergy)
     {
-        EmployeeOtherAllergyEntity entity = new EmployeeOtherAllergyEntity
-        {
-            Employee = employee,
-            OtherAllergy = otherAllergy
-        };
-
-        await _employeeOtherAllergiesRepository.AddToDatabase(entity);
+        await _employeeOtherAllergiesRepository.AddToDatabase(employee, otherAllergy);
     }
 
     public Task AddOrUpdateEmployeeAllergyComment(EmployeeEntity employee, string comment)

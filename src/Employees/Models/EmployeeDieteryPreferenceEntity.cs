@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Employees.Models;
 
-public enum DietaeryPreferenceEnum
+public enum DietaryPreferenceEnum
 {
     KOSHER,
     NOT_BEEF,
@@ -23,5 +23,5 @@ public record EmployeeDietaryPreferenceEntity
 
     public EmployeeEntity Employee { get; set; } = null!;
 
-    public DietaeryPreferenceEnum DietaryPreference { get; set; }
+    public DietaryPreferenceEnum DietaryPreference { get; set; }
 }
