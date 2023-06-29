@@ -51,7 +51,6 @@ public class EmployeeTest :
                 config.Excluding(employee => employee.Address);
                 config.Excluding(employee => employee.ZipCode);
                 config.Excluding(employee => employee.City);
-                config.Excluding(employee => employee.AllergyComment);
 
                 return config;
             }
@@ -80,7 +79,6 @@ public class EmployeeTest :
                 config.Excluding(employee => employee.Address);
                 config.Excluding(employee => employee.ZipCode);
                 config.Excluding(employee => employee.City);
-                config.Excluding(employee => employee.AllergyComment);
 
                 return config;
             }

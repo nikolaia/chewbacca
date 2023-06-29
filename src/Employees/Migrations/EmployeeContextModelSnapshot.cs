@@ -52,42 +52,35 @@ namespace Employees.Migrations
                     b.ToTable("EmergencyContacts");
                 });
 
-            modelBuilder.Entity("Employees.Models.EmployeeDefaultAllergyEntity", b =>
+            modelBuilder.Entity("Employees.Models.EmployeeAllergiesAndDietaryPreferencesEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("DefaultAllergy")
-                        .HasColumnType("int");
+                    b.Property<string>("Comment")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DefaultAllergies")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DietaryPreferences")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("EmployeeId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("OtherAllergies")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("EmployeeId");
 
-                    b.ToTable("EmployeeDefaultAllergies");
-                });
-
-            modelBuilder.Entity("Employees.Models.EmployeeDietaryPreferenceEntity", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("DietaryPreference")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("EmployeeId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EmployeeId");
-
-                    b.ToTable("EmployeeDietaryPreferences");
+                    b.ToTable("EmployeeAllergiesAndDietaryPreferences");
                 });
 
             modelBuilder.Entity("Employees.Models.EmployeeEntity", b =>
@@ -100,9 +93,6 @@ namespace Employees.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AllergyComment")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("City")
@@ -149,26 +139,6 @@ namespace Employees.Migrations
                     b.ToTable("Employees");
                 });
 
-            modelBuilder.Entity("Employees.Models.EmployeeOtherAllergyEntity", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("EmployeeId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("OtherAllergy")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EmployeeId");
-
-                    b.ToTable("EmployeeOtherAllergies");
-                });
-
             modelBuilder.Entity("Employees.Models.EmergencyContactEntity", b =>
                 {
                     b.HasOne("Employees.Models.EmployeeEntity", "Employee")
@@ -180,29 +150,7 @@ namespace Employees.Migrations
                     b.Navigation("Employee");
                 });
 
-            modelBuilder.Entity("Employees.Models.EmployeeDefaultAllergyEntity", b =>
-                {
-                    b.HasOne("Employees.Models.EmployeeEntity", "Employee")
-                        .WithMany()
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Employee");
-                });
-
-            modelBuilder.Entity("Employees.Models.EmployeeDietaryPreferenceEntity", b =>
-                {
-                    b.HasOne("Employees.Models.EmployeeEntity", "Employee")
-                        .WithMany()
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Employee");
-                });
-
-            modelBuilder.Entity("Employees.Models.EmployeeOtherAllergyEntity", b =>
+            modelBuilder.Entity("Employees.Models.EmployeeAllergiesAndDietaryPreferencesEntity", b =>
                 {
                     b.HasOne("Employees.Models.EmployeeEntity", "Employee")
                         .WithMany()

@@ -13,5 +13,5 @@ public record EmployeeExtendedJson
     public string? ZipCode { get; init; }
     public string? City { get; init; }
     public EmergencyContact? EmergencyContact { get; set; } = null!;
-    public AllergiesAndDietaryPreferences AllergiesAndDietaryPreferences { get; set; } = null!;
+    public AllergiesAndDietaryPreferences? AllergiesAndDietaryPreferences { get; set; } = null!;
 }

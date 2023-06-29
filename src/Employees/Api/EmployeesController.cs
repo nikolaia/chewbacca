@@ -15,7 +15,6 @@ public class EmployeesController : ControllerBase
     private readonly EmployeesService _employeeService;
     private readonly ILogger<EmployeesController> _logger;
 
-
     public EmployeesController(EmployeesService employeeService, ILogger<EmployeesController> logger)
     {
         this._employeeService = employeeService;
@@ -151,9 +150,7 @@ public class EmployeesController : ControllerBase
         }
         else
         {
-            await _employeeService.UpdateAllergies(employee, allergiesAndDietaryPreferences.DefaultAllergies, allergiesAndDietaryPreferences.OtherAllergies);
-            await _employeeService.UpdateDietaryPreferences(employee, allergiesAndDietaryPreferences.DietaryPreferences);
-            await _employeeService.AddOrUpdateEmployeeAllergyComment(employee, allergiesAndDietaryPreferences.Comment);
+            await _employeeService.UpdateAllergiesAndDietaryPreferences(employee, allergiesAndDietaryPreferences);
 
             return NoContent();
         }
