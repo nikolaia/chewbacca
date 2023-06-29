@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Employees.Migrations
 {
     [DbContext(typeof(EmployeeContext))]
-    [Migration("20230629082430_OneTableForAllergiesAndDietaryPreferences")]
-    partial class OneTableForAllergiesAndDietaryPreferences
+    [Migration("20230629091136_CreateEmployeeAllergiesAndDietaryPreferences")]
+    partial class CreateEmployeeAllergiesAndDietaryPreferences
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
