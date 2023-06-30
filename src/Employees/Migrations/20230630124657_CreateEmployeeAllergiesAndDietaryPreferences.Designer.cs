@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Employees.Migrations
 {
     [DbContext(typeof(EmployeeContext))]
-    [Migration("20230629091136_CreateEmployeeAllergiesAndDietaryPreferences")]
+    [Migration("20230630124657_CreateEmployeeAllergiesAndDietaryPreferences")]
     partial class CreateEmployeeAllergiesAndDietaryPreferences
     {
         /// <inheritdoc />
@@ -81,7 +81,8 @@ namespace Employees.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EmployeeId");
+                    b.HasIndex("EmployeeId")
+                        .IsUnique();
 
                     b.ToTable("EmployeeAllergiesAndDietaryPreferences");
                 });
@@ -156,12 +157,17 @@ namespace Employees.Migrations
             modelBuilder.Entity("Employees.Models.EmployeeAllergiesAndDietaryPreferencesEntity", b =>
                 {
                     b.HasOne("Employees.Models.EmployeeEntity", "Employee")
-                        .WithMany()
-                        .HasForeignKey("EmployeeId")
+                        .WithOne("AllergiesAndDietaryPreferences")
+                        .HasForeignKey("Employees.Models.EmployeeAllergiesAndDietaryPreferencesEntity", "EmployeeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("Employees.Models.EmployeeEntity", b =>
+                {
+                    b.Navigation("AllergiesAndDietaryPreferences");
                 });
 #pragma warning restore 612, 618
         }

@@ -36,7 +36,8 @@ namespace Employees.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_EmployeeAllergiesAndDietaryPreferences_EmployeeId",
                 table: "EmployeeAllergiesAndDietaryPreferences",
-                column: "EmployeeId");
+                column: "EmployeeId",
+                unique: true);
         }
 
         /// <inheritdoc />
