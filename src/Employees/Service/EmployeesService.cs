@@ -6,10 +6,14 @@ namespace Employees.Service;
 public class EmployeesService
 {
     private readonly EmployeesRepository _employeesRepository;
+    private readonly EmployeeAllergiesAndDietaryPreferencesRepository _employeeAllergiesAndDietaryPreferencesRepository;
 
-    public EmployeesService(EmployeesRepository employeesRepository)
+    public EmployeesService(EmployeesRepository employeesRepository,
+        EmployeeAllergiesAndDietaryPreferencesRepository employeeAllergiesAndDietaryPreferencesRepository
+        )
     {
         this._employeesRepository = employeesRepository;
+        this._employeeAllergiesAndDietaryPreferencesRepository = employeeAllergiesAndDietaryPreferencesRepository;
     }
 
     private static bool IsEmployeeActive(EmployeeEntity employee)
@@ -93,5 +97,27 @@ public class EmployeesService
     public Boolean isValid(EmergencyContact emergencyContact)
     {
         return emergencyContact.Name.Length >= 2 && emergencyContact.Phone.Length >= 8;
+    }
+
+    public List<DefaultAllergyEnum> GetDefaultAllergies()
+    {
+        return Enum.GetValues(typeof(DefaultAllergyEnum)).Cast<DefaultAllergyEnum>().ToList();
+    }
+
+    public List<DietaryPreferenceEnum> GetDietaryPreferences()
+    {
+        return Enum.GetValues(typeof(DietaryPreferenceEnum)).Cast<DietaryPreferenceEnum>().ToList();
+    }
+
+    public async Task<AllergiesAndDietaryPreferences?> GetAllergiesAndDietaryPreferencesByEmployee(EmployeeEntity employee)
+    {
+        var employeeAllergiesAndDietaryPreferences = await _employeeAllergiesAndDietaryPreferencesRepository.GetByEmployee(employee);
+
+        return employeeAllergiesAndDietaryPreferences == null ? null : ModelConverters.ToAllergiesAndDietaryPreferences(employeeAllergiesAndDietaryPreferences);
+    }
+
+    public async Task<bool> UpdateAllergiesAndDietaryPreferencesByAliasAndCountry(string alias, string country, AllergiesAndDietaryPreferences allergiesAndDietaryPreferences)
+    {
+        return await _employeeAllergiesAndDietaryPreferencesRepository.AddOrUpdateEmployeeAllergiesAndDietaryPreferences(alias, country, allergiesAndDietaryPreferences);
     }
 }
