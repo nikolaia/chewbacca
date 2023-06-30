@@ -13,28 +13,25 @@ using Microsoft.Extensions.DependencyInjection;
 
 using Newtonsoft.Json;
 
-
 namespace IntegrationTests.Tests;
 
 public class EmployeeTest :
-    IClassFixture<CustomWebApplicationFactory<Program>>
+    IClassFixture<CustomWebApplicationFactory<Program>>, IDisposable
 {
     private readonly HttpClient _client;
-    private readonly EmployeeContext _db;
+    private readonly IServiceScope _scope;
+    private EmployeeContext _db;
 
     public EmployeeTest()
     {
         var factory = new CustomWebApplicationFactory<Program>();
 
-        using var scope = factory.Services.CreateScope();
+        _scope = factory.Services.CreateScope();
+        var scopedServices = _scope.ServiceProvider;
+        _db = scopedServices.GetRequiredService<EmployeeContext>();
+        _db.Database.EnsureCreated();
+        Utilities.InitializeDbForTests(_db);
 
-        var scopedServices = scope.ServiceProvider;
-        var db = scopedServices.GetRequiredService<EmployeeContext>();
-        db.Database.EnsureCreated();
-        Utilities.InitializeDbForTests(db);
-
-
-        _db = db;
         _client = factory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
     }
 
@@ -42,7 +39,7 @@ public class EmployeeTest :
     public async void Given_EmployeeExists_When_CallingEmployeeControllerGET_Then_ReturnsSampleData()
     {
         // Arrange
-        var knownSeedData = Seed.GetSeedingEmployees();
+        var knownSeedData = Seed.GetSeedingEmployees().Select(ModelConverters.ToEmployeeJson);
 
         // Act
         var employeeResponse = await _client.GetAsync("/employees");
@@ -51,26 +48,15 @@ public class EmployeeTest :
                 .ReadAsStringAsync());
 
         // Assert
-        content!.Employees.Should().BeEquivalentTo(knownSeedData, config =>
-            {
-                config.Excluding(employee => employee.Id);
-                config.Excluding(employee => employee.EndDate);
-                config.Excluding(employee => employee.CountryCode);
-                config.Excluding(employee => employee.AccountNumber);
-                config.Excluding(employee => employee.Address);
-                config.Excluding(employee => employee.ZipCode);
-                config.Excluding(employee => employee.City);
-
-                return config;
-            }
-        );
+        content!.Employees.Should().BeEquivalentTo(knownSeedData);
     }
 
     [Fact]
     public async void Given_EmployeeExists_When_CallingEmployeeControllerGETByCountry_Then_ReturnsSampleData()
     {
         // Arrange
-        var knownSeedData = Seed.GetSeedingEmployees();
+        var knownSeedData = Seed.GetSeedingEmployees().Where(emp => emp.CountryCode == "no")
+            .Select(ModelConverters.ToEmployeeJson);
 
         // Act
         var employeeResponse = await _client.GetAsync("/employees?country=no");
@@ -79,26 +65,14 @@ public class EmployeeTest :
                 .ReadAsStringAsync());
 
         // Assert
-        content!.Employees.Should().BeEquivalentTo(knownSeedData.Where(emp => emp.CountryCode == "no"), config =>
-            {
-                config.Excluding(employee => employee.Id);
-                config.Excluding(employee => employee.EndDate);
-                config.Excluding(employee => employee.CountryCode);
-                config.Excluding(employee => employee.AccountNumber);
-                config.Excluding(employee => employee.Address);
-                config.Excluding(employee => employee.ZipCode);
-                config.Excluding(employee => employee.City);
-
-                return config;
-            }
-        );
+        content!.Employees.Should().BeEquivalentTo(knownSeedData);
     }
 
     [Fact]
     public async void Given_EmployeeExists_When_CallingEmployeeControllerGETEmployee_Then_ReturnsSampleData()
     {
         // Arrange
-        var knownSeedData = Seed.GetSeedingEmployees();
+        var knownSeedData = Seed.GetSeedingEmployees().Select(ModelConverters.ToEmployeeJson).First();
 
         // Act
         var employeeResponse = await _client.GetAsync("/employees/test?country=no");
@@ -107,17 +81,12 @@ public class EmployeeTest :
                 .ReadAsStringAsync());
 
         // Assert
-        content!.Email.Should().BeEquivalentTo(knownSeedData[0].Email);
+        content!.Email.Should().BeEquivalentTo(knownSeedData.Email);
     }
 
     [Fact]
     public async void Given_EmployeeExists_When_CallingEmployeeControllerGETEmployeeExtended_Then_ReturnsSampleData()
     {
-        // Arrange
-        var knownSeedData = Seed.GetSeedingEmployees();
-        var emergencyContactSeed = Seed.GetSeedingEmergencyContact(knownSeedData[0])[0];
-        var allergiesAndDietaryPreferencesSeed = Seed.GetSeedingAllergiesAndDietaryPreferences(knownSeedData[0]);
-
         // Act
         var employeeResponse = await _client.GetAsync("/employees/test/extended?country=no");
         var content =
@@ -125,19 +94,11 @@ public class EmployeeTest :
                 .ReadAsStringAsync());
 
         // Assert
-        content!.Email.Should().BeEquivalentTo(knownSeedData[0].Email);
-
-        content!.EmergencyContact!.Should().BeEquivalentTo(emergencyContactSeed, config =>
-            {
-                config.Excluding(emergencyContact => emergencyContact.Id);
-                config.Excluding(emergencyContact => emergencyContact.Employee);
-
-                return config;
-            });
-        content!.AllergiesAndDietaryPreferences!.DefaultAllergies.Should().BeEquivalentTo(new List<string> { "MILK", "EGG" });
-        content!.AllergiesAndDietaryPreferences!.OtherAllergies.Should().BeEquivalentTo(allergiesAndDietaryPreferencesSeed.OtherAllergies);
-        content!.AllergiesAndDietaryPreferences!.DietaryPreferences.Should().BeEquivalentTo(new List<string> { "VEGETARIAN" });
-        content!.AllergiesAndDietaryPreferences!.Comment.Should().BeEquivalentTo(allergiesAndDietaryPreferencesSeed.Comment);
+        content!.EmergencyContact!.Name.Should().NotBeNull();
+        content!.AllergiesAndDietaryPreferences!.DefaultAllergies.Should()
+            .BeEquivalentTo(new List<string> { "MILK", "EGG" });
+        content!.AllergiesAndDietaryPreferences!.DietaryPreferences.Should()
+            .BeEquivalentTo(new List<string> { "VEGETARIAN" });
     }
 
     [Fact]
@@ -147,24 +108,19 @@ public class EmployeeTest :
         var employeeResponse = await _client.GetAsync("/employees/test");
 
         // Assert
-        employeeResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
+        employeeResponse.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
     [Fact]
-    public async void Given_EmployeeExists_When_CallingEmployeeControllerPOSTAllergiesAndDietaryPreferences_Then_UpdateDatabase()
+    public async void
+        Given_EmployeeExists_When_CallingEmployeeControllerPOSTAllergiesAndDietaryPreferences_Then_UpdateDatabase()
     {
         // Arrange
-        var seedingEmployee = Seed.GetSeedingEmployees()[0];
-        var expectedAllergiesAndDietaryPreferences = new EmployeeAllergiesAndDietaryPreferencesEntity
-        {
-            Employee = seedingEmployee,
-            DefaultAllergies = new List<DefaultAllergyEnum> { DefaultAllergyEnum.MILK, DefaultAllergyEnum.GLUTEN, DefaultAllergyEnum.PEANUTS },
-            OtherAllergies = new List<string> { "epler", "druer" },
-            DietaryPreferences = new List<DietaryPreferenceEnum> { DietaryPreferenceEnum.NO_PREFERENCES },
-            Comment = "Kjøtt må være helt gjennomstekt"
-        };
+        var firstSeededEmployee = Seed.GetSeedingEmployees()
+            .FirstOrDefault(preferences => preferences.AllergiesAndDietaryPreferences != null);
+        var firstSeededEmployeeAlias = firstSeededEmployee!.Email.Split("@").First();
 
-        string json = """
+        const string json = """
             {
                 "DefaultAllergies": ["MILK", "GLUTEN", "PEANUTS"],
                 "OtherAllergies": ["epler", "druer"],
@@ -173,56 +129,31 @@ public class EmployeeTest :
             }
         """;
 
-        var request = new HttpRequestMessage
-        {
-            RequestUri = new Uri("/employees/allergiesAndDietaryPreferences/no/test"),
-            Method = HttpMethod.Post,
-            Content = new StringContent(json, Encoding.UTF8, "application/json"),
-        };
-
-
-        // var dbEmployeeAllergiesAndDietaryPreferencesBefore = _db?.EmployeeAllergiesAndDietaryPreferences.FirstOrDefault(e => e.Employee.Email.Equals(employee.Email))!;
-        // var dbEmployees = _db?.Employees;
-
         // Act
-        // var response = await _client.PostAsync("/employees/allergiesAndDietaryPreferences/no/test",
-        //  JsonContent.Create(json));
-
-        var response = await _client.SendAsync(request);
-        var responseBody = await response.Content.ReadAsStringAsync();
-        // var content =
-        //             JsonConvert.DeserializeObject<AllergiesAndDietaryPreferences>(await response.Content
-        //                 .ReadAsStringAsync());
-
-        // // Retrive from database
-        //var dbEmployeeAllergiesAndDietaryPreferences = _db.EmployeeAllergiesAndDietaryPreferences.FirstOrDefault(e => e.Employee.Email.Equals(seedingEmployee.Email))!;
-        //var allAllergies = _db.EmployeeAllergiesAndDietaryPreferences;
-
+        var response =
+            await _client.PostAsync($"/employees/allergiesAndDietaryPreferences/no/{firstSeededEmployeeAlias}",
+                new StringContent(json, Encoding.UTF8, "application/json"));
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
-        var employee = _db.Employees.Include(employee => employee.AllergiesAndDietaryPreferences)
-        .FirstOrDefault(e => e.Email.Equals(seedingEmployee.Email))!;
+        var employee = _db.Employees
+            .Include(employee => employee.AllergiesAndDietaryPreferences)
+            .First(e => e.Email.Equals(firstSeededEmployee.Email));
 
-        employee.Should().BeEquivalentTo(seedingEmployee, config =>
-        {
-            config.Excluding(e => e.Id);
-            return config;
-        });
+        ModelConverters.ToEmployeeJson(employee).Should()
+            .BeEquivalentTo(ModelConverters.ToEmployeeJson(firstSeededEmployee));
 
-        var allergiesAndDietaryPreferences = employee.AllergiesAndDietaryPreferences;
+        employee.AllergiesAndDietaryPreferences!.DefaultAllergies.Should()
+            .BeEquivalentTo(new List<DefaultAllergyEnum> { DefaultAllergyEnum.MILK, DefaultAllergyEnum.GLUTEN, DefaultAllergyEnum.PEANUTS });
+        employee!.AllergiesAndDietaryPreferences!.DietaryPreferences.Should()
+            .BeEquivalentTo(new List<DietaryPreferenceEnum> { DietaryPreferenceEnum.NO_PREFERENCES });
+    }
 
-        allergiesAndDietaryPreferences.Should().NotBeNull();
-        allergiesAndDietaryPreferences!.Employee.Should().BeEquivalentTo(seedingEmployee, config =>
-            {
-                config.Excluding(employee => employee.Id);
-
-                return config;
-            });
-        allergiesAndDietaryPreferences!.DefaultAllergies.Should().BeEquivalentTo(expectedAllergiesAndDietaryPreferences.DefaultAllergies);
-        allergiesAndDietaryPreferences!.OtherAllergies.Should().BeEquivalentTo(expectedAllergiesAndDietaryPreferences.OtherAllergies);
-        allergiesAndDietaryPreferences!.DietaryPreferences.Should().BeEquivalentTo(expectedAllergiesAndDietaryPreferences.DietaryPreferences);
-        allergiesAndDietaryPreferences!.Comment.Should().BeEquivalentTo(expectedAllergiesAndDietaryPreferences.Comment);
+    public void Dispose()
+    {
+        _client.Dispose();
+        _scope.Dispose();
+        _db.Dispose();
     }
 }

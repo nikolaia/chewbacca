@@ -12,7 +12,6 @@ public static class Utilities
         var employee = db.Employees.FirstOrDefault(e => e.Email == "test@variant.no")!;
 
         db.EmergencyContacts.AddRange(Seed.GetSeedingEmergencyContact(employee));
-        db.EmployeeAllergiesAndDietaryPreferences.AddRange(Seed.GetSeedingAllergiesAndDietaryPreferences(employee));
 
         db.SaveChanges();
     }

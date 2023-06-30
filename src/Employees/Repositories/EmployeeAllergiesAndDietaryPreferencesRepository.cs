@@ -7,10 +7,12 @@ namespace Employees.Repositories;
 public class EmployeeAllergiesAndDietaryPreferencesRepository
 {
     private readonly EmployeeContext _db;
+    private readonly EmployeesRepository _employeesRepository;
 
-    public EmployeeAllergiesAndDietaryPreferencesRepository(EmployeeContext db)
+    public EmployeeAllergiesAndDietaryPreferencesRepository(EmployeeContext db, EmployeesRepository employeesRepository)
     {
         _db = db;
+        _employeesRepository = employeesRepository;
     }
 
     public async Task<EmployeeAllergiesAndDietaryPreferencesEntity?> GetByEmployee(EmployeeEntity employee)
@@ -20,32 +22,30 @@ public class EmployeeAllergiesAndDietaryPreferencesRepository
             .SingleOrDefaultAsync();
     }
 
-    public async Task AddOrUpdateToDatabase(EmployeeEntity employee, AllergiesAndDietaryPreferences allergiesAndDietaryPreferences)
+    public async Task<bool> AddOrUpdateEmployeeAllergiesAndDietaryPreferences(string alias, string country,
+        AllergiesAndDietaryPreferences allergiesAndDietaryPreferences)
     {
-        EmployeeAllergiesAndDietaryPreferencesEntity? existingEmployeeAllergiesAndDietaryPreferences = await GetByEmployee(employee);
-
-        if (existingEmployeeAllergiesAndDietaryPreferences == null)
+        var employee = await _employeesRepository.GetEmployeeAsync(alias, country);
+        
+        if (employee == null)
         {
-            var employeeAllergyAndDietaryPreferences = new EmployeeAllergiesAndDietaryPreferencesEntity
-            {
-                Employee = employee,
-                DefaultAllergies = ModelConverters.DefaultAllergyStringListToEnumList(allergiesAndDietaryPreferences.DefaultAllergies),
-                OtherAllergies = allergiesAndDietaryPreferences.OtherAllergies,
-                DietaryPreferences = ModelConverters.DietaryPreferenceStringListToEnumList(allergiesAndDietaryPreferences.DietaryPreferences),
-                Comment = allergiesAndDietaryPreferences.Comment
-            };
-
-            await _db.AddAsync(employeeAllergyAndDietaryPreferences);
+            return false;
         }
-        else
+        
+        employee.AllergiesAndDietaryPreferences = new EmployeeAllergiesAndDietaryPreferencesEntity
         {
-            existingEmployeeAllergiesAndDietaryPreferences.DefaultAllergies = ModelConverters.DefaultAllergyStringListToEnumList(allergiesAndDietaryPreferences.DefaultAllergies);
-            existingEmployeeAllergiesAndDietaryPreferences.OtherAllergies = allergiesAndDietaryPreferences.OtherAllergies;
-            existingEmployeeAllergiesAndDietaryPreferences.DietaryPreferences = ModelConverters.DietaryPreferenceStringListToEnumList(allergiesAndDietaryPreferences.DietaryPreferences);
-            existingEmployeeAllergiesAndDietaryPreferences.Comment = allergiesAndDietaryPreferences.Comment;
-        }
+            Employee = employee,
+            DefaultAllergies =
+                ModelConverters.DefaultAllergyStringListToEnumList(allergiesAndDietaryPreferences.DefaultAllergies),
+            OtherAllergies = allergiesAndDietaryPreferences.OtherAllergies,
+            DietaryPreferences =
+                ModelConverters.DietaryPreferenceStringListToEnumList(allergiesAndDietaryPreferences
+                    .DietaryPreferences),
+            Comment = allergiesAndDietaryPreferences.Comment
+        };
 
-        await _db.SaveChangesAsync();
+        var changes = await _db.SaveChangesAsync();
+        return changes > 0;
     }
 
     public async Task Delete(EmployeeAllergiesAndDietaryPreferencesEntity employeeAllergy)

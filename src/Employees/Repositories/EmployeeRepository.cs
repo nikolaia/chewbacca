@@ -26,6 +26,7 @@ public class EmployeesRepository
     public async Task<EmployeeEntity?> GetEmployeeAsync(string alias, string country)
     {
         return await _db.Employees
+            .Include(employee => employee.AllergiesAndDietaryPreferences)
             .Where(emp => emp.Email.StartsWith($"{alias}@"))
             .Where(emp => emp.CountryCode == country)
             .SingleOrDefaultAsync();
@@ -45,10 +46,10 @@ public class EmployeesRepository
             updateEmployee.StartDate = employee.StartDate;
             updateEmployee.EndDate = employee.EndDate;
             updateEmployee.CountryCode = employee.CountryCode;
-            employee.Address = employee.Address;
-            employee.AccountNumber = employee.AccountNumber;
-            employee.ZipCode = employee.ZipCode;
-            employee.City = employee.City;
+            updateEmployee.Address = employee.Address;
+            updateEmployee.AccountNumber = employee.AccountNumber;
+            updateEmployee.ZipCode = employee.ZipCode;
+            updateEmployee.City = employee.City;
         }
         else
         {

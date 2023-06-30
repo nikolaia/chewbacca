@@ -21,7 +21,14 @@ public static class Seed
                 AccountNumber = null,
                 Address = null,
                 ZipCode = null,
-                City = null
+                City = null,
+                AllergiesAndDietaryPreferences = new EmployeeAllergiesAndDietaryPreferencesEntity()
+                {
+                    DefaultAllergies = new List<DefaultAllergyEnum> { DefaultAllergyEnum.MILK, DefaultAllergyEnum.EGG },
+                    OtherAllergies = new List<string> { "Druer", "Pære" },
+                    DietaryPreferences = new List<DietaryPreferenceEnum> { DietaryPreferenceEnum.VEGETARIAN },
+                    Comment = "Reagerer bare på eggehvite, ikke eggeplomme",
+                }
             },
             new()
             {
@@ -53,18 +60,6 @@ public static class Seed
                 Relation = "Far",
                 Comment = "Jobber nattevakter, send melding først"
             }
-        };
-    }
-
-    public static EmployeeAllergiesAndDietaryPreferencesEntity GetSeedingAllergiesAndDietaryPreferences(EmployeeEntity employee)
-    {
-        return new EmployeeAllergiesAndDietaryPreferencesEntity
-        {
-            Employee = employee,
-            DefaultAllergies = new List<DefaultAllergyEnum> { DefaultAllergyEnum.MILK, DefaultAllergyEnum.EGG },
-            OtherAllergies = new List<string> { "Druer", "Pære" },
-            DietaryPreferences = new List<DietaryPreferenceEnum> { DietaryPreferenceEnum.VEGETARIAN },
-            Comment = "Reagerer bare på eggehvite, ikke eggeplomme",
         };
     }
 }

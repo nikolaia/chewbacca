@@ -116,8 +116,8 @@ public class EmployeesService
         return employeeAllergiesAndDietaryPreferences == null ? null : ModelConverters.ToAllergiesAndDietaryPreferences(employeeAllergiesAndDietaryPreferences);
     }
 
-    public async Task UpdateAllergiesAndDietaryPreferences(EmployeeEntity employee, AllergiesAndDietaryPreferences allergiesAndDietaryPreferences)
+    public async Task<bool> UpdateAllergiesAndDietaryPreferencesByAliasAndCountry(string alias, string country, AllergiesAndDietaryPreferences allergiesAndDietaryPreferences)
     {
-        await _employeeAllergiesAndDietaryPreferencesRepository.AddOrUpdateToDatabase(employee, allergiesAndDietaryPreferences);
+        return await _employeeAllergiesAndDietaryPreferencesRepository.AddOrUpdateEmployeeAllergiesAndDietaryPreferences(alias, country, allergiesAndDietaryPreferences);
     }
 }
