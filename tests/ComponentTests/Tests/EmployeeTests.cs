@@ -97,8 +97,12 @@ public class EmployeeTest :
         content!.EmergencyContact!.Name.Should().NotBeNull();
         content!.AllergiesAndDietaryPreferences!.DefaultAllergies.Should()
             .BeEquivalentTo(new List<string> { "MILK", "EGG" });
+        content!.AllergiesAndDietaryPreferences!.OtherAllergies.Should()
+            .BeEquivalentTo(new List<string> { "Druer", "Pære" });
         content!.AllergiesAndDietaryPreferences!.DietaryPreferences.Should()
             .BeEquivalentTo(new List<string> { "VEGETARIAN" });
+        content!.AllergiesAndDietaryPreferences!.Comment.Should()
+.BeEquivalentTo("Reagerer bare på eggehvite, ikke eggeplomme");
     }
 
     [Fact]
@@ -146,8 +150,10 @@ public class EmployeeTest :
 
         employee.AllergiesAndDietaryPreferences!.DefaultAllergies.Should()
             .BeEquivalentTo(new List<DefaultAllergyEnum> { DefaultAllergyEnum.MILK, DefaultAllergyEnum.GLUTEN, DefaultAllergyEnum.PEANUTS });
+        employee!.AllergiesAndDietaryPreferences!.OtherAllergies.Should().BeEquivalentTo(new List<string> { "epler", "druer" });
         employee!.AllergiesAndDietaryPreferences!.DietaryPreferences.Should()
             .BeEquivalentTo(new List<DietaryPreferenceEnum> { DietaryPreferenceEnum.NO_PREFERENCES });
+        employee!.AllergiesAndDietaryPreferences.Comment.Should().BeEquivalentTo("Kjøtt må være helt gjennomstekt");
     }
 
     public void Dispose()
