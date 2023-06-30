@@ -40,4 +40,31 @@ public static class Seed
             }
         };
     }
+
+    public static List<EmergencyContactEntity> GetSeedingEmergencyContact(EmployeeEntity employee)
+    {
+        return new List<EmergencyContactEntity>()
+        {
+            new()
+            {
+                Employee = employee,
+                Name = "Ola Nordmann",
+                Phone = "12345678",
+                Relation = "Far",
+                Comment = "Jobber nattevakter, send melding først"
+            }
+        };
+    }
+
+    public static EmployeeAllergiesAndDietaryPreferencesEntity GetSeedingAllergiesAndDietaryPreferences(EmployeeEntity employee)
+    {
+        return new EmployeeAllergiesAndDietaryPreferencesEntity
+        {
+            Employee = employee,
+            DefaultAllergies = new List<DefaultAllergyEnum> { DefaultAllergyEnum.MILK, DefaultAllergyEnum.EGG },
+            OtherAllergies = new List<string> { "Druer", "Pære" },
+            DietaryPreferences = new List<DietaryPreferenceEnum> { DietaryPreferenceEnum.VEGETARIAN },
+            Comment = "Reagerer bare på eggehvite, ikke eggeplomme",
+        };
+    }
 }
