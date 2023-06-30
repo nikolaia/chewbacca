@@ -30,6 +30,7 @@ public record EmployeeAllergiesAndDietaryPreferencesEntity
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Guid Id { get; set; }
 
+    public Guid EmployeeId { get; set; }
     public EmployeeEntity Employee { get; set; } = null!;
 
     public List<DefaultAllergyEnum> DefaultAllergies { get; set; } = null!;
