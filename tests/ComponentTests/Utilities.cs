@@ -8,5 +8,11 @@ public static class Utilities
     {
         db.Employees.AddRange(Seed.GetSeedingEmployees());
         db.SaveChanges();
+
+        var employee = db.Employees.FirstOrDefault(e => e.Email == "test@variant.no")!;
+
+        db.EmergencyContacts.AddRange(Seed.GetSeedingEmergencyContact(employee));
+
+        db.SaveChanges();
     }
 }

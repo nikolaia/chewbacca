@@ -21,7 +21,14 @@ public static class Seed
                 AccountNumber = null,
                 Address = null,
                 ZipCode = null,
-                City = null
+                City = null,
+                AllergiesAndDietaryPreferences = new EmployeeAllergiesAndDietaryPreferencesEntity()
+                {
+                    DefaultAllergies = new List<DefaultAllergyEnum> { DefaultAllergyEnum.MILK, DefaultAllergyEnum.EGG },
+                    OtherAllergies = new List<string> { "Druer", "Pære" },
+                    DietaryPreferences = new List<DietaryPreferenceEnum> { DietaryPreferenceEnum.VEGETARIAN },
+                    Comment = "Reagerer bare på eggehvite, ikke eggeplomme",
+                }
             },
             new()
             {
@@ -37,6 +44,21 @@ public static class Seed
                 Address = null,
                 ZipCode = null,
                 City = null
+            }
+        };
+    }
+
+    public static List<EmergencyContactEntity> GetSeedingEmergencyContact(EmployeeEntity employee)
+    {
+        return new List<EmergencyContactEntity>()
+        {
+            new()
+            {
+                Employee = employee,
+                Name = "Ola Nordmann",
+                Phone = "12345678",
+                Relation = "Far",
+                Comment = "Jobber nattevakter, send melding først"
             }
         };
     }
