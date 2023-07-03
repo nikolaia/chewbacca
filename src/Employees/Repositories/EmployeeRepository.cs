@@ -27,6 +27,7 @@ public class EmployeesRepository
     {
         return await _db.Employees
             .Include(employee => employee.AllergiesAndDietaryPreferences)
+            .Include(employee => employee.EmergencyContact)
             .Where(emp => emp.Email.StartsWith($"{alias}@"))
             .Where(emp => emp.CountryCode == country)
             .SingleOrDefaultAsync();

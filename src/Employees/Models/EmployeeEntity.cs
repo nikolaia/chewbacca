@@ -32,4 +32,5 @@ public record EmployeeEntity
     public string? City { get; set; }
 
     public EmployeeAllergiesAndDietaryPreferencesEntity? AllergiesAndDietaryPreferences { get; set; }
+    public EmergencyContactEntity? EmergencyContact { get; set; }
 }
