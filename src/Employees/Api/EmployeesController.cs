@@ -106,20 +106,17 @@ public class EmployeesController : ControllerBase
             return StatusCode(500, "Invalid data");
         }
 
-        var employee = await _employeeService.GetEntityByAliasAndCountry(alias, country);
+        var updateSuccess = await _employeeService.AddOrUpdateEmergencyContactByAliasAndCountry(alias, country, emergencyContact);
 
-        if (employee == null)
+        if (updateSuccess)
         {
-            _logger.LogError(
-                "Can't update EmergencyContact because there is no matching Employee to alias {alias} and country {country}",
-                alias, country);
-            return NotFound();
-        }
-        else
-        {
-            await _employeeService.AddOrUpdateEmergencyContact(employee, emergencyContact);
             return NoContent();
         }
+
+        _logger.LogError(
+            "Can't update EmergencyContact because there is no matching Employee to alias {alias} and country {country}",
+            alias, country);
+        return NotFound();
     }
 
     /**
