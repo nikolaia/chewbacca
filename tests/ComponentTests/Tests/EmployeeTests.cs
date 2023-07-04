@@ -140,12 +140,8 @@ public class EmployeeTest :
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
-        var employee = _db.Employees
-            .First(e => e.Email.Equals(firstSeededEmployee.Email));
-
-        // TODO: just for debugging
         var employeeResponse = await _client.GetAsync($"/employees/{firstSeededEmployeeAlias}/extended?country={firstSeededEmployeeCountry}");
-        var content =
+        var employee =
             JsonConvert.DeserializeObject<EmployeeExtendedJson>(await employeeResponse.Content
                 .ReadAsStringAsync());
 
