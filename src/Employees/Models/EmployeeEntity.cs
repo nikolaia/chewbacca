@@ -31,5 +31,6 @@ public record EmployeeEntity
     public string? ZipCode { get; set; }
     public string? City { get; set; }
 
+    public EmergencyContactEntity? EmergencyContact { get; set; }
     public EmployeeAllergiesAndDietaryPreferencesEntity? AllergiesAndDietaryPreferences { get; set; }
 }

@@ -11,6 +11,7 @@ public record EmergencyContactEntity
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Guid Id { get; set; }
 
+    public Guid EmployeeId { get; set; }
     public EmployeeEntity Employee { get; set; } = null!;
     public string Name { get; set; } = null!;
     public string Phone { get; set; } = null!;
