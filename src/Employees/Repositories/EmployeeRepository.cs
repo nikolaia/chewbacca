@@ -27,6 +27,7 @@ public class EmployeesRepository
     {
         return await _db.Employees
             .Include(employee => employee.AllergiesAndDietaryPreferences)
+            .Include(employee => employee.EmergencyContact)
             .Where(emp => emp.Email.StartsWith($"{alias}@"))
             .Where(emp => emp.CountryCode == country)
             .SingleOrDefaultAsync();
@@ -93,31 +94,5 @@ public class EmployeesRepository
 
         return employees.Select(employee => employee.ImageUrl);
 
-    }
-
-    public async Task<EmergencyContactEntity?> GetEmergencyContactAsync(EmployeeEntity employee)
-    {
-        return await _db.EmergencyContacts
-            .Where(emp => emp.Employee.Equals(employee))
-            .SingleOrDefaultAsync();
-    }
-
-    public async Task AddToDatabase(EmergencyContactEntity emergencyContact)
-    {
-        var updateEmergencyContact = await _db.EmergencyContacts.SingleOrDefaultAsync(e => e.Employee == emergencyContact.Employee);
-
-        if (updateEmergencyContact != null)
-        {
-            updateEmergencyContact.Name = emergencyContact.Name;
-            updateEmergencyContact.Phone = emergencyContact.Phone;
-            updateEmergencyContact.Relation = emergencyContact.Relation;
-            updateEmergencyContact.Comment = emergencyContact.Comment;
-        }
-        else
-        {
-            await _db.AddAsync(emergencyContact);
-        }
-
-        await _db.SaveChangesAsync();
     }
 }
