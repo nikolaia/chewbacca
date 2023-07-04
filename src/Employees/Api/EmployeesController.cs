@@ -79,22 +79,18 @@ public class EmployeesController : ControllerBase
     public async Task<ActionResult> UpdateEmployeeInformation(string alias, string country,
         [FromBody] EmployeeInformation employeeInformation)
     {
-        var employee = await _employeeService.GetEntityByAliasAndCountry(alias, country);
-
-        if (employee == null)
+        var updateSuccess = await _employeeService.UpdateEmployeeInformationByAliasAndCountry(alias, country, employeeInformation);
+        if (updateSuccess)
         {
-            _logger.LogError(
-                "Can't update EmployeeInformation because there is no matching Employee to alias {alias} and country {country}",
-                alias, country);
-            return NotFound();
-        }
-        else
-        {
-            await _employeeService.UpdateEmployeeInformation(employee, employeeInformation);
-
             return NoContent();
         }
+
+        _logger.LogError(
+            "Can't update EmployeeInformation because there is no matching Employee to alias {alias} and country {country}",
+            alias, country);
+        return NotFound();
     }
+
 
     [Microsoft.AspNetCore.Cors.EnableCors("DashCorsPolicy")]
     [HttpPost("emergencyContact/{country}/{alias}")]

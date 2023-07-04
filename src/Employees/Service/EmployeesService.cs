@@ -65,15 +65,9 @@ public class EmployeesService
         return _employeesRepository.EnsureEmployeesWithEndDateBeforeTodayAreDeleted();
     }
 
-    public Task UpdateEmployeeInformation(EmployeeEntity employee, EmployeeInformation employeeInformation)
+    public async Task<bool> UpdateEmployeeInformationByAliasAndCountry(string alias, string country, EmployeeInformation employeeInformation)
     {
-        employee.Telephone = employeeInformation.Phone;
-        employee.Address = employeeInformation.Address;
-        employee.AccountNumber = employeeInformation.AccountNumber;
-        employee.ZipCode = employeeInformation.ZipCode;
-        employee.City = employeeInformation.City;
-
-        return _employeesRepository.AddToDatabase(employee);
+        return await _employeesRepository.UpdateEmployeeInformation(alias, country, employeeInformation);
     }
 
     public async Task<EmergencyContact?> GetEmergencyContactByEmployee(EmployeeEntity employee)

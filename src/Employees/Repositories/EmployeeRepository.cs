@@ -47,10 +47,8 @@ public class EmployeesRepository
             updateEmployee.StartDate = employee.StartDate;
             updateEmployee.EndDate = employee.EndDate;
             updateEmployee.CountryCode = employee.CountryCode;
-            updateEmployee.Address = employee.Address;
-            updateEmployee.AccountNumber = employee.AccountNumber;
-            updateEmployee.ZipCode = employee.ZipCode;
-            updateEmployee.City = employee.City;
+            // Don't set Address, AccountNumber, ZipCode and City since these aren't fetched from external sources,
+            // and hence the information given from variantdash will be overwritten
         }
         else
         {
@@ -58,6 +56,25 @@ public class EmployeesRepository
         }
 
         await _db.SaveChangesAsync();
+    }
+
+    public async Task<bool> UpdateEmployeeInformation(string alias, string country, EmployeeInformation employeeInformation)
+    {
+        var employee = await GetEmployeeAsync(alias, country);
+
+        if (employee == null)
+        {
+            return false;
+        }
+
+        employee.Telephone = employeeInformation.Phone;
+        employee.AccountNumber = employeeInformation.AccountNumber;
+        employee.Address = employeeInformation.Address;
+        employee.ZipCode = employeeInformation.ZipCode;
+        employee.City = employeeInformation.City;
+
+        var changes = await _db.SaveChangesAsync();
+        return changes > 0;
     }
 
     /// <summary>

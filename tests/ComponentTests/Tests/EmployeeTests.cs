@@ -115,6 +115,48 @@ public class EmployeeTest :
     }
 
     [Fact]
+    public async void Given_EmployeeExists_When_CallingEmployeeControllerPOSTInformation_Then_UpdateDatabase()
+    {
+        // Arrange
+        var firstSeededEmployee = Seed.GetSeedingEmployees()[0];
+        var firstSeededEmployeeAlias = firstSeededEmployee!.Email.Split("@").First();
+        var firstSeededEmployeeCountry = firstSeededEmployee!.Email.Split(".").Last();
+
+        const string json = """
+            {
+                "Phone": "11223344",
+                "AccountNumber": "12341234123",
+                "Address": "Et annet sted",
+                "ZipCode": "7000",
+                "City": "Trondheim"
+            }
+        """;
+
+        // Act
+        var response =
+            await _client.PostAsync($"/employees/information/{firstSeededEmployeeCountry}/{firstSeededEmployeeAlias}",
+                new StringContent(json, Encoding.UTF8, "application/json"));
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+
+        var employeeResponse = await _client.GetAsync($"/employees/{firstSeededEmployeeAlias}/extended?country={firstSeededEmployeeCountry}");
+        var employee =
+            JsonConvert.DeserializeObject<EmployeeExtendedJson>(await employeeResponse.Content
+                .ReadAsStringAsync());
+
+        employee!.Name.Should().BeEquivalentTo(firstSeededEmployee.Name);
+        employee!.OfficeName.Should().BeEquivalentTo(firstSeededEmployee.OfficeName);
+        employee!.Telephone.Should().BeEquivalentTo("11223344");
+        employee.AccountNumber.Should()
+            .BeEquivalentTo("12341234123");
+        employee!.Address.Should()
+            .BeEquivalentTo("Et annet sted");
+        employee!.ZipCode.Should().BeEquivalentTo("7000");
+        employee!.City.Should().BeEquivalentTo("Trondheim");
+    }
+
+    [Fact]
     public async void
     Given_EmployeeExists_When_CallingEmployeeControllerPOSTEmergencyContact_Then_UpdateDatabase()
     {
