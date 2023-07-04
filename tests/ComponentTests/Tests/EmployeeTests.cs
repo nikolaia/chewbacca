@@ -94,7 +94,7 @@ public class EmployeeTest :
                 .ReadAsStringAsync());
 
         // Assert
-        content!.EmergencyContact!.Name.Should().NotBeNull();
+        content!.EmergencyContact!.Name.Should().BeEquivalentTo("Ola Nordmann");
         content!.AllergiesAndDietaryPreferences!.DefaultAllergies.Should()
             .BeEquivalentTo(new List<string> { "MILK", "EGG" });
         content!.AllergiesAndDietaryPreferences!.OtherAllergies.Should()
@@ -117,12 +117,54 @@ public class EmployeeTest :
 
     [Fact]
     public async void
+    Given_EmployeeExists_When_CallingEmployeeControllerPOSTEmergencyContact_Then_UpdateDatabase()
+    {
+        // Arrange
+        var firstSeededEmployee = Seed.GetSeedingEmployees()[0];
+        var firstSeededEmployeeAlias = firstSeededEmployee!.Email.Split("@").First();
+        var firstSeededEmployeeCountry = firstSeededEmployee!.Email.Split(".").Last();
+
+        const string json = """
+            {
+                "Name": "Kari Nordmann",
+                "Phone": "11223344",
+                "Relation": "",
+                "Comment": ""
+            }
+        """;
+
+        // Act
+        var response =
+            await _client.PostAsync($"/employees/emergencyContact/{firstSeededEmployeeCountry}/{firstSeededEmployeeAlias}",
+                new StringContent(json, Encoding.UTF8, "application/json"));
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+
+        var employee = _db.Employees
+            .Include(employee => employee.EmergencyContact)
+            .First(e => e.Email.Equals(firstSeededEmployee.Email));
+
+        ModelConverters.ToEmployeeJson(employee).Should()
+            .BeEquivalentTo(ModelConverters.ToEmployeeJson(firstSeededEmployee));
+
+        employee.EmergencyContact!.Name.Should()
+            .BeEquivalentTo("Kari Nordmann");
+        employee!.EmergencyContact!.Phone.Should().BeEquivalentTo("11223344");
+        employee!.EmergencyContact!.Relation.Should()
+            .BeEquivalentTo("");
+        employee!.EmergencyContact!.Comment.Should().BeEquivalentTo("");
+    }
+
+    [Fact]
+    public async void
         Given_EmployeeExists_When_CallingEmployeeControllerPOSTAllergiesAndDietaryPreferences_Then_UpdateDatabase()
     {
         // Arrange
         var firstSeededEmployee = Seed.GetSeedingEmployees()
             .FirstOrDefault(preferences => preferences.AllergiesAndDietaryPreferences != null);
         var firstSeededEmployeeAlias = firstSeededEmployee!.Email.Split("@").First();
+        var firstSeededEmployeeCountry = firstSeededEmployee!.Email.Split(".").Last();
 
         const string json = """
             {
@@ -135,7 +177,7 @@ public class EmployeeTest :
 
         // Act
         var response =
-            await _client.PostAsync($"/employees/allergiesAndDietaryPreferences/no/{firstSeededEmployeeAlias}",
+            await _client.PostAsync($"/employees/allergiesAndDietaryPreferences/{firstSeededEmployeeCountry}/{firstSeededEmployeeAlias}",
                 new StringContent(json, Encoding.UTF8, "application/json"));
 
         // Assert
