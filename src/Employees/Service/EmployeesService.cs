@@ -6,14 +6,17 @@ namespace Employees.Service;
 public class EmployeesService
 {
     private readonly EmployeesRepository _employeesRepository;
+    private readonly EmergencyContactRepository _emergencyContactRepository;
     private readonly EmployeeAllergiesAndDietaryPreferencesRepository _employeeAllergiesAndDietaryPreferencesRepository;
 
     public EmployeesService(EmployeesRepository employeesRepository,
-        EmployeeAllergiesAndDietaryPreferencesRepository employeeAllergiesAndDietaryPreferencesRepository
+        EmployeeAllergiesAndDietaryPreferencesRepository employeeAllergiesAndDietaryPreferencesRepository,
+        EmergencyContactRepository emergencyContactRepository
         )
     {
         this._employeesRepository = employeesRepository;
         this._employeeAllergiesAndDietaryPreferencesRepository = employeeAllergiesAndDietaryPreferencesRepository;
+        this._emergencyContactRepository = emergencyContactRepository;
     }
 
     private static bool IsEmployeeActive(EmployeeEntity employee)
@@ -75,23 +78,14 @@ public class EmployeesService
 
     public async Task<EmergencyContact?> GetEmergencyContactByEmployee(EmployeeEntity employee)
     {
-        var emergencyContact = await _employeesRepository.GetEmergencyContactAsync(employee);
+        var emergencyContact = await _emergencyContactRepository.GetByEmployee(employee);
 
         return emergencyContact == null ? null : ModelConverters.ToEmergencyContact(emergencyContact);
     }
 
-    public Task AddOrUpdateEmergencyContact(EmployeeEntity employee, EmergencyContact emergencyContact)
+    public async Task<bool> AddOrUpdateEmergencyContactByAliasAndCountry(string alias, string country, EmergencyContact emergencyContact)
     {
-        var entity = new EmergencyContactEntity
-        {
-            Employee = employee,
-            Name = emergencyContact.Name,
-            Phone = emergencyContact.Phone,
-            Relation = emergencyContact.Relation == "" ? null : emergencyContact.Relation,
-            Comment = emergencyContact.Comment == "" ? null : emergencyContact.Comment,
-        };
-
-        return _employeesRepository.AddToDatabase(entity);
+        return await _emergencyContactRepository.AddOrUpdateEmergencyContact(alias, country, emergencyContact);
     }
 
     public Boolean isValid(EmergencyContact emergencyContact)

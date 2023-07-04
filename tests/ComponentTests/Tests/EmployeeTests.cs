@@ -20,7 +20,6 @@ public class EmployeeTest :
 {
     private readonly HttpClient _client;
     private readonly IServiceScope _scope;
-    private EmployeeContext _db;
 
     public EmployeeTest()
     {
@@ -28,9 +27,9 @@ public class EmployeeTest :
 
         _scope = factory.Services.CreateScope();
         var scopedServices = _scope.ServiceProvider;
-        _db = scopedServices.GetRequiredService<EmployeeContext>();
-        _db.Database.EnsureCreated();
-        Utilities.InitializeDbForTests(_db);
+        var db = scopedServices.GetRequiredService<EmployeeContext>();
+        db.Database.EnsureCreated();
+        Utilities.InitializeDbForTests(db);
 
         _client = factory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
     }
@@ -94,7 +93,7 @@ public class EmployeeTest :
                 .ReadAsStringAsync());
 
         // Assert
-        content!.EmergencyContact!.Name.Should().NotBeNull();
+        content!.EmergencyContact!.Name.Should().BeEquivalentTo("Ola Nordmann");
         content!.AllergiesAndDietaryPreferences!.DefaultAllergies.Should()
             .BeEquivalentTo(new List<string> { "MILK", "EGG" });
         content!.AllergiesAndDietaryPreferences!.OtherAllergies.Should()
@@ -117,12 +116,53 @@ public class EmployeeTest :
 
     [Fact]
     public async void
+    Given_EmployeeExists_When_CallingEmployeeControllerPOSTEmergencyContact_Then_UpdateDatabase()
+    {
+        // Arrange
+        var firstSeededEmployee = Seed.GetSeedingEmployees()[0];
+        var firstSeededEmployeeAlias = firstSeededEmployee!.Email.Split("@").First();
+        var firstSeededEmployeeCountry = firstSeededEmployee!.Email.Split(".").Last();
+
+        const string json = """
+            {
+                "Name": "Kari Nordmann",
+                "Phone": "11223344",
+                "Relation": "",
+                "Comment": ""
+            }
+        """;
+
+        // Act
+        var response =
+            await _client.PostAsync($"/employees/emergencyContact/{firstSeededEmployeeCountry}/{firstSeededEmployeeAlias}",
+                new StringContent(json, Encoding.UTF8, "application/json"));
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+
+        var employeeResponse = await _client.GetAsync($"/employees/{firstSeededEmployeeAlias}/extended?country={firstSeededEmployeeCountry}");
+        var employee =
+            JsonConvert.DeserializeObject<EmployeeExtendedJson>(await employeeResponse.Content
+                .ReadAsStringAsync());
+
+        employee!.Email.Should().BeEquivalentTo(firstSeededEmployee.Email);
+        employee!.EmergencyContact!.Name.Should()
+            .BeEquivalentTo("Kari Nordmann");
+        employee!.EmergencyContact!.Phone.Should().BeEquivalentTo("11223344");
+        employee!.EmergencyContact!.Relation.Should()
+            .BeEquivalentTo("");
+        employee!.EmergencyContact!.Comment.Should().BeEquivalentTo("");
+    }
+
+    [Fact]
+    public async void
         Given_EmployeeExists_When_CallingEmployeeControllerPOSTAllergiesAndDietaryPreferences_Then_UpdateDatabase()
     {
         // Arrange
         var firstSeededEmployee = Seed.GetSeedingEmployees()
             .FirstOrDefault(preferences => preferences.AllergiesAndDietaryPreferences != null);
         var firstSeededEmployeeAlias = firstSeededEmployee!.Email.Split("@").First();
+        var firstSeededEmployeeCountry = firstSeededEmployee!.Email.Split(".").Last();
 
         const string json = """
             {
@@ -135,24 +175,23 @@ public class EmployeeTest :
 
         // Act
         var response =
-            await _client.PostAsync($"/employees/allergiesAndDietaryPreferences/no/{firstSeededEmployeeAlias}",
+            await _client.PostAsync($"/employees/allergiesAndDietaryPreferences/{firstSeededEmployeeCountry}/{firstSeededEmployeeAlias}",
                 new StringContent(json, Encoding.UTF8, "application/json"));
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
-        var employee = _db.Employees
-            .Include(employee => employee.AllergiesAndDietaryPreferences)
-            .First(e => e.Email.Equals(firstSeededEmployee.Email));
+        var employeeResponse = await _client.GetAsync($"/employees/{firstSeededEmployeeAlias}/extended?country={firstSeededEmployeeCountry}");
+        var employee =
+            JsonConvert.DeserializeObject<EmployeeExtendedJson>(await employeeResponse.Content
+                .ReadAsStringAsync());
 
-        ModelConverters.ToEmployeeJson(employee).Should()
-            .BeEquivalentTo(ModelConverters.ToEmployeeJson(firstSeededEmployee));
-
-        employee.AllergiesAndDietaryPreferences!.DefaultAllergies.Should()
-            .BeEquivalentTo(new List<DefaultAllergyEnum> { DefaultAllergyEnum.MILK, DefaultAllergyEnum.GLUTEN, DefaultAllergyEnum.PEANUTS });
+        employee!.Email.Should().BeEquivalentTo(firstSeededEmployee.Email);
+        employee!.AllergiesAndDietaryPreferences!.DefaultAllergies.Should()
+            .BeEquivalentTo(new List<string> { "MILK", "GLUTEN", "PEANUTS" });
         employee!.AllergiesAndDietaryPreferences!.OtherAllergies.Should().BeEquivalentTo(new List<string> { "epler", "druer" });
         employee!.AllergiesAndDietaryPreferences!.DietaryPreferences.Should()
-            .BeEquivalentTo(new List<DietaryPreferenceEnum> { DietaryPreferenceEnum.NO_PREFERENCES });
+            .BeEquivalentTo(new List<string> { "NO_PREFERENCES" });
         employee!.AllergiesAndDietaryPreferences.Comment.Should().BeEquivalentTo("Kjøtt må være helt gjennomstekt");
     }
 
@@ -160,6 +199,5 @@ public class EmployeeTest :
     {
         _client.Dispose();
         _scope.Dispose();
-        _db.Dispose();
     }
 }
