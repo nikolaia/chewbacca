@@ -119,4 +119,26 @@ public class EmployeesRepository
 
         await _db.SaveChangesAsync();
     }
+
+    public async Task AddToDatabase(PresentationEntity presentation)
+    {
+        var updateEmergencyContact = await _db.Presentations.SingleOrDefaultAsync(e => e.Id == presentation.Id);
+
+        if (updateEmergencyContact != null)
+        {
+            updateEmergencyContact.Title = presentation.Title;
+            updateEmergencyContact.Description = presentation.Description;
+            updateEmergencyContact.EmployeeId = presentation.EmployeeId;
+            updateEmergencyContact.Month = presentation.Month;
+            updateEmergencyContact.Year = presentation.Year;
+            updateEmergencyContact.Url = presentation.Url;
+            updateEmergencyContact.Order = presentation.Order;
+        }
+        else
+        {
+            await _db.AddAsync(presentation);
+        }
+
+        await _db.SaveChangesAsync();
+    }
 }

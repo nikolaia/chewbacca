@@ -106,4 +106,38 @@ public class OrchestratorService
     {
         return DateTime.Now >= bemanning.StartDate && (bemanning.EndDate == null || DateTime.Now <= bemanning.EndDate);
     }
+
+
+    public async Task FetchMapAndSavePresentationData()
+    {
+        _logger.LogInformation("OrchestratorRepository: FetchMapAndSavePresentationData: Started");
+        var employeeEntries = await _employeesService.GetActiveEmployees();
+        var userEntries = await _cvPartnerService.GetCvPartnerEmployees();
+
+        foreach (var employee in employeeEntries)
+        {
+            var user = userEntries.Find(cv => cv.email.ToLower().Trim() == employee.Email.ToLower().Trim());
+
+            if (user != null)
+            {
+                var presentations = await _cvPartnerService.GetCvPartnerPresentations(user.user_id, user.default_cv_id);
+
+                await _employeesService.AddOrUpdatePresentation(new PresentationEntity
+                {
+
+                    //  @TODO Ooops. Here we require the actual ID passed in to data entity for employee, but this is hidden from DTO
+                    // Either see if we should have GUID accessible in DTO or if we have to restructure things.
+                }, employee.Id);
+            }
+            else
+            {
+                // If the employee does not exist in CV Partner, only in Bemanning, soft-delete all presentations.
+                _logger.LogInformation(
+                    "Soft-deleting all presentations from {BemanningEmail} from database, as they don't exist in CV Partner",
+                    employee.Email);
+            }
+        }
+
+        _logger.LogInformation("OrchestratorRepository: FetchMapAndSavePresentationData: Finished");
+    }
 }

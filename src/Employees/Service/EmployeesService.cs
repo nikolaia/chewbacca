@@ -89,6 +89,11 @@ public class EmployeesService
 
         return _employeesRepository.AddToDatabase(entity);
     }
+    public Task AddOrUpdatePresentation(PresentationEntity presentation, Guid employeeId)
+    {
+        var entity = presentation with { EmployeeId = employeeId, };
+        return _employeesRepository.AddToDatabase(entity);
+    }
 
     public Boolean isValid(EmergencyContact emergencyContact)
     {
