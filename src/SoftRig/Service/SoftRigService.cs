@@ -22,10 +22,7 @@ public class SoftRigService
         return await _softRigRepository.GetCompanyKey(token, companyName);
     }
 
-    // public async Task<List<GadgetJournalEntry>> GetGadgetJournalEntries(string token)
-    // {
-    //     return await _softRigRepository.GetAllGadgetEntries(token);
-    // }
+
 
     public async Task<List<SoftRigEmployee>> GetSoftRigEmployees(string token)
     {
@@ -42,5 +39,10 @@ public class SoftRigService
         var token = await RequestTokenAsync();
         var employee = await GetSoftRigEmployee(token.AccessToken!, email);
         return await _softRigRepository.UpdateEmployee(token.AccessToken!, employee, updatedInformation);
+    }
+
+    public async Task<List<GadgetJournalEntry>> GetAllGadgetJournalEntries(string token)
+    {
+        return await _softRigRepository.GetAllGadgetEntries(token);
     }
 }

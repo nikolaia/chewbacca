@@ -42,7 +42,7 @@ public class SoftRigRepository
         var response = await client.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
         {
             Address = disco.TokenEndpoint,
-            Scope = "AppFramework",
+            Scope = "AppFramework Accounting.Admin Accounting.Approval Accounting.Journal Accounting.Reporting Approval.Accounting Payroll.Admin Payroll.Payroll Payroll.Travel Timetracking.Admin Timetracking.HR Timetracking.Manager Timetracking.Reporting Timetracking.Worker",
 
             ClientAssertion =
                 {
@@ -117,59 +117,6 @@ public class SoftRigRepository
         var tokenHandler = new JwtSecurityTokenHandler();
         return tokenHandler.WriteToken(token);
     }
-
-
-    // public async Task<List<GadgetJournalEntry>> GetAllGadgetEntries(string token)
-    // {
-
-    //     Console.WriteLine("SoftRigRepository:GetAllGadgetEntries");
-
-    //     var client = new HttpClient
-    //     {
-    //         BaseAddress = new Uri(_appSettings.Value.SoftRig.APIBaseUrl.ToString())
-    //     };
-
-    //     client.SetBearerToken(token);
-    //     client.DefaultRequestHeaders.Add("CompanyKey", _appSettings.Value.SoftRig.CompanyKey);
-
-    //     const int skip = 0;
-
-    //     try
-    //     {
-    //         const int countPerFetch = 50;
-    //         //string url = $"biz/statistics?skip={skip}&top={countPerFetch}&model=Employee&select=BusinessRelationInfo.Name as name,Employments.StartDate as startDate,Employments.EndDate as endDate&expand=BusinessRelationInfo,Employments&distinct=true";
-    //         string url = "biz/accounts?select=ID,AccountNumber,AccountName,VatTypeID";
-
-    //         var response = await client.GetAsync(_appSettings.Value.SoftRig.APIBaseUrl.ToString() + url);
-
-
-    //         // var content =
-    //         //     JsonConvert.DeserializeObject<EmployeesJson>(await employeeResponse.Content
-    //         //         .ReadAsStringAsync());
-
-    //         Console.WriteLine("Result from request");
-    //         Console.WriteLine(JsonConvert.SerializeObject(response, Formatting.Indented, new JsonConverter[] { }));
-
-    //         Console.WriteLine(JsonConvert.SerializeObject(await response.Content.ReadAsStringAsync(), Formatting.Indented, new JsonConverter[] { }));
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         Console.WriteLine(JsonConvert.SerializeObject(ex, Formatting.Indented));
-
-    //         Console.WriteLine("Exception: " + ex.Message + " \n stack " + ex.StackTrace);
-    //     }
-
-    //     return null;
-    //     // var apiResponse = await _softRigApiClient.GetAllGadgetEntries(_appSettings.Value.SoftRig.Token);
-
-    //     // if (apiResponse is { IsSuccessStatusCode: true, Content: not null })
-    //     // {
-    //     //     return apiResponse.Content.ToList();
-    //     // }
-
-    //     // _logger.LogCritical(apiResponse.Error, "Exception when calling SoftRig");
-    //     // return new List<GadgetJournalEntry>();
-    // }
 
     public async Task<List<SoftRigEmployee>> GetAllEmployees(string token)
     {
@@ -291,6 +238,41 @@ public class SoftRigRepository
         }
     }
 
+
+    // TODO
+    // Separate endpoints for fetching gadget entries to a specific employee
+    public async Task<List<GadgetJournalEntry>> GetAllGadgetEntries(string token)
+    {
+        Console.WriteLine("SoftRigRepository:GetAllGadgetEntries");
+
+        var client = SetupClient(token);
+
+        const int skip = 0;
+
+        const int GADGET_ACCOUNT_NO = 6541;
+        try
+        {
+            const int countPerFetch = 50;
+            string url = $"statistics?skip={skip}&top={countPerFetch}&filter=Account.AccountNumber eq {GADGET_ACCOUNT_NO}&orderby=JournalEntryLine.FinancialDate desc&model=JournalEntryLine&select=JournalEntryLine.ID as id,JournalEntry.JournalEntryNumber as JournalEntryNumber,Dimension5.Name as EmployeeName,JournalEntryLine.Description as Description, JournalEntryLine.Amount as Amount,Account.AccountNumber as AccountNumber,Account.AccountName as AccountName,JournalEntryLine.FinancialDate as FinancialDate&expand=JournalEntry,Dimensions.Dimension5,Account&distinct=false";
+
+            var response = await client.GetAsync(_appSettings.Value.SoftRig.APIBaseUrl.ToString() + url);
+
+            WriteReadableJson(response);
+
+            var responseObject = await DeserializeResponse<SoftRigStatisticReponse>(response);
+
+            return responseObject.Data;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(JsonConvert.SerializeObject(ex, Formatting.Indented));
+
+            Console.WriteLine("Exception: " + ex.Message + " \n stack " + ex.StackTrace);
+        }
+
+        return null;
+    }
+
     private HttpClient SetupClient(string token)
     {
         var client = new HttpClient
@@ -311,6 +293,20 @@ public class SoftRigRepository
 
         T result = JsonConvert.DeserializeObject<T>(json, settings);
         return result;
+    }
+
+    private async void WriteReadableJson(HttpResponseMessage response)
+    {
+        Console.WriteLine(JsonConvert.SerializeObject(JsonConvert.DeserializeObject(await response.Content.ReadAsStringAsync()), Formatting.Indented, new JsonConverter[] { }));
+
+    }
+
+    private record SoftRigStatisticReponse
+    {
+        public List<GadgetJournalEntry> Data { get; set; } = null!;
+        public Boolean Success { get; set; }
+        public string Message { get; set; } = null!;
+        public List<String> Columns { get; set; } = null!;
     }
 
 }

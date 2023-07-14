@@ -15,29 +15,6 @@ public class SoftRigController : ControllerBase
         this._softRigService = softRigService;
     }
 
-    // [HttpGet("/softrig/gadgetEntries")]
-    // [OutputCache(Duration = 60)]
-    // public async Task<List<GadgetJournalEntry>> GetAllGadgetEntries()
-    // {
-    //     var token = await _softRigService.RequestTokenAsync();
-    //     var gadgetEntries = await _softRigService.GetGadgetJournalEntries(token.AccessToken!);
-
-    //     // TODO
-    //     return null;
-    // }
-
-
-    // [HttpPost("/softrig/gadgetEntries")]
-    // [OutputCache(Duration = 60)]
-    // public async Task<List<GadgetJournalEntry>> GetAllGadgetEntries()
-    // {
-    //     var token = await _softRigService.RequestTokenAsync();
-    //     var gadgetEntries = await _softRigService.GetGadgetJournalEntries(token.AccessToken!);
-
-    //     // TODO
-    //     return null;
-    // }
-
 
     [HttpGet("/softrig/companyKey")]
     [OutputCache(Duration = 60)]
@@ -84,5 +61,13 @@ public class SoftRigController : ControllerBase
     {
         var token = await _softRigService.RequestTokenAsync();
         return await _softRigService.GetSoftRigEmployees(token.AccessToken!);
+    }
+
+    [HttpGet("/softrig/gadgetEntries")]
+    [OutputCache(Duration = 60)]
+    public async Task<List<GadgetJournalEntry>> GetAllGadgetEntries()
+    {
+        var token = await _softRigService.RequestTokenAsync();
+        return await _softRigService.GetAllGadgetJournalEntries(token.AccessToken!);
     }
 }
