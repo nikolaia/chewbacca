@@ -118,66 +118,13 @@ public class SoftRigRepository
         return tokenHandler.WriteToken(token);
     }
 
-
-    // public async Task<List<GadgetJournalEntry>> GetAllGadgetEntries(string token)
-    // {
-
-    //     Console.WriteLine("SoftRigRepository:GetAllGadgetEntries");
-
-    //     var client = new HttpClient
-    //     {
-    //         BaseAddress = new Uri(_appSettings.Value.SoftRig.APIBaseUrl.ToString())
-    //     };
-
-    //     client.SetBearerToken(token);
-    //     client.DefaultRequestHeaders.Add("CompanyKey", _appSettings.Value.SoftRig.CompanyKey);
-
-    //     const int skip = 0;
-
-    //     try
-    //     {
-    //         const int countPerFetch = 50;
-    //         //string url = $"biz/statistics?skip={skip}&top={countPerFetch}&model=Employee&select=BusinessRelationInfo.Name as name,Employments.StartDate as startDate,Employments.EndDate as endDate&expand=BusinessRelationInfo,Employments&distinct=true";
-    //         string url = "biz/accounts?select=ID,AccountNumber,AccountName,VatTypeID";
-
-    //         var response = await client.GetAsync(_appSettings.Value.SoftRig.APIBaseUrl.ToString() + url);
-
-
-    //         // var content =
-    //         //     JsonConvert.DeserializeObject<EmployeesJson>(await employeeResponse.Content
-    //         //         .ReadAsStringAsync());
-
-    //         Console.WriteLine("Result from request");
-    //         Console.WriteLine(JsonConvert.SerializeObject(response, Formatting.Indented, new JsonConverter[] { }));
-
-    //         Console.WriteLine(JsonConvert.SerializeObject(await response.Content.ReadAsStringAsync(), Formatting.Indented, new JsonConverter[] { }));
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         Console.WriteLine(JsonConvert.SerializeObject(ex, Formatting.Indented));
-
-    //         Console.WriteLine("Exception: " + ex.Message + " \n stack " + ex.StackTrace);
-    //     }
-
-    //     return null;
-    //     // var apiResponse = await _softRigApiClient.GetAllGadgetEntries(_appSettings.Value.SoftRig.Token);
-
-    //     // if (apiResponse is { IsSuccessStatusCode: true, Content: not null })
-    //     // {
-    //     //     return apiResponse.Content.ToList();
-    //     // }
-
-    //     // _logger.LogCritical(apiResponse.Error, "Exception when calling SoftRig");
-    //     // return new List<GadgetJournalEntry>();
-    // }
-
     public async Task<List<SoftRigEmployee>> GetAllEmployees(string token)
     {
         var client = SetupClient(token);
 
         try
         {
-            string url = "biz/employees?expand=BusinessRelationInfo.DefaultBankAccount,BusinesssRelationInfo.DefaultPhone,BusinessRelationInfo.DefaultEmail,BusinessRelationInfo.Addresses";
+            string url = "biz/employees?expand=BusinessRelationInfo.DefaultBankAccount,BusinesssRelationInfo.DefaultPhone,BusinessRelationInfo.DefaultEmail,BusinessRelationInfo.InvoiceAddress";
 
             var response = await client.GetAsync(_appSettings.Value.SoftRig.APIBaseUrl.ToString() + url);
 
@@ -187,13 +134,8 @@ public class SoftRigRepository
         }
         catch (Exception ex)
         {
-            Console.WriteLine(JsonConvert.SerializeObject(ex, Formatting.Indented));
-
-            Console.WriteLine("Exception: " + ex.Message + " \n stack " + ex.StackTrace);
+            throw new Exception("Unable to fetch employees from SoftRig: " + ex.Message + "\n stack " + ex.StackTrace);
         }
-
-        return null;
-
     }
 
     public async Task<SoftRigEmployee> GetEmployee(string token, string email)
@@ -210,7 +152,7 @@ public class SoftRigRepository
 
             if (employees == null || employees.Count == 0)
             {
-                throw new Exception("Could not find employee in UniEconomy with email " + email);
+                throw new Exception("Could not find employee in SoftRig with email " + email);
             }
 
             if (employees.Count > 1)
@@ -224,13 +166,9 @@ public class SoftRigRepository
         }
         catch (Exception ex)
         {
-            Console.WriteLine(JsonConvert.SerializeObject(ex, Formatting.Indented));
+            throw new Exception("Unable to fetch employee from SoftRig: " + ex.Message + "\n stack " + ex.StackTrace);
 
-            Console.WriteLine("Exception: " + ex.Message + " \n stack " + ex.StackTrace);
         }
-
-        return null;
-
     }
 
     // Can update phone, address and account nr
@@ -247,13 +185,11 @@ public class SoftRigRepository
         if (employee.BusinessRelationInfo == null)
         {
             _logger.LogError("The business related info to employee is not loaded when attempting to update employee in SoftRig");
-            // TODO: fetch employee from softrig again?
             return false;
         }
 
         try
         {
-
             // Phone
             employee.BusinessRelationInfo.DefaultPhone.Number = updatedInformation!.Phone!;
 
@@ -270,7 +206,6 @@ public class SoftRigRepository
             var json = JsonConvert.SerializeObject(employee);
 
             var response = await client.PutAsync(_appSettings.Value.SoftRig.APIBaseUrl.ToString() + url, new StringContent(json, Encoding.UTF8, "application/json"));
-
 
             if (response is not { IsSuccessStatusCode: true, Content: not null })
             {
@@ -309,9 +244,7 @@ public class SoftRigRepository
         string json = await response.Content.ReadAsStringAsync();
         var settings = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore, MissingMemberHandling = MissingMemberHandling.Ignore };
 
-        T result = JsonConvert.DeserializeObject<T>(json, settings);
-        return result;
+        return JsonConvert.DeserializeObject<T>(json, settings);
     }
 
 }
-

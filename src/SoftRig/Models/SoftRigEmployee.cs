@@ -3,11 +3,8 @@ namespace SoftRig.Models;
 public record SoftRigEmployee
 {
     public int ID { get; set; }
-
     public int BusinessRelationID { get; set; }
-
     public int EmployeeNumber { get; set; }
-
     public BusinessRelation BusinessRelationInfo { get; set; } = null!;
 }
 
@@ -29,7 +26,6 @@ public class BankAccount
     public int BusinessRelationID { get; set; }
     public string AccountNumber { get; set; } = null!;
     public bool Deleted { get; set; }
-
 }
 
 public class BusinessRelation
@@ -39,12 +35,9 @@ public class BusinessRelation
     public int ID { get; set; }
     public int DefaultEmailID { get; set; }
     public int InvoiceAddressID { get; set; }
-    public int ShippingAddressID { get; set; }
     public bool Deleted { get; set; }
     public int DefaultBankAccountID { get; set; }
-    public List<Address> Addresses { get; set; } = null!;
     public Address InvoiceAddress { get; set; } = null!;
-    public Address ShippingAddress { get; set; } = null!;
     public Phone DefaultPhone { get; set; } = null!;
     public Email DefaultEmail { get; set; } = null!;
     public BankAccount DefaultBankAccount { get; set; } = null!;
