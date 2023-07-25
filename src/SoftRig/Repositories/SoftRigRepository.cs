@@ -124,7 +124,7 @@ public class SoftRigRepository
 
         try
         {
-            string url = "biz/employees?expand=BusinessRelationInfo.DefaultBankAccount,BusinesssRelationInfo.DefaultPhone,BusinessRelationInfo.DefaultEmail,BusinessRelationInfo.InvoiceAddress";
+            string url = "biz/employees?expand=BusinessRelationInfo.DefaultBankAccount,BusinessRelationInfo.DefaultPhone,BusinessRelationInfo.DefaultEmail,BusinessRelationInfo.InvoiceAddress";
 
             var response = await client.GetAsync(_appSettings.Value.SoftRig.APIBaseUrl.ToString() + url);
 

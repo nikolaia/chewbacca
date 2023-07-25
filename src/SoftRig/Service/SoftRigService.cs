@@ -22,9 +22,10 @@ public class SoftRigService
         return await _softRigRepository.GetCompanyKey(token, companyName);
     }
 
-    public async Task<List<SoftRigEmployee>> GetSoftRigEmployees(string token)
+    public async Task<List<SoftRigEmployee>> GetSoftRigEmployees()
     {
-        return await _softRigRepository.GetAllEmployees(token);
+        var token = await RequestTokenAsync();
+        return await _softRigRepository.GetAllEmployees(token.AccessToken!);
     }
 
     public async Task<SoftRigEmployee> GetSoftRigEmployee(string token, string email)
