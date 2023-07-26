@@ -3,7 +3,7 @@ using SoftRig.Repositories;
 
 namespace SoftRig.Service;
 
-public class SoftRigService
+public class SoftRigService : ISoftRigService
 {
     private readonly SoftRigRepository _softRigRepository;
 

@@ -16,7 +16,7 @@ public class OrchestratorService
     private readonly EmployeesService _employeesService;
     private readonly CvPartnerService _cvPartnerService;
     private readonly IBemanningRepository _bemanningRepository;
-    private readonly SoftRigService _softRigService;
+    private readonly ISoftRigService _softRigService;
     private readonly BlobStorageService _blobStorageService;
     private readonly ILogger<OrchestratorService> _logger;
     private readonly FilteredUids _filteredUids;
@@ -26,7 +26,7 @@ public class OrchestratorService
         BlobStorageService blobStorageService,
         FilteredUids filteredUids,
         ILogger<OrchestratorService> logger,
-        SoftRigService softRigService)
+        ISoftRigService softRigService)
     {
         _employeesService = employeesService;
         _cvPartnerService = cvPartnerService;

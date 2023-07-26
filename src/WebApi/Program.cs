@@ -99,7 +99,7 @@ builder.Services.AddScoped<IBlobStorageRepository, BlobStorageRepository>();
 
 // SoftRig
 builder.Services.AddScoped<SoftRigRepository>();
-builder.Services.AddScoped<SoftRigService>();
+builder.Services.AddScoped<ISoftRigService, SoftRigService>();
 
 // Orchestrator
 builder.Services.AddScoped<OrchestratorService>();

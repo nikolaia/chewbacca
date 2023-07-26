@@ -15,10 +15,10 @@ namespace Employees.Api;
 public class EmployeesController : ControllerBase
 {
     private readonly EmployeesService _employeeService;
-    private readonly SoftRigService _softRigService;
+    private readonly ISoftRigService _softRigService;
     private readonly ILogger<EmployeesController> _logger;
 
-    public EmployeesController(EmployeesService employeeService, SoftRigService softRigService, ILogger<EmployeesController> logger)
+    public EmployeesController(EmployeesService employeeService, ISoftRigService softRigService, ILogger<EmployeesController> logger)
     {
         this._employeeService = employeeService;
         this._softRigService = softRigService;
