@@ -4,6 +4,7 @@ using Employees.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Employees.Migrations
 {
     [DbContext(typeof(EmployeeContext))]
-    partial class EmployeeContextModelSnapshot : ModelSnapshot
+    [Migration("20230630124657_CreateEmployeeAllergiesAndDietaryPreferences")]
+    partial class CreateEmployeeAllergiesAndDietaryPreferences
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -47,8 +50,7 @@ namespace Employees.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EmployeeId")
-                        .IsUnique();
+                    b.HasIndex("EmployeeId");
 
                     b.ToTable("EmergencyContacts");
                 });
@@ -144,8 +146,8 @@ namespace Employees.Migrations
             modelBuilder.Entity("Employees.Models.EmergencyContactEntity", b =>
                 {
                     b.HasOne("Employees.Models.EmployeeEntity", "Employee")
-                        .WithOne("EmergencyContact")
-                        .HasForeignKey("Employees.Models.EmergencyContactEntity", "EmployeeId")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -166,8 +168,6 @@ namespace Employees.Migrations
             modelBuilder.Entity("Employees.Models.EmployeeEntity", b =>
                 {
                     b.Navigation("AllergiesAndDietaryPreferences");
-
-                    b.Navigation("EmergencyContact");
                 });
 #pragma warning restore 612, 618
         }

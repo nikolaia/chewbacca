@@ -2,6 +2,7 @@ using Employees.Models;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+
 using Employees.Service;
 
 using Microsoft.AspNetCore.OutputCaching;
@@ -29,10 +30,7 @@ public class EmployeesController : ControllerBase
     public async Task<EmployeesJson> Get([FromQuery] string? country = null)
     {
         var employees = await _employeeService.GetActiveEmployees(country);
-        return new EmployeesJson
-        {
-            Employees = employees.Select(ModelConverters.ToEmployeeJson)
-        };
+        return new EmployeesJson { Employees = employees.Select(ModelConverters.ToEmployeeJson) };
     }
 
     /**
@@ -51,8 +49,10 @@ public class EmployeesController : ControllerBase
         }
 
         var emergencyContact = await _employeeService.GetEmergencyContactByEmployee(employee);
+        var allergiesAndDietaryPreferences =
+            await _employeeService.GetAllergiesAndDietaryPreferencesByEmployee(employee);
 
-        return ModelConverters.ToEmployeeExtendedJson(employee, emergencyContact);
+        return ModelConverters.ToEmployeeExtendedJson(employee, emergencyContact, allergiesAndDietaryPreferences);
     }
 
     /**
@@ -74,46 +74,84 @@ public class EmployeesController : ControllerBase
         }
     }
 
-
     [Microsoft.AspNetCore.Cors.EnableCors("DashCorsPolicy")]
     [HttpPost("information/{country}/{alias}")]
-    public async Task<ActionResult> UpdateEmployeeInformation(string alias, string country, [FromBody] EmployeeInformation employeeInformation)
+    public async Task<ActionResult> UpdateEmployeeInformation(string alias, string country,
+        [FromBody] EmployeeInformation employeeInformation)
     {
-        var employee = await _employeeService.GetEntityByAliasAndCountry(alias, country);
-
-        if (employee == null)
+        var updateSuccess = await _employeeService.UpdateEmployeeInformationByAliasAndCountry(alias, country, employeeInformation);
+        if (updateSuccess)
         {
-            _logger.LogError("Can't update EmployeeInformation because there is no matching Employee to alias {alias} and country {country}", alias, country);
-            return NotFound();
-        }
-        else
-        {
-            await _employeeService.UpdateEmployeeInformation(employee, employeeInformation);
-
             return NoContent();
         }
+
+        _logger.LogError(
+            "Can't update EmployeeInformation because there is no matching Employee to alias {alias} and country {country}",
+            alias, country);
+        return NotFound();
     }
+
 
     [Microsoft.AspNetCore.Cors.EnableCors("DashCorsPolicy")]
     [HttpPost("emergencyContact/{country}/{alias}")]
-    public async Task<ActionResult> UpdateEmergencyContact(string alias, string country, [FromBody] EmergencyContact emergencyContact)
+    public async Task<ActionResult> UpdateEmergencyContact(string alias, string country,
+        [FromBody] EmergencyContact emergencyContact)
     {
         if (!_employeeService.isValid(emergencyContact))
         {
             return StatusCode(500, "Invalid data");
         }
 
-        var employee = await _employeeService.GetEntityByAliasAndCountry(alias, country);
+        var updateSuccess = await _employeeService.AddOrUpdateEmergencyContactByAliasAndCountry(alias, country, emergencyContact);
 
-        if (employee == null)
+        if (updateSuccess)
         {
-            _logger.LogError("Can't update EmergencyContact because there is no matching Employee to alias {alias} and country {country}", alias, country);
-            return NotFound();
-        }
-        else
-        {
-            await _employeeService.AddOrUpdateEmergencyContact(employee, emergencyContact);
             return NoContent();
         }
+
+        _logger.LogError(
+            "Can't update EmergencyContact because there is no matching Employee to alias {alias} and country {country}",
+            alias, country);
+        return NotFound();
+    }
+
+    /**
+     * <returns>A list of the allergies as strings</returns>
+     */
+    [HttpGet("allergies")]
+    [OutputCache(Duration = 60)]
+    public List<string> GetAllergies()
+    {
+        return _employeeService.GetDefaultAllergies().Select(a => a.ToString()).ToList();
+    }
+
+    /**
+     * <returns>A list of the dietary preferences as strings</returns>
+     */
+    [HttpGet("dietaryPreferences")]
+    [OutputCache(Duration = 60)]
+    public List<string> GetDietaryPreferences()
+    {
+        return _employeeService.GetDietaryPreferences().Select(a => a.ToString()).ToList();
+    }
+
+    [Microsoft.AspNetCore.Cors.EnableCors("DashCorsPolicy")]
+    [HttpPost("allergiesAndDietaryPreferences/{country}/{alias}")]
+    public async Task<IActionResult> UpdateAllergiesAndDietaryPreferences(string alias, string country,
+        [FromBody] AllergiesAndDietaryPreferences allergiesAndDietaryPreferences)
+    {
+        var updateSuccess =
+            await _employeeService.UpdateAllergiesAndDietaryPreferencesByAliasAndCountry(alias, country,
+                allergiesAndDietaryPreferences);
+
+        if (updateSuccess)
+        {
+            return NoContent();
+        }
+
+        _logger.LogWarning(
+            "Can't update allergies and dietary preferences because there is no matching Employee to alias {Alias} and country {Country}",
+            alias, country);
+        return NotFound();
     }
 }

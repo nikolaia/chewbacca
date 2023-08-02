@@ -82,6 +82,8 @@ builder.Services.AddScoped<CvPartnerService>();
 builder.Services.AddScoped<CvPartnerRepository>();
 builder.Services.AddScoped<EmployeesService>();
 builder.Services.AddScoped<EmployeesRepository>();
+builder.Services.AddScoped<EmergencyContactRepository>();
+builder.Services.AddScoped<EmployeeAllergiesAndDietaryPreferencesRepository>();
 
 builder.Services.AddScoped<FilteredUids>();
 

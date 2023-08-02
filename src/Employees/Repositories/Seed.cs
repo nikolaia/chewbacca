@@ -21,7 +21,21 @@ public static class Seed
                 AccountNumber = null,
                 Address = null,
                 ZipCode = null,
-                City = null
+                City = null,
+                EmergencyContact = new EmergencyContactEntity()
+                {
+                    Name = "Ola Nordmann",
+                    Phone = "12345678",
+                    Relation = "Far",
+                    Comment = "Jobber nattevakter, send melding først"
+                },
+                AllergiesAndDietaryPreferences = new EmployeeAllergiesAndDietaryPreferencesEntity()
+                {
+                    DefaultAllergies = new List<DefaultAllergyEnum> { DefaultAllergyEnum.MILK, DefaultAllergyEnum.EGG },
+                    OtherAllergies = new List<string> { "Druer", "Pære" },
+                    DietaryPreferences = new List<DietaryPreferenceEnum> { DietaryPreferenceEnum.VEGETARIAN },
+                    Comment = "Reagerer bare på eggehvite, ikke eggeplomme",
+                }
             },
             new()
             {

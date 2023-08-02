@@ -26,6 +26,8 @@ public class EmployeesRepository
     public async Task<EmployeeEntity?> GetEmployeeAsync(string alias, string country)
     {
         return await _db.Employees
+            .Include(employee => employee.AllergiesAndDietaryPreferences)
+            .Include(employee => employee.EmergencyContact)
             .Where(emp => emp.Email.StartsWith($"{alias}@"))
             .Where(emp => emp.CountryCode == country)
             .SingleOrDefaultAsync();
@@ -45,10 +47,8 @@ public class EmployeesRepository
             updateEmployee.StartDate = employee.StartDate;
             updateEmployee.EndDate = employee.EndDate;
             updateEmployee.CountryCode = employee.CountryCode;
-            employee.Address = employee.Address;
-            employee.AccountNumber = employee.AccountNumber;
-            employee.ZipCode = employee.ZipCode;
-            employee.City = employee.City;
+            // Don't set Address, AccountNumber, ZipCode and City since these aren't fetched from external sources,
+            // and hence the information given from variantdash will be overwritten
         }
         else
         {
@@ -56,6 +56,25 @@ public class EmployeesRepository
         }
 
         await _db.SaveChangesAsync();
+    }
+
+    public async Task<bool> UpdateEmployeeInformation(string alias, string country, EmployeeInformation employeeInformation)
+    {
+        var employee = await GetEmployeeAsync(alias, country);
+
+        if (employee == null)
+        {
+            return false;
+        }
+
+        employee.Telephone = employeeInformation.Phone;
+        employee.AccountNumber = employeeInformation.AccountNumber;
+        employee.Address = employeeInformation.Address;
+        employee.ZipCode = employeeInformation.ZipCode;
+        employee.City = employeeInformation.City;
+
+        var changes = await _db.SaveChangesAsync();
+        return changes > 0;
     }
 
     /// <summary>

@@ -6,10 +6,17 @@ namespace Employees.Service;
 public class EmployeesService
 {
     private readonly EmployeesRepository _employeesRepository;
+    private readonly EmergencyContactRepository _emergencyContactRepository;
+    private readonly EmployeeAllergiesAndDietaryPreferencesRepository _employeeAllergiesAndDietaryPreferencesRepository;
 
-    public EmployeesService(EmployeesRepository employeesRepository)
+    public EmployeesService(EmployeesRepository employeesRepository,
+        EmployeeAllergiesAndDietaryPreferencesRepository employeeAllergiesAndDietaryPreferencesRepository,
+        EmergencyContactRepository emergencyContactRepository
+        )
     {
         this._employeesRepository = employeesRepository;
+        this._employeeAllergiesAndDietaryPreferencesRepository = employeeAllergiesAndDietaryPreferencesRepository;
+        this._emergencyContactRepository = emergencyContactRepository;
     }
 
     private static bool IsEmployeeActive(EmployeeEntity employee)
@@ -58,36 +65,21 @@ public class EmployeesService
         return _employeesRepository.EnsureEmployeesWithEndDateBeforeTodayAreDeleted();
     }
 
-    public Task UpdateEmployeeInformation(EmployeeEntity employee, EmployeeInformation employeeInformation)
+    public async Task<bool> UpdateEmployeeInformationByAliasAndCountry(string alias, string country, EmployeeInformation employeeInformation)
     {
-        employee.Telephone = employeeInformation.Phone;
-        employee.Address = employeeInformation.Address;
-        employee.AccountNumber = employeeInformation.AccountNumber;
-        employee.ZipCode = employeeInformation.ZipCode;
-        employee.City = employeeInformation.City;
-
-        return _employeesRepository.AddToDatabase(employee);
+        return await _employeesRepository.UpdateEmployeeInformation(alias, country, employeeInformation);
     }
 
     public async Task<EmergencyContact?> GetEmergencyContactByEmployee(EmployeeEntity employee)
     {
-        var emergencyContact = await _employeesRepository.GetEmergencyContactAsync(employee);
+        var emergencyContact = await _emergencyContactRepository.GetByEmployee(employee);
 
         return emergencyContact == null ? null : ModelConverters.ToEmergencyContact(emergencyContact);
     }
 
-    public Task AddOrUpdateEmergencyContact(EmployeeEntity employee, EmergencyContact emergencyContact)
+    public async Task<bool> AddOrUpdateEmergencyContactByAliasAndCountry(string alias, string country, EmergencyContact emergencyContact)
     {
-        var entity = new EmergencyContactEntity
-        {
-            Employee = employee,
-            Name = emergencyContact.Name,
-            Phone = emergencyContact.Phone,
-            Relation = emergencyContact.Relation == "" ? null : emergencyContact.Relation,
-            Comment = emergencyContact.Comment == "" ? null : emergencyContact.Comment,
-        };
-
-        return _employeesRepository.AddToDatabase(entity);
+        return await _emergencyContactRepository.AddOrUpdateEmergencyContact(alias, country, emergencyContact);
     }
     public Task AddOrUpdatePresentation(PresentationEntity presentation, Guid employeeId)
     {
@@ -98,5 +90,27 @@ public class EmployeesService
     public Boolean isValid(EmergencyContact emergencyContact)
     {
         return emergencyContact.Name.Length >= 2 && emergencyContact.Phone.Length >= 8;
+    }
+
+    public List<DefaultAllergyEnum> GetDefaultAllergies()
+    {
+        return Enum.GetValues(typeof(DefaultAllergyEnum)).Cast<DefaultAllergyEnum>().ToList();
+    }
+
+    public List<DietaryPreferenceEnum> GetDietaryPreferences()
+    {
+        return Enum.GetValues(typeof(DietaryPreferenceEnum)).Cast<DietaryPreferenceEnum>().ToList();
+    }
+
+    public async Task<AllergiesAndDietaryPreferences?> GetAllergiesAndDietaryPreferencesByEmployee(EmployeeEntity employee)
+    {
+        var employeeAllergiesAndDietaryPreferences = await _employeeAllergiesAndDietaryPreferencesRepository.GetByEmployee(employee);
+
+        return employeeAllergiesAndDietaryPreferences == null ? null : ModelConverters.ToAllergiesAndDietaryPreferences(employeeAllergiesAndDietaryPreferences);
+    }
+
+    public async Task<bool> UpdateAllergiesAndDietaryPreferencesByAliasAndCountry(string alias, string country, AllergiesAndDietaryPreferences allergiesAndDietaryPreferences)
+    {
+        return await _employeeAllergiesAndDietaryPreferencesRepository.AddOrUpdateEmployeeAllergiesAndDietaryPreferences(alias, country, allergiesAndDietaryPreferences);
     }
 }
