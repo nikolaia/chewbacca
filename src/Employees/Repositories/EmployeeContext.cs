@@ -1,7 +1,6 @@
 ﻿using Employees.Models;
 
 using Microsoft.EntityFrameworkCore;
-
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
@@ -16,20 +15,25 @@ public class EmployeeContext : DbContext
     public DbSet<EmployeeEntity> Employees { get; set; } = null!;
     public DbSet<PresentationEntity> Presentations { get; set; } = null!;
     public DbSet<EmergencyContactEntity> EmergencyContacts { get; set; } = null!;
-    public DbSet<EmployeeAllergiesAndDietaryPreferencesEntity> EmployeeAllergiesAndDietaryPreferences { get; set; } = null!;
+
+    public DbSet<EmployeeAllergiesAndDietaryPreferencesEntity> EmployeeAllergiesAndDietaryPreferences { get; set; } =
+        null!;
+
+    public DbSet<WorkExperienceEntity> WorkExperiences { get; set; } = null!;
+    
+    public DbSet<ProjectExperienceEntity> ProjectExperiences { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-
         var defaultAllergyConverter = new ValueConverter<List<DefaultAllergyEnum>, string>(
             v => string.Join(",", v),
             v => v.Split(",", StringSplitOptions.RemoveEmptyEntries)
-            .Select(Enum.Parse<DefaultAllergyEnum>)
-            .ToList()
+                .Select(Enum.Parse<DefaultAllergyEnum>)
+                .ToList()
         );
 
         var defaultAllergyComparer = new ValueComparer<List<DefaultAllergyEnum>>(
-            (c1, c2) => c1 == null && c2 == null ? true : c1 == null || c2 == null ? false : c1.SequenceEqual(c2),
+            (c1, c2) => c1 == null && c2 == null ? true : c1 == null || c2 != null ? false : c1.SequenceEqual(c2),
             c => c.GetHashCode(),
             c => c.ToList()
         );
@@ -37,8 +41,8 @@ public class EmployeeContext : DbContext
         var dietaryPreferencesConverter = new ValueConverter<List<DietaryPreferenceEnum>, string>(
             v => string.Join(",", v),
             v => v.Split(",", StringSplitOptions.RemoveEmptyEntries)
-            .Select(Enum.Parse<DietaryPreferenceEnum>)
-            .ToList()
+                .Select(Enum.Parse<DietaryPreferenceEnum>)
+                .ToList()
         );
 
         var dietaryPreferencesComparer = new ValueComparer<List<DietaryPreferenceEnum>>(
@@ -61,7 +65,7 @@ public class EmployeeContext : DbContext
         modelBuilder.Entity<EmployeeAllergiesAndDietaryPreferencesEntity>()
             .Property(b => b.DefaultAllergies)
             .HasConversion(defaultAllergyConverter)
-                        .Metadata.SetValueComparer(defaultAllergyComparer);
+            .Metadata.SetValueComparer(defaultAllergyComparer);
 
         modelBuilder.Entity<EmployeeAllergiesAndDietaryPreferencesEntity>()
             .Property(b => b.OtherAllergies)

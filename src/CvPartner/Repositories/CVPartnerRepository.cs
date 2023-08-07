@@ -29,7 +29,7 @@ public class CvPartnerRepository
             return apiResponse.Content.ToList();
         }
 
-        _logger.LogCritical(apiResponse.Error, "Exception when calling CVPartner");
+        _logger.LogCritical(apiResponse.Error, "Exception when calling CVPartner for fetching employees");
         return new List<CVPartnerUserDTO>();
     }
 
@@ -42,7 +42,7 @@ public class CvPartnerRepository
             return apiResponse.Content;
         }
 
-        _logger.LogCritical(apiResponse.Error, "Exception when calling CVPartner");
+        _logger.LogCritical(apiResponse.Error, "Exception when calling CVPartner for CV presentation");
         return new CVPartnerCvDTO();
     }
 }

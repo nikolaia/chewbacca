@@ -4,6 +4,7 @@ using Employees.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Employees.Migrations
 {
     [DbContext(typeof(EmployeeContext))]
-    partial class EmployeeContextModelSnapshot : ModelSnapshot
+    [Migration("20230803111624_createWorkExperience")]
+    partial class createWorkExperience
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -155,6 +158,7 @@ namespace Employees.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Month")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Order")
@@ -168,6 +172,7 @@ namespace Employees.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Year")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -175,48 +180,6 @@ namespace Employees.Migrations
                     b.HasIndex("EmployeeId");
 
                     b.ToTable("Presentations");
-                });
-
-            modelBuilder.Entity("Employees.Models.WorkExperienceEntity", b =>
-                {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("EmployeeId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("MonthFrom")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("MonthTo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Order")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Url")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("YearFrom")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("YearTo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EmployeeId");
-
-                    b.ToTable("WorkExperiences");
                 });
 
             modelBuilder.Entity("Employees.Models.EmergencyContactEntity", b =>
@@ -242,17 +205,6 @@ namespace Employees.Migrations
                 });
 
             modelBuilder.Entity("Employees.Models.PresentationEntity", b =>
-                {
-                    b.HasOne("Employees.Models.EmployeeEntity", "Employee")
-                        .WithMany()
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Employee");
-                });
-
-            modelBuilder.Entity("Employees.Models.WorkExperienceEntity", b =>
                 {
                     b.HasOne("Employees.Models.EmployeeEntity", "Employee")
                         .WithMany()

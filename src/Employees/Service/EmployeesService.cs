@@ -28,15 +28,15 @@ public class EmployeesService
     /**
      * <returns>list of employees from database</returns>
      */
-    public async Task<IEnumerable<Employee>> GetActiveEmployees(string? country = null)
+    public async Task<IEnumerable<EmployeeEntity>> GetActiveEmployees(string? country = null)
     {
         var employees = await (string.IsNullOrEmpty(country)
             ? _employeesRepository.GetAllEmployees()
             : _employeesRepository.GetEmployeesByCountry(country));
 
         return employees
-            .Where(IsEmployeeActive)
-            .Select(ModelConverters.ToEmployee);
+            .Where(IsEmployeeActive);
+
     }
 
     public async Task<Employee?> GetByAliasAndCountry(string alias, string country)
@@ -80,11 +80,6 @@ public class EmployeesService
     public async Task<bool> AddOrUpdateEmergencyContactByAliasAndCountry(string alias, string country, EmergencyContact emergencyContact)
     {
         return await _emergencyContactRepository.AddOrUpdateEmergencyContact(alias, country, emergencyContact);
-    }
-    public Task AddOrUpdatePresentation(PresentationEntity presentation, Guid employeeId)
-    {
-        var entity = presentation with { EmployeeId = employeeId, };
-        return _employeesRepository.AddToDatabase(entity);
     }
 
     public Boolean isValid(EmergencyContact emergencyContact)

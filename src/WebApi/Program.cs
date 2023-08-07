@@ -151,12 +151,7 @@ app.UseCors();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<EmployeeContext>();
-
-    if (app.Environment.IsDevelopment())
-    {
-        db.Database.EnsureCreated();
-    }
-
+    
     var isInMemoryDatabase = db.Database.ProviderName?.StartsWith("Microsoft.EntityFrameworkCore.InMemory") ?? false;
     if (!isInMemoryDatabase)
     {

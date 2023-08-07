@@ -30,4 +30,9 @@ public class CvPartnerService
         var employee = await _cvPartnerRepository.GetEmployeeCv(userId, cvId);
         return employee.presentations ?? new List<CvPartnerPresentationDTO>();
     }
+
+    public async Task<CVPartnerCvDTO> GetCvForEmployee(string userId, string cvId)
+    {
+        return await _cvPartnerRepository.GetEmployeeCv(userId, cvId);
+    }
 }

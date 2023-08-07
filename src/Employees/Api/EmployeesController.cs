@@ -30,7 +30,10 @@ public class EmployeesController : ControllerBase
     public async Task<EmployeesJson> Get([FromQuery] string? country = null)
     {
         var employees = await _employeeService.GetActiveEmployees(country);
-        return new EmployeesJson { Employees = employees.Select(ModelConverters.ToEmployeeJson) };
+        return new EmployeesJson
+        {
+            Employees = employees.Select(ModelConverters.ToEmployee).Select(ModelConverters.ToEmployeeJson)
+        };
     }
 
     /**
@@ -79,7 +82,8 @@ public class EmployeesController : ControllerBase
     public async Task<ActionResult> UpdateEmployeeInformation(string alias, string country,
         [FromBody] EmployeeInformation employeeInformation)
     {
-        var updateSuccess = await _employeeService.UpdateEmployeeInformationByAliasAndCountry(alias, country, employeeInformation);
+        var updateSuccess =
+            await _employeeService.UpdateEmployeeInformationByAliasAndCountry(alias, country, employeeInformation);
         if (updateSuccess)
         {
             return NoContent();
@@ -102,7 +106,8 @@ public class EmployeesController : ControllerBase
             return StatusCode(500, "Invalid data");
         }
 
-        var updateSuccess = await _employeeService.AddOrUpdateEmergencyContactByAliasAndCountry(alias, country, emergencyContact);
+        var updateSuccess =
+            await _employeeService.AddOrUpdateEmergencyContactByAliasAndCountry(alias, country, emergencyContact);
 
         if (updateSuccess)
         {

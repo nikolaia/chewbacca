@@ -49,7 +49,7 @@ public class CVPartnerCvDTO
     public List<Blog> blogs { get; set; }
     public int born_day { get; set; }
     public int born_month { get; set; }
-    public int born_year { get; set; }
+    public int? born_year { get; set; }
     public string bruker_id { get; set; }
     public List<Certification> certifications { get; set; }
     public DateTime created_at { get; set; }
@@ -69,12 +69,12 @@ public class CVPartnerCvDTO
     public Nationality nationality { get; set; }
     public string navn { get; set; }
     public object order { get; set; }
-    public DateTime owner_updated_at { get; set; }
-    public DateTime owner_updated_at_significant { get; set; }
+    public DateTime? owner_updated_at { get; set; }
+    public DateTime? owner_updated_at_significant { get; set; }
     public PlaceOfResidence place_of_residence { get; set; }
     public List<Position> positions { get; set; }
-    public List<CvPartnerPresentationDTO> presentations { get; set; }
-    public List<ProjectExperience> project_experiences { get; set; }
+    public List<CvPartnerPresentationDTO>? presentations { get; set; }
+    public List<ProjectExperience>? project_experiences { get; set; }
     public List<Recommendation> recommendations { get; set; }
     public List<Technology> technologies { get; set; }
     public string telefon { get; set; }
@@ -83,7 +83,7 @@ public class CVPartnerCvDTO
     public string twitter { get; set; }
     public DateTime updated_at { get; set; }
     public int version { get; set; }
-    public List<WorkExperience> work_experiences { get; set; }
+    public List<WorkExperience>? work_experiences { get; set; }
     public string name { get; set; }
     public string user_id { get; set; }
     public string company_id { get; set; }
@@ -196,7 +196,7 @@ public class Certification
     public int order { get; set; }
     public Organiser organiser { get; set; }
     public object origin_id { get; set; }
-    public DateTime owner_updated_at { get; set; }
+    public DateTime? owner_updated_at { get; set; }
     public bool recently_added { get; set; }
     public bool starred { get; set; }
     public DateTime updated_at { get; set; }
@@ -255,7 +255,7 @@ public class Degree
 
 public class Description
 {
-    public string no { get; set; }
+    public string? no { get; set; }
     public string @int { get; set; }
 }
 
@@ -347,7 +347,7 @@ public class Level
 
 public class LongDescription
 {
-    public string no { get; set; }
+    public string? no { get; set; }
     public string @int { get; set; }
 }
 
@@ -495,7 +495,7 @@ public class Role
     public LongDescription long_description { get; set; }
     public object modifier_id { get; set; }
     public Name name { get; set; }
-    public int order { get; set; }
+    public int? order { get; set; }
     public object origin_id { get; set; }
     public bool recently_added { get; set; }
     public bool starred { get; set; }
@@ -528,13 +528,13 @@ public class Technology
 {
     public string _id { get; set; }
     public Category category { get; set; }
-    public DateTime created_at { get; set; }
+    public DateTime? created_at { get; set; }
     public bool disabled { get; set; }
     public bool diverged_from_master { get; set; }
     public List<object> exclude_tags { get; set; }
     public object external_unique_id { get; set; }
     public object modifier_id { get; set; }
-    public int order { get; set; }
+    public int? order { get; set; }
     public object origin_id { get; set; }
     public DateTime? owner_updated_at { get; set; }
     public bool recently_added { get; set; }

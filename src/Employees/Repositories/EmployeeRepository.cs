@@ -1,5 +1,6 @@
 using Employees.Models;
 
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace Employees.Repositories;
@@ -58,7 +59,8 @@ public class EmployeesRepository
         await _db.SaveChangesAsync();
     }
 
-    public async Task<bool> UpdateEmployeeInformation(string alias, string country, EmployeeInformation employeeInformation)
+    public async Task<bool> UpdateEmployeeInformation(string alias, string country,
+        EmployeeInformation employeeInformation)
     {
         var employee = await GetEmployeeAsync(alias, country);
 
@@ -110,7 +112,6 @@ public class EmployeesRepository
         await _db.SaveChangesAsync();
 
         return employees.Select(employee => employee.ImageUrl);
-
     }
 
     public async Task<EmergencyContactEntity?> GetEmergencyContactAsync(EmployeeEntity employee)
@@ -122,7 +123,8 @@ public class EmployeesRepository
 
     public async Task AddToDatabase(EmergencyContactEntity emergencyContact)
     {
-        var updateEmergencyContact = await _db.EmergencyContacts.SingleOrDefaultAsync(e => e.Employee == emergencyContact.Employee);
+        var updateEmergencyContact =
+            await _db.EmergencyContacts.SingleOrDefaultAsync(e => e.Employee == emergencyContact.Employee);
 
         if (updateEmergencyContact != null)
         {
@@ -139,23 +141,105 @@ public class EmployeesRepository
         await _db.SaveChangesAsync();
     }
 
-    public async Task AddToDatabase(PresentationEntity presentation)
+    public async Task AddToDatabase(List<PresentationEntity> presentations)
     {
-        var updateEmergencyContact = await _db.Presentations.SingleOrDefaultAsync(e => e.Id == presentation.Id);
-
-        if (updateEmergencyContact != null)
+        foreach (PresentationEntity presentationEntity in presentations)
         {
-            updateEmergencyContact.Title = presentation.Title;
-            updateEmergencyContact.Description = presentation.Description;
-            updateEmergencyContact.EmployeeId = presentation.EmployeeId;
-            updateEmergencyContact.Month = presentation.Month;
-            updateEmergencyContact.Year = presentation.Year;
-            updateEmergencyContact.Url = presentation.Url;
-            updateEmergencyContact.Order = presentation.Order;
+            await AddToDatabase(presentationEntity);
+        }
+
+        await _db.SaveChangesAsync();
+    }
+
+    public async Task AddToDatabase(List<WorkExperienceEntity> presentations)
+    {
+        foreach (WorkExperienceEntity presentationEntity in presentations)
+        {
+            await AddToDatabase(presentationEntity);
+        }
+
+        await _db.SaveChangesAsync();
+    }
+
+    public async Task AddToDatabase(List<ProjectExperienceEntity> projectExperiences)
+    {
+        foreach (ProjectExperienceEntity projectExperienceEntity in projectExperiences)
+        {
+            await AddToDatabase(projectExperienceEntity);
+        }
+
+        await _db.SaveChangesAsync();
+    }
+
+    private async Task AddToDatabase(PresentationEntity presentation)
+    {
+        var updatePresentationEntity = await _db.Presentations.SingleOrDefaultAsync(e => e.Id == presentation.Id);
+
+        if (updatePresentationEntity != null)
+        {
+            updatePresentationEntity.Title = presentation.Title;
+            updatePresentationEntity.Description = presentation.Description;
+            updatePresentationEntity.EmployeeId = presentation.EmployeeId;
+            updatePresentationEntity.Month = presentation.Month;
+            updatePresentationEntity.Year = presentation.Year;
+            updatePresentationEntity.Url = presentation.Url;
+            updatePresentationEntity.Order = presentation.Order;
         }
         else
         {
             await _db.AddAsync(presentation);
+        }
+    }
+
+    private async Task AddToDatabase(WorkExperienceEntity workExperience)
+    {
+        var updateWorkExperienceEntity = await _db.WorkExperiences.SingleOrDefaultAsync(e => e.Id == workExperience.Id);
+        if (updateWorkExperienceEntity != null)
+        {
+            updateWorkExperienceEntity.Title = workExperience.Title;
+            updateWorkExperienceEntity.Description = workExperience.Description;
+            updateWorkExperienceEntity.MonthFrom = workExperience.MonthFrom;
+            updateWorkExperienceEntity.MonthTo = workExperience.MonthTo;
+            updateWorkExperienceEntity.YearFrom = workExperience.YearFrom;
+            updateWorkExperienceEntity.YearTo = workExperience.YearTo;
+        }
+        else
+        {
+            await _db.AddAsync(workExperience);
+        }
+    }
+
+    private async Task AddToDatabase(ProjectExperienceEntity projectExperience)
+    {
+        var updateWorkExperienceEntity =
+            await _db.ProjectExperiences.SingleOrDefaultAsync(e => e.Id == projectExperience.Id);
+        if (updateWorkExperienceEntity != null)
+        {
+            updateWorkExperienceEntity.Title = projectExperience.Title;
+            updateWorkExperienceEntity.Description = projectExperience.Description;
+            updateWorkExperienceEntity.MonthFrom = projectExperience.MonthFrom;
+            updateWorkExperienceEntity.MonthTo = projectExperience.MonthTo;
+            updateWorkExperienceEntity.YearFrom = projectExperience.YearFrom;
+            updateWorkExperienceEntity.YearTo = projectExperience.YearTo;
+        }
+        else
+        {
+            await _db.AddAsync(projectExperience);
+        }
+    }
+
+    public async Task SoftDeleteCvDataForEmployees(IEnumerable<Guid> employeeIds)
+    {
+        foreach (var parameters in employeeIds.Select(employeeId => new SqlParameter("@employeeId", employeeId)))
+        {
+            const string updatePresentations = "UPDATE Presentations SET IsDeleted = 1 WHERE EMPLOYEEId = @employeeId";
+            const string updateProjectExperiences =
+                "UPDATE ProjectExperiences SET IsDeleted = 1 WHERE EMPLOYEEId = @employeeId";
+            const string updateWOrkExperiences =
+                "UPDATE WorkExperiences SET IsDeleted = 1 WHERE EMPLOYEEId = @employeeId";
+            await _db.Database.ExecuteSqlRawAsync(updatePresentations, parameters);
+            await _db.Database.ExecuteSqlRawAsync(updateWOrkExperiences, parameters);
+            await _db.Database.ExecuteSqlRawAsync(updateProjectExperiences, parameters);
         }
 
         await _db.SaveChangesAsync();
