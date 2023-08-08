@@ -229,4 +229,30 @@ public class EmployeesRepository
             await _db.AddAsync(projectExperience);
         }
     }
+
+    public async Task<List<PresentationEntity>> GetPresentationsByEmployeeId(Guid employeeId)
+    {
+        var thresholdDate = DateTime.Now.AddDays(-30).Date;
+        return await _db.Presentations.Where(entity => employeeId == entity.EmployeeId)
+            .Where(e => e.EmployeeId == employeeId && e.LastSynced.Date >= thresholdDate)
+            .ToListAsync();
+    }
+
+    public async Task<List<WorkExperienceEntity>> GetWorkExperiencesByEmployeeId(Guid employeeId)
+    {
+        var thresholdDate = DateTime.Now.AddDays(-30).Date;
+        return await _db.WorkExperiences
+            .Where(e => e.EmployeeId == employeeId && e.LastSynced.Date >= thresholdDate)
+            .ToListAsync();
+    }
+    
+    public async Task<List<ProjectExperienceEntity>> GetProjectExperiencesByEmployeeId(Guid employeeId)
+    {
+        var thresholdDate = DateTime.Now.AddDays(-30).Date;
+        return await _db.ProjectExperiences.Where(entity => employeeId == entity.EmployeeId)
+            .Where(e => e.EmployeeId == employeeId && e.LastSynced.Date >= thresholdDate)
+            .ToListAsync();
+    }
+    
+    
 }

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 
 using Employees.Service;
 
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OutputCaching;
 
 namespace Employees.Api;
@@ -35,6 +36,17 @@ public class EmployeesController : ControllerBase
             Employees = employees.Select(ModelConverters.ToEmployee).Select(ModelConverters.ToEmployeeJson)
         };
     }
+
+    [HttpGet("cv")]
+    [OutputCache(Duration = 60)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<Cv> GetCvForEmployee ([FromQuery] string alias, [FromQuery] string country)
+    {
+        return await _employeeService.GetCvForEmployee(alias, country);
+    }
+    
+    
 
     /**
     * <returns>a call to Service's GetByNameAndCountry</returns>
