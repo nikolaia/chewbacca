@@ -1,6 +1,5 @@
 using Employees.Models;
 
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace Employees.Repositories;
@@ -184,6 +183,7 @@ public class EmployeesRepository
             updatePresentationEntity.Year = presentation.Year;
             updatePresentationEntity.Url = presentation.Url;
             updatePresentationEntity.Order = presentation.Order;
+            updatePresentationEntity.LastSynced = DateTime.Now;
         }
         else
         {
@@ -202,6 +202,7 @@ public class EmployeesRepository
             updateWorkExperienceEntity.MonthTo = workExperience.MonthTo;
             updateWorkExperienceEntity.YearFrom = workExperience.YearFrom;
             updateWorkExperienceEntity.YearTo = workExperience.YearTo;
+            updateWorkExperienceEntity.LastSynced = DateTime.Now;
         }
         else
         {
@@ -221,27 +222,11 @@ public class EmployeesRepository
             updateWorkExperienceEntity.MonthTo = projectExperience.MonthTo;
             updateWorkExperienceEntity.YearFrom = projectExperience.YearFrom;
             updateWorkExperienceEntity.YearTo = projectExperience.YearTo;
+            updateWorkExperienceEntity.LastSynced = DateTime.Now;
         }
         else
         {
             await _db.AddAsync(projectExperience);
         }
-    }
-
-    public async Task SoftDeleteCvDataForEmployees(IEnumerable<Guid> employeeIds)
-    {
-        foreach (var parameters in employeeIds.Select(employeeId => new SqlParameter("@employeeId", employeeId)))
-        {
-            const string updatePresentations = "UPDATE Presentations SET IsDeleted = 1 WHERE EMPLOYEEId = @employeeId";
-            const string updateProjectExperiences =
-                "UPDATE ProjectExperiences SET IsDeleted = 1 WHERE EMPLOYEEId = @employeeId";
-            const string updateWOrkExperiences =
-                "UPDATE WorkExperiences SET IsDeleted = 1 WHERE EMPLOYEEId = @employeeId";
-            await _db.Database.ExecuteSqlRawAsync(updatePresentations, parameters);
-            await _db.Database.ExecuteSqlRawAsync(updateWOrkExperiences, parameters);
-            await _db.Database.ExecuteSqlRawAsync(updateProjectExperiences, parameters);
-        }
-
-        await _db.SaveChangesAsync();
     }
 }

@@ -123,33 +123,28 @@ public class OrchestratorService
         List<PresentationEntity> presentations = new();
         List<WorkExperienceEntity> workExperiences = new();
         List<ProjectExperienceEntity> projectExperiences = new();
-
-        List<Guid> employeeNotInCvPartner = new();
+        
         
         foreach (var employee in employeeEntries)
         {
             var user = userEntries.Find(cv => cv.email.ToLower().Trim() == employee.Email.ToLower().Trim());
 
-            if (user != null)
+            if (user == null)
+            {
+                continue;
+            }
+
             {
                 var cv = await _cvPartnerService.GetCvForEmployee(user.user_id, user.default_cv_id);
                 presentations.AddRange(CreatePresentationsFromCv(cv, employee));
                 workExperiences.AddRange(CreateWorkExperienceFromCv(cv, employee));
                 projectExperiences.AddRange(CreateProjectExperienceFromCv(cv, employee));
             }
-            else
-            {
-                _logger.LogInformation(
-                    "Soft-deleting CV-content from {BemanningEmail} from database, as they don't exist in CV Partner",
-                    employee.Email);
-                employeeNotInCvPartner.Add(employee.Id);
-            }
         }
 
         await _employeesRepository.AddToDatabase(presentations);
         await _employeesRepository.AddToDatabase(workExperiences);
         await _employeesRepository.AddToDatabase(projectExperiences);
-        await _employeesRepository.SoftDeleteCvDataForEmployees(employeeNotInCvPartner);
         _logger.LogInformation("OrchestratorRepository: FetchMapAndSaveCvData: Finished");
     }
 
@@ -167,7 +162,8 @@ public class OrchestratorService
             Description = dto.long_description.no ?? "",
             Year = dto.year,
             Month = dto.month,
-            Title = dto.description.no ?? ""
+            Title = dto.description.no ?? "",
+            LastSynced = DateTime.Now
         });
     }
 
@@ -187,7 +183,8 @@ public class OrchestratorService
             YearFrom = dto.year_from,
             MonthTo = dto.month_to,
             YearTo = dto.year_to,
-            Title = dto.description.no ?? ""
+            Title = dto.description.no ?? "",
+            LastSynced = DateTime.Now
         });
     }
 
@@ -208,7 +205,8 @@ public class OrchestratorService
             YearFrom = dto.year_from,
             MonthTo = dto.month_to,
             YearTo = dto.year_to, 
-            Title = dto.description.no ?? ""
+            Title = dto.description.no ?? "",
+            LastSynced = DateTime.Now
         });
     }
     
