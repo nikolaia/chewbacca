@@ -23,13 +23,26 @@ public class CvPartnerRepository
     public async Task<List<CVPartnerUserDTO>> GetAllEmployees()
     {
         var apiResponse = await _cvPartnerApiClient.GetAllEmployee(_appSettings.Value.CvPartner.Token);
-        
-        if (apiResponse is {IsSuccessStatusCode: true, Content: not null })
+
+        if (apiResponse is { IsSuccessStatusCode: true, Content: not null })
         {
             return apiResponse.Content.ToList();
         }
-        
-        _logger.LogCritical(apiResponse.Error, "Exception when calling CVPartner");
+
+        _logger.LogCritical(apiResponse.Error, "Exception when calling CVPartner for fetching employees");
         return new List<CVPartnerUserDTO>();
+    }
+
+    public async Task<CVPartnerCvDTO> GetEmployeeCv(string userId, string cvId)
+    {
+        var apiResponse = await _cvPartnerApiClient.GetEmployeeCv(userId, cvId, _appSettings.Value.CvPartner.Token);
+
+        if (apiResponse is { IsSuccessStatusCode: true, Content: not null })
+        {
+            return apiResponse.Content;
+        }
+
+        _logger.LogCritical(apiResponse.Error, "Exception when calling CVPartner for CV presentation");
+        return new CVPartnerCvDTO();
     }
 }
