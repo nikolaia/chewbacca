@@ -116,6 +116,8 @@ public class EmployeesService
 
     public async Task<Cv> GetCvForEmployee(string alias, string country)
     {
+        throw new BadHttpRequestException("service is not ready yet", 423);
+        //må sette opp auth før denne kan brukes
         EmployeeEntity? employeeEntity = await _employeesRepository.GetEmployeeAsync(alias, country);
         if (employeeEntity == null)
         {
