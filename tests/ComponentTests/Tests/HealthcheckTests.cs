@@ -1,6 +1,6 @@
-using Employees.Repositories;
-
 using FluentAssertions;
+
+using Infrastructure;
 
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,6 +8,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 
 using Shared;
+
+using Web;
 
 namespace IntegrationTests.Tests;
 

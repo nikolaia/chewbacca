@@ -1,17 +1,15 @@
 using System.Net;
 
+using ApplicationCore.Entities;
+using ApplicationCore.Interfaces;
+
 using AutoFixture;
 
-using Bemanning.Repositories;
-
-using BlobStorage.Repositories;
-
-using CvPartner.Models;
-using CvPartner.Repositories;
-
-using Employees.Repositories;
-
 using FluentAssertions;
+
+using Infrastructure;
+using Infrastructure.ApiClients;
+using Infrastructure.ApiClients.DTOs;
 
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,6 +18,8 @@ using Moq;
 using Moq.AutoMock;
 
 using Refit;
+
+using Web;
 
 namespace IntegrationTests.Tests;
 

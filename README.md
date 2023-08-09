@@ -39,7 +39,8 @@ az deployment group create --resource-group my-test-group --template-file .\infr
 ```
 
 ## Struktur
-Skisse over hvordan applikasjonen er bygget opp finner man [her](./docs/Structure/Structure.md)
+
+Les mer om Clean Architecture her: https://learn.microsoft.com/en-us/dotnet/architecture/modern-web-apps-azure/common-web-application-architectures#clean-architecture
 
 ## Feilsøking
 

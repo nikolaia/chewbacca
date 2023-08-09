@@ -1,4 +1,5 @@
-﻿using Employees.Repositories;
+﻿using Infrastructure;
+using Infrastructure.Repositories;
 
 namespace IntegrationTests;
 
