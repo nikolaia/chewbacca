@@ -11,13 +11,18 @@ public class CvPartnerService
     {
         _cvPartnerRepository = cvPartnerRepository;
     }
-
+    
     /**
-     * <summary>Calls CvPartnerRepository's GetAllEmployee and converts them
-     * to an employee. Adds to database.</summary>
+     * <summary> Calls CvPartnerRepository's GetAllEmployee and converts them
+     to an employee. Adds to database.</summary>
      */
     public async Task<List<CVPartnerUserDTO>> GetCvPartnerEmployees()
     {
         return await _cvPartnerRepository.GetAllEmployees();
+    }
+
+    public async Task<CVPartnerCvDTO> GetCvForEmployee(string userId, string cvId)
+    {
+        return await _cvPartnerRepository.GetEmployeeCv(userId, cvId);
     }
 }
