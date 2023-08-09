@@ -1,5 +1,10 @@
+using System.Net;
+using System.Web;
+
 using Employees.Models;
 using Employees.Repositories;
+
+using Microsoft.AspNetCore.Http;
 
 namespace Employees.Service;
 
@@ -107,5 +112,27 @@ public class EmployeesService
     public async Task<bool> UpdateAllergiesAndDietaryPreferencesByAliasAndCountry(string alias, string country, AllergiesAndDietaryPreferences allergiesAndDietaryPreferences)
     {
         return await _employeeAllergiesAndDietaryPreferencesRepository.AddOrUpdateEmployeeAllergiesAndDietaryPreferences(alias, country, allergiesAndDietaryPreferences);
+    }
+
+    public async Task<Cv> GetCvForEmployee(string alias, string country)
+    {
+        EmployeeEntity? employeeEntity = await _employeesRepository.GetEmployeeAsync(alias, country);
+        if (employeeEntity == null)
+        {
+            throw new BadHttpRequestException($"Employee with alias {alias} and country {country} not found", 404);
+        }
+        var employeeId = employeeEntity.Id;
+        List<PresentationEntity> presentationEntities = await _employeesRepository.GetPresentationsByEmployeeId(employeeId);
+        List<WorkExperienceEntity> workExperienceEntities =
+            await _employeesRepository.GetWorkExperiencesByEmployeeId(employeeId);
+        List<ProjectExperienceEntity> projectExperienceEntities =
+            await _employeesRepository.GetProjectExperiencesByEmployeeId(employeeId);
+
+        return new Cv()
+        {
+            Presentations = presentationEntities.Select(ModelConverters.ToPresentation).ToList(),
+            WorkExperiences = workExperienceEntities.Select(ModelConverters.ToWorkExperience).ToList(),
+            ProjectExperiences = projectExperienceEntities.Select(ModelConverters.ToProjectExperience).ToList()
+        };
     }
 }

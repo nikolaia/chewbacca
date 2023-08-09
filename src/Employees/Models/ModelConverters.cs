@@ -42,7 +42,8 @@ public static class ModelConverters
         };
     }
 
-    public static EmployeeExtendedJson ToEmployeeExtendedJson(EmployeeEntity employee, EmergencyContact? emergencyContact, AllergiesAndDietaryPreferences? allergiesAndDietaryPreferences)
+    public static EmployeeExtendedJson ToEmployeeExtendedJson(EmployeeEntity employee,
+        EmergencyContact? emergencyContact, AllergiesAndDietaryPreferences? allergiesAndDietaryPreferences)
     {
         return new EmployeeExtendedJson
         {
@@ -71,14 +72,55 @@ public static class ModelConverters
         };
     }
 
-    public static AllergiesAndDietaryPreferences ToAllergiesAndDietaryPreferences(EmployeeAllergiesAndDietaryPreferencesEntity employeeAllergiesAndDietaryPreferences)
+    public static AllergiesAndDietaryPreferences ToAllergiesAndDietaryPreferences(
+        EmployeeAllergiesAndDietaryPreferencesEntity employeeAllergiesAndDietaryPreferences)
     {
         return new AllergiesAndDietaryPreferences
         {
-            DefaultAllergies = employeeAllergiesAndDietaryPreferences.DefaultAllergies.Select(allergy => allergy.ToString()).ToList(),
+            DefaultAllergies =
+                employeeAllergiesAndDietaryPreferences.DefaultAllergies.Select(allergy => allergy.ToString()).ToList(),
             OtherAllergies = employeeAllergiesAndDietaryPreferences.OtherAllergies,
-            DietaryPreferences = employeeAllergiesAndDietaryPreferences.DietaryPreferences.Select(dietaryPreference => dietaryPreference.ToString()).ToList(),
-            Comment = employeeAllergiesAndDietaryPreferences.Comment == null ? "" : employeeAllergiesAndDietaryPreferences.Comment,
+            DietaryPreferences =
+                employeeAllergiesAndDietaryPreferences.DietaryPreferences
+                    .Select(dietaryPreference => dietaryPreference.ToString()).ToList(),
+            Comment = employeeAllergiesAndDietaryPreferences.Comment ?? "",
+        };
+    }
+
+    public static Presentation ToPresentation(PresentationEntity entity)
+    {
+        return new Presentation()
+        {
+            Title = entity.Title,
+            Description = entity.Description,
+            Month = entity.Month,
+            Year = entity.Year
+        };
+    }
+
+    public static WorkExperience ToWorkExperience(WorkExperienceEntity entity)
+    {
+        return new WorkExperience()
+        {
+            Title = entity.Title,
+            Description = entity.Description,
+            MonthFrom = entity.MonthFrom,
+            MonthTo = entity.MonthTo,
+            YearFrom = entity.YearFrom,
+            YearTo = entity.YearTo
+        };
+    }
+
+    public static ProjectExperience ToProjectExperience(ProjectExperienceEntity entity)
+    {
+        return new ProjectExperience()
+        {
+            Title = entity.Title,
+            Description = entity.Description,
+            MonthFrom = entity.MonthFrom,
+            MonthTo = entity.MonthTo,
+            YearFrom = entity.YearFrom,
+            YearTo = entity.YearTo
         };
     }
 
@@ -89,7 +131,7 @@ public static class ModelConverters
 
     public static List<DefaultAllergyEnum> DefaultAllergyStringListToEnumList(List<string> allergies)
     {
-        return allergies.ConvertAll(delegate (string allergy) { return (DefaultAllergyEnum)Enum.Parse(typeof(DefaultAllergyEnum), allergy); });
+        return allergies.ConvertAll(allergy => (DefaultAllergyEnum)Enum.Parse(typeof(DefaultAllergyEnum), allergy));
     }
 
     public static List<string> DietaryPreferenceEnumListToStringList(List<DietaryPreferenceEnum> dietaryPreferences)
@@ -99,6 +141,7 @@ public static class ModelConverters
 
     public static List<DietaryPreferenceEnum> DietaryPreferenceStringListToEnumList(List<string> dietaryPreferences)
     {
-        return dietaryPreferences.ConvertAll(delegate (string dieteryPreference) { return (DietaryPreferenceEnum)Enum.Parse(typeof(DietaryPreferenceEnum), dieteryPreference); });
+        return dietaryPreferences.ConvertAll(dieteryPreference =>
+            (DietaryPreferenceEnum)Enum.Parse(typeof(DietaryPreferenceEnum), dieteryPreference));
     }
 }
