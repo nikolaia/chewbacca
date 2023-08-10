@@ -1,13 +1,11 @@
 ﻿using System.Net;
 
-using Bemanning.Repositories;
+using ApplicationCore.Interfaces;
+using ApplicationCore.Models;
 
-using BlobStorage.Repositories;
-
-using CvPartner.Models;
-using CvPartner.Repositories;
-
-using Employees.Repositories;
+using Infrastructure;
+using Infrastructure.ApiClients;
+using Infrastructure.ApiClients.DTOs;
 
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;

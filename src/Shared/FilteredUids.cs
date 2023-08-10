@@ -1,8 +1,6 @@
-
-
 using Microsoft.Extensions.Options;
 
-using Shared;
+namespace Shared;
 
 public class FilteredUids
 {

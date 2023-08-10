@@ -32,7 +32,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\WebApi\WebApi.csproj" />
+      <ProjectReference Include="..\..\src\Web\Web.csproj" />
     </ItemGroup>
 
 </Project>
