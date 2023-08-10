@@ -1,6 +1,7 @@
 using ApplicationCore.Models;
 using ApplicationCore.Services;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
 
@@ -10,6 +11,7 @@ namespace Web.Controllers;
 
 [ApiController]
 [Route("[controller]")]
+[Authorize]
 public class EmployeesController : ControllerBase
 {
     private readonly EmployeesService _employeeService;
@@ -26,15 +28,30 @@ public class EmployeesController : ControllerBase
      */
     [HttpGet]
     [OutputCache(Duration = 60)]
+    [AllowAnonymous]
     public async Task<EmployeesJson> Get([FromQuery] string? country = null)
     {
         var employees = await _employeeService.GetActiveEmployees(country);
-        return new EmployeesJson
-        {
-            Employees = employees.Select(ModelConverters.ToEmployeeJson)
-        };
+        return new EmployeesJson { Employees = employees.Select(ModelConverters.ToEmployeeJson) };
     }
 
+    /**
+     * <returns>a call to Service's GetByNameAndCountry</returns>
+     */
+    [HttpGet("{alias}")]
+    [OutputCache(Duration = 60)]
+    [AllowAnonymous]
+    public async Task<ActionResult<EmployeeJson>> GetByAlias(string alias, [FromQuery] string country)
+    {
+        var employee = await _employeeService.GetByAliasAndCountry(alias, country);
+
+        if (employee == null)
+        {
+            return NotFound();
+        }
+
+        return ModelConverters.ToEmployeeJson(employee);
+    }
     // [HttpGet("cv")]
     // [OutputCache(Duration = 60)]
     // [ProducesResponseType(StatusCodes.Status200OK)]
@@ -44,7 +61,6 @@ public class EmployeesController : ControllerBase
     //     return await _employeeService.GetCvForEmployee(alias, country);
     // }
     //
-    
 
     /**
     * <returns>a call to Service's GetByNameAndCountry</returns>
@@ -66,23 +82,6 @@ public class EmployeesController : ControllerBase
             await _employeeService.GetAllergiesAndDietaryPreferencesByEmployee(alias, country);
 
         return ModelConverters.ToEmployeeExtendedJson(employee, emergencyContact, allergiesAndDietaryPreferences);
-    }
-
-    /**
-     * <returns>a call to Service's GetByNameAndCountry</returns>
-     */
-    [HttpGet("{alias}")]
-    [OutputCache(Duration = 60)]
-    public async Task<ActionResult<EmployeeJson>> GetByAlias(string alias, [FromQuery] string country)
-    {
-        var employee = await _employeeService.GetByAliasAndCountry(alias, country);
-
-        if (employee == null)
-        {
-            return NotFound();
-        }
-
-        return ModelConverters.ToEmployeeJson(employee);
     }
 
     [Microsoft.AspNetCore.Cors.EnableCors("DashCorsPolicy")]
@@ -164,9 +163,10 @@ public class EmployeesController : ControllerBase
                     .DietaryPreferences),
             OtherAllergies = allergiesAndDietaryPreferencesJson.OtherAllergies
         };
-            
+
         var updateSuccess =
-            await _employeeService.UpdateAllergiesAndDietaryPreferencesByAliasAndCountry(alias, country, allergiesAndDietaryPreferences);
+            await _employeeService.UpdateAllergiesAndDietaryPreferencesByAliasAndCountry(alias, country,
+                allergiesAndDietaryPreferences);
 
         if (updateSuccess)
         {

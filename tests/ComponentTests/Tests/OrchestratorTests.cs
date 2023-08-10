@@ -1,4 +1,5 @@
 using System.Net;
+using System.Security.Claims;
 
 using ApplicationCore.Interfaces;
 using ApplicationCore.Models;
@@ -33,8 +34,13 @@ public class OrchestratorTest :
     public OrchestratorTest(CustomWebApplicationFactory<Program> factory)
     {
         _factory = factory;
-        _client = _factory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
         _mocker = _factory.Mocker;
+        _client = _factory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
+        var claims = new Dictionary<string, object>
+        {
+            { ClaimTypes.Name, "test@sample.com" }
+        };
+        _client.SetFakeBearerToken(claims);
     }
 
     [Fact]

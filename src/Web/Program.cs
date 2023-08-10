@@ -9,14 +9,19 @@ using Infrastructure;
 using Infrastructure.ApiClients;
 using Infrastructure.Repositories;
 
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 using Refit;
 
 using Shared;
 using Shared.AzureIdentity;
+
+using Swashbuckle.AspNetCore.Filters;
 
 using Web;
 
@@ -28,19 +33,20 @@ builder.Services.AddCors(options =>
     if (builder.Environment.EnvironmentName.Equals("Development"))
     {
         options.AddPolicy("DashCorsPolicy",
-        policy =>
-        {
-            policy.AllowAnyMethod().AllowAnyHeader().WithOrigins("https://dash.variant.no", "http://localhost:3000");
-        });
+            policy =>
+            {
+                policy.AllowAnyMethod().AllowAnyHeader()
+                    .WithOrigins("https://dash.variant.no", "http://localhost:3000");
+            });
     }
     else
     {
         {
             options.AddPolicy("DashCorsPolicy",
-            policy =>
-            {
-                policy.AllowAnyMethod().AllowAnyHeader().WithOrigins("https://dash.variant.no");
-            });
+                policy =>
+                {
+                    policy.AllowAnyMethod().AllowAnyHeader().WithOrigins("https://dash.variant.no");
+                });
         }
     }
 });
@@ -51,7 +57,23 @@ builder.Services.AddControllers();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(
+    c =>
+    {
+        c.SwaggerDoc("v1", new OpenApiInfo { Title = "Chewbacca", Version = "v1" });
+        c.OperationFilter<AddResponseHeadersFilter>(); // [SwaggerResponseHeader]
+
+        c.OperationFilter<AppendAuthorizeToSummaryOperationFilter>(); // Adds "(Auth)" to the summary so that you can see which endpoints have Authorization
+        c.OperationFilter<SecurityRequirementsOperationFilter>();
+        c.AddSecurityDefinition("oauth2",
+            new OpenApiSecurityScheme
+            {
+                Description = "Standard Authorization header using the Bearer scheme. Example: \"bearer {token}\"",
+                In = ParameterLocation.Header,
+                Name = "Authorization",
+                Type = SecuritySchemeType.ApiKey
+            });
+    });
 
 builder.Configuration
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
@@ -59,7 +81,6 @@ builder.Configuration
     // appsettings.Local.json is in the .gitignore. Using a local config instead of userSecrets to avoid references in the .csproj:
     .AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true)
     .AddEnvironmentVariables();
-
 
 
 // Bind configuration "TestApp:Settings" section to the Settings object
@@ -79,7 +100,8 @@ builder.Services.AddScoped<IBlobStorageRepository, BlobStorageRepository>();
 builder.Services.AddScoped<IEmergencyContactRepository, EmergencyContactRepository>();
 builder.Services.AddScoped<EmergencyContactRepository>();
 
-builder.Services.AddScoped<IEmployeeAllergiesAndDietaryPreferencesRepository, EmployeeAllergiesAndDietaryPreferencesRepository>();
+builder.Services
+    .AddScoped<IEmployeeAllergiesAndDietaryPreferencesRepository, EmployeeAllergiesAndDietaryPreferencesRepository>();
 builder.Services.AddScoped<EmployeeAllergiesAndDietaryPreferencesRepository>();
 
 builder.Services.AddScoped<EmployeesService>();
@@ -130,10 +152,32 @@ builder.Services.AddScheduler(ctx =>
         options =>
         {
             options.CronSchedule = "0 4 * * *";
-            options.RunImmediately = true;
+            options.RunImmediately = false;
         },
         jobName: jobName);
 });
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        const string variantTenantId = "0f16d077-bd82-4a6c-b498-52741239205f";
+        options.Authority = $"https://login.microsoftonline.com/{variantTenantId}/v2.0/";
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ClockSkew = TimeSpan.FromMinutes(5),
+            RequireSignedTokens = true,
+            ValidateIssuerSigningKey = true,
+            ValidateIssuer = true,
+            ValidIssuers = new[]
+            {
+                $"https://login.microsoftonline.com/{variantTenantId}/v2.0",
+                $"https://sts.windows.net/{variantTenantId}/"
+            },
+            ValidateAudience = false,
+            ValidateLifetime = true
+        };
+    });
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -168,6 +212,7 @@ if (initialAppSettings.UseAzureAppConfig)
     app.UseAzureAppConfiguration();
 }
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapGet("/", () => "Hello World!");
@@ -184,9 +229,7 @@ app.MapGet("/healthcheck",
 
         var response = new HealthcheckResponse()
         {
-            Database = dbCanConnect,
-            KeyVault = healthcheck.KeyVault,
-            AppConfig = healthcheck.AppConfig
+            Database = dbCanConnect, KeyVault = healthcheck.KeyVault, AppConfig = healthcheck.AppConfig
         };
 
         return response;

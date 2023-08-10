@@ -9,6 +9,7 @@ using Infrastructure.ApiClients.DTOs;
 
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -17,6 +18,8 @@ using Moq;
 using Moq.AutoMock;
 
 using Refit;
+
+using WebMotions.Fake.Authentication.JwtBearer;
 
 namespace IntegrationTests;
 
@@ -28,6 +31,13 @@ public class CustomWebApplicationFactory<TStartup>
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Test");
+        builder
+            .UseTestServer()
+            .ConfigureTestServices(collection =>
+            {
+                collection.AddAuthentication(FakeJwtBearerDefaults.AuthenticationScheme).AddFakeJwtBearer();
+            });
+        
         builder.ConfigureServices(services =>
         {
             var descriptor = services.SingleOrDefault(
