@@ -17,7 +17,7 @@ do
             dotnet test -c Release
             ;;
         --artifact) 
-            dotnet publish ./src/WebApi/ -c Release -r linux-x64 --self-contained false -o build
+            dotnet publish ./src/Web/ -c Release -r linux-x64 --self-contained false -o build
             echo "\e[42m~~~>\e[0m Building zip artifact"
             cd build
             zip -9 -r chewbacca.zip .
