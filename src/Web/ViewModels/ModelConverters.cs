@@ -32,11 +32,14 @@ public static class ModelConverters
             ZipCode = employee.ZipCode,
             City = employee.City,
             EmergencyContact = emergencyContact,
-            AllergiesAndDietaryPreferences = ToEmployeeAllergiesAndDietaryPreferencesJson(allergiesAndDietaryPreferences)
+            AllergiesAndDietaryPreferences = allergiesAndDietaryPreferences != null
+                ? ToEmployeeAllergiesAndDietaryPreferencesJson(allergiesAndDietaryPreferences)
+                : null
         };
     }
-    
-    public static EmployeeAllergiesAndDietaryPreferencesJson ToEmployeeAllergiesAndDietaryPreferencesJson(EmployeeAllergiesAndDietaryPreferences entity)
+
+    public static EmployeeAllergiesAndDietaryPreferencesJson ToEmployeeAllergiesAndDietaryPreferencesJson(
+        EmployeeAllergiesAndDietaryPreferences entity)
     {
         return new EmployeeAllergiesAndDietaryPreferencesJson()
         {
@@ -46,7 +49,7 @@ public static class ModelConverters
             OtherAllergies = entity.OtherAllergies.Select(e => e.ToString()).ToList()
         };
     }
-    
+
     public static List<DefaultAllergyEnum> DefaultAllergyStringListToEnumList(List<string> allergies)
     {
         return allergies.ConvertAll(allergy => (DefaultAllergyEnum)Enum.Parse(typeof(DefaultAllergyEnum), allergy));
@@ -57,15 +60,12 @@ public static class ModelConverters
         return dietaryPreferences.ConvertAll(dieteryPreference =>
             (DietaryPreferenceEnum)Enum.Parse(typeof(DietaryPreferenceEnum), dieteryPreference));
     }
-    
+
     public static Presentation ToPresentation(Presentation entity)
     {
         return new Presentation()
         {
-            Title = entity.Title,
-            Description = entity.Description,
-            Month = entity.Month,
-            Year = entity.Year
+            Title = entity.Title, Description = entity.Description, Month = entity.Month, Year = entity.Year
         };
     }
 
@@ -94,6 +94,4 @@ public static class ModelConverters
             YearTo = entity.YearTo
         };
     }
-
-
 }

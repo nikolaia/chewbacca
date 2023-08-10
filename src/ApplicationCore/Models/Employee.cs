@@ -13,5 +13,5 @@ public record Employee
     public string? Address { get; init; }
     public string? ZipCode { get; init; }
     public string? City { get; init; }
-    public string CountryCode { get; set; }
+    public string CountryCode { get; set; } = null!;
 }

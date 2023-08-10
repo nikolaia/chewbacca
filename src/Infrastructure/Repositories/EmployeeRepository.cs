@@ -143,7 +143,7 @@ public class EmployeesRepository : IEmployeesRepository
         var emergencyContact = await _db.EmergencyContacts
             .Where(emp => emp.Employee.Email.Equals(employee.Email))
             .SingleOrDefaultAsync();
-        return emergencyContact.ToEmergencyContact();
+        return emergencyContact?.ToEmergencyContact();
     }
 
     public async Task AddToDatabase(string employeeEmail, EmergencyContact emergencyContact)

@@ -17,7 +17,6 @@ public record EmergencyContactEntity
     public string Phone { get; set; } = null!;
     public string? Relation { get; set; }
     public string? Comment { get; set; }
-
 }
 
 public static class EmergencyContactEntityExtensions

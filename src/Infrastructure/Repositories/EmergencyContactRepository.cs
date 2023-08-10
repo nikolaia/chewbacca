@@ -24,7 +24,7 @@ public class EmergencyContactRepository : IEmergencyContactRepository
                     .Where(emp => emp.Employee.Email.StartsWith($"{alias}@"))
                     .Where(emp => emp.Employee.CountryCode == country)
                     .SingleOrDefaultAsync();
-        return emergencyContacts.ToEmergencyContact();
+        return emergencyContacts?.ToEmergencyContact();
     }
 
     public async Task<bool> AddOrUpdateEmergencyContact(string alias, string country,
