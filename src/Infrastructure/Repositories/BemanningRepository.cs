@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 
-using ApplicationCore.Entities;
 using ApplicationCore.Interfaces;
+using ApplicationCore.Models;
 
 using Microsoft.Extensions.Options;
 

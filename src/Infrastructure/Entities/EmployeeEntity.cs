@@ -1,11 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-using ApplicationCore.Entities;
+using ApplicationCore.Models;
 
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.Models;
+namespace Infrastructure.Entities;
 
 [Index(nameof(Email), IsUnique = true)]
 public record EmployeeEntity

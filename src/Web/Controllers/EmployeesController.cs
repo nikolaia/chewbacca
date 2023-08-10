@@ -1,4 +1,4 @@
-using ApplicationCore.Entities;
+using ApplicationCore.Models;
 using ApplicationCore.Services;
 
 using Microsoft.AspNetCore.Mvc;

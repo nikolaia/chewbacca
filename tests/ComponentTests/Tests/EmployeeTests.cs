@@ -4,7 +4,7 @@ using System.Text;
 using FluentAssertions;
 
 using Infrastructure;
-using Infrastructure.Models;
+using Infrastructure.Entities;
 using Infrastructure.Repositories;
 
 using Microsoft.AspNetCore.Mvc.Testing;

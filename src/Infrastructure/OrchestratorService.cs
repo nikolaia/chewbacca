@@ -1,9 +1,9 @@
-using ApplicationCore.Entities;
 using ApplicationCore.Interfaces;
+using ApplicationCore.Models;
 using ApplicationCore.Services;
 
 using Infrastructure.ApiClients.DTOs;
-using Infrastructure.Models;
+using Infrastructure.Entities;
 using Infrastructure.Repositories;
 
 using Microsoft.Extensions.Logging;

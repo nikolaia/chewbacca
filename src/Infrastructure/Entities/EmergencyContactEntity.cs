@@ -1,9 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-using ApplicationCore.Entities;
+using ApplicationCore.Models;
 
-namespace Infrastructure.Models;
+namespace Infrastructure.Entities;
 
 public record EmergencyContactEntity
 {

@@ -1,6 +1,4 @@
-﻿using ApplicationCore.Entities;
-
-namespace Web.ViewModels;
+﻿namespace Web.ViewModels;
 
 public record EmployeeAllergiesAndDietaryPreferencesJson
 {

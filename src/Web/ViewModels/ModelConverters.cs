@@ -1,8 +1,6 @@
-using ApplicationCore.Entities;
+using ApplicationCore.Models;
 
-using Web.ViewModels;
-
-namespace Web;
+namespace Web.ViewModels;
 
 public static class ModelConverters
 {

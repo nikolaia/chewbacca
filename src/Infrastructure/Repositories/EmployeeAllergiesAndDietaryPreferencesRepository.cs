@@ -1,7 +1,7 @@
-using ApplicationCore.Entities;
 using ApplicationCore.Interfaces;
+using ApplicationCore.Models;
 
-using Infrastructure.Models;
+using Infrastructure.Entities;
 
 using Microsoft.EntityFrameworkCore;
 

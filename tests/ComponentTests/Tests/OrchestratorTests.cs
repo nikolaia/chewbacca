@@ -1,7 +1,7 @@
 using System.Net;
 
-using ApplicationCore.Entities;
 using ApplicationCore.Interfaces;
+using ApplicationCore.Models;
 
 using AutoFixture;
 

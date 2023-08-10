@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Infrastructure.Models;
+namespace Infrastructure.Entities;
 
 // [Index(nameof(Email), IsUnique = true)]
 public record PresentationEntity

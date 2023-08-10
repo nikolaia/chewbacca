@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Infrastructure.Models;
+namespace Infrastructure.Entities;
 
 public record ProjectExperienceEntity
 {

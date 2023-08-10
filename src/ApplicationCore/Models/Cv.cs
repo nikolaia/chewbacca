@@ -1,4 +1,4 @@
-﻿namespace ApplicationCore.Entities;
+﻿namespace ApplicationCore.Models;
 
 public class Cv
 {

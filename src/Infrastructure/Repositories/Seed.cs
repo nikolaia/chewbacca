@@ -1,6 +1,6 @@
-﻿using ApplicationCore.Entities;
+﻿using ApplicationCore.Models;
 
-using Infrastructure.Models;
+using Infrastructure.Entities;
 
 namespace Infrastructure.Repositories;
 
