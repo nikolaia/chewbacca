@@ -1,4 +1,5 @@
 using System.Net;
+using System.Security.Claims;
 using System.Text;
 
 using FluentAssertions;
@@ -34,6 +35,11 @@ public class EmployeeTest :
         Utilities.InitializeDbForTests(db);
 
         _client = factory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
+        var claims = new Dictionary<string, object>
+        {
+            { ClaimTypes.Name, "test@sample.com" }
+        };
+        _client.SetFakeBearerToken(claims);
     }
 
     [Fact]
@@ -97,6 +103,7 @@ public class EmployeeTest :
                 .ReadAsStringAsync());
 
         // Assert
+        employeeResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         content!.EmergencyContact!.Name.Should().BeEquivalentTo("Ola Nordmann");
         content!.AllergiesAndDietaryPreferences!.DefaultAllergies.Should()
             .BeEquivalentTo(new List<string> { "MILK", "EGG" });

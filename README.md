@@ -30,6 +30,10 @@ For å få tilgang til integrasjoner må man ha:
 
 Man kan da få konfigurasjon og secrets fra azure uten noe ekstra oppsett gjennom Azure App Configuration. Når man utvikler kjører man opp SQL Server og Blob Storage lokalt, siden det er disse to tjenestene som skrives til - så de er grei å ha kontroll på selv. De er definert i `docker-compose.yml`. Installer Docker Desktop og kjør `docker-compose up -d`.
 
+## Auth
+
+For å gjøre kall til endepunkter som er bak _auth_ kan man kjøre `az account get-access-token` for å få et gyldig token. Man kan da trykke Authorize knappen øverst til høyre i Swagger UI på `/swagger/index.html` og lime inn tokenet der: `Bearer <token>`. Man kan da kalle de låste endepunktene.
+
 ## Infrastructure
 
 Work in progress. Se i `infrastructure`-mappa
