@@ -24,6 +24,8 @@ public class EmployeeContext : DbContext
     public DbSet<WorkExperienceEntity> WorkExperiences { get; set; } = null!;
     
     public DbSet<ProjectExperienceEntity> ProjectExperiences { get; set; }
+    
+    public DbSet<ProjectExperienceRoleEntity> ProjectExperienceRoles { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -78,5 +80,6 @@ public class EmployeeContext : DbContext
             .Property(b => b.DietaryPreferences)
             .HasConversion(dietaryPreferencesConverter)
             .Metadata.SetValueComparer(dietaryPreferencesComparer);
+
     }
 }

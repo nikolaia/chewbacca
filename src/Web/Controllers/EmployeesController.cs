@@ -52,15 +52,15 @@ public class EmployeesController : ControllerBase
 
         return ModelConverters.ToEmployeeJson(employee);
     }
-    // [HttpGet("cv")]
-    // [OutputCache(Duration = 60)]
-    // [ProducesResponseType(StatusCodes.Status200OK)]
-    // [ProducesResponseType(StatusCodes.Status404NotFound)]
-    // public async Task<Cv> GetCvForEmployee ([FromQuery] string alias, [FromQuery] string country)
-    // {
-    //     return await _employeeService.GetCvForEmployee(alias, country);
-    // }
-    //
+    [HttpGet("cv")]
+    [OutputCache(Duration = 60)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<Cv> GetCvForEmployee ([FromQuery] string alias, [FromQuery] string country)
+    {
+        return await _employeeService.GetCvForEmployee(alias, country);
+    }
+    
 
     /**
     * <returns>a call to Service's GetByNameAndCountry</returns>
@@ -76,12 +76,7 @@ public class EmployeesController : ControllerBase
         {
             return NotFound();
         }
-
-        var emergencyContact = await _employeeService.GetEmergencyContactByEmployee(alias, country);
-        var allergiesAndDietaryPreferences =
-            await _employeeService.GetAllergiesAndDietaryPreferencesByEmployee(alias, country);
-
-        return ModelConverters.ToEmployeeExtendedJson(employee, emergencyContact, allergiesAndDietaryPreferences);
+        return ModelConverters.ToEmployeeExtendedJson(employee);
     }
 
     [Microsoft.AspNetCore.Cors.EnableCors("DashCorsPolicy")]

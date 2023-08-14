@@ -7,8 +7,7 @@ public interface IEmployeesRepository
     Task<List<Employee>> GetAllEmployees();
     Task<List<Employee>> GetEmployeesByCountry(string country);
     Task<Employee?> GetEmployeeAsync(string alias, string country);
-    Task AddToDatabase(Employee employee);
-    Task AddToDatabase(string email, EmergencyContact emergencyContact);
+    Task AddOrUpdateEmployeeInformation(Employee employee);
 
     Task<bool> UpdateEmployeeInformation(string alias, string country,
         EmployeeInformation employeeInformation);
@@ -21,12 +20,8 @@ public interface IEmployeesRepository
     Task<string?> EnsureEmployeeIsDeleted(string email);
 
     Task<IEnumerable<string?>> EnsureEmployeesWithEndDateBeforeTodayAreDeleted();
-    Task<EmergencyContact?> GetEmergencyContactAsync(Employee employee);
-    
-    // Task AddToDatabase(List<Presentation> presentations);
-    // Task AddToDatabase(List<WorkExperience> presentations);
-    // Task AddToDatabase(List<ProjectExperience> projectExperiences);
-    // Task<List<Presentation>> GetPresentationsByEmployeeId(string alias, string country);
-    // Task<List<WorkExperience>> GetWorkExperiencesByEmployeeId(string alias, string country);
-    // Task<List<ProjectExperience>> GetProjectExperiencesByEmployeeId(string alias, string country);
+
+    Task AddOrUpdateCvInformation(List<Employee> employees);
+
+    Task<Employee> GetEmployeeWithCv(string alias, string country);
 }

@@ -31,6 +31,6 @@ public class OrchestratorJob  : IScheduledJob
         using var scope = _provider.CreateScope();
         var orchestratorService = scope.ServiceProvider.GetRequiredService<OrchestratorService>();
         await orchestratorService.FetchMapAndSaveEmployeeData();
-        // await orchestratorService.FetchMapAndSaveCvData();
+        await orchestratorService.FetchMapAndSaveCvData();
     }
 }
