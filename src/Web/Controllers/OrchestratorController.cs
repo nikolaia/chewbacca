@@ -21,6 +21,12 @@ public class OrchestratorController : ControllerBase
     public async Task<IActionResult> Get()
     {
         await _orchestratorService.FetchMapAndSaveEmployeeData();
+        return Ok();
+    }
+
+    [HttpGet("cv")]
+    public async Task<IActionResult> GetCvs()
+    {
         await _orchestratorService.FetchMapAndSaveCvData();
         return Ok();
     }

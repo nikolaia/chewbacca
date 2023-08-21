@@ -1,4 +1,6 @@
 using System.Net;
+using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
 using System.Security.Claims;
 
 using ApplicationCore.Interfaces;
@@ -11,6 +13,7 @@ using FluentAssertions;
 using Infrastructure;
 using Infrastructure.ApiClients;
 using Infrastructure.ApiClients.DTOs;
+using Infrastructure.Entities;
 
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,6 +24,8 @@ using Moq.AutoMock;
 using Refit;
 
 using Web;
+
+using ProjectExperience = ApplicationCore.Models.ProjectExperience;
 
 namespace IntegrationTests.Tests;
 
@@ -36,10 +41,7 @@ public class OrchestratorTest :
         _factory = factory;
         _mocker = _factory.Mocker;
         _client = _factory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
-        var claims = new Dictionary<string, object>
-        {
-            { ClaimTypes.Name, "test@sample.com" }
-        };
+        var claims = new Dictionary<string, object> { { ClaimTypes.Name, "test@sample.com" } };
         _client.SetFakeBearerToken(claims);
     }
 
@@ -47,7 +49,6 @@ public class OrchestratorTest :
     public async void
         Given_CvPartnerEmployeesReturned_When_CallingCvPartnerControllerGET_Then_EnsureSavedToEmployeeDatabase()
     {
-
         // Arrange
         var fixture = new Fixture();
         var cvPartnerUserDTOs = fixture.CreateMany<CVPartnerUserDTO>().ToList();
@@ -72,7 +73,7 @@ public class OrchestratorTest :
 
         using var scope = _factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<EmployeeContext>();
-        
+
         // Check if added
         db.Employees.Count().Should().Be(cvPartnerUserDTOs.Count);
 
@@ -83,5 +84,78 @@ public class OrchestratorTest :
         var blobStorageServiceMocker = _mocker.GetMock<IBlobStorageRepository>();
         blobStorageServiceMocker.Verify(x => x.SaveToBlob(It.IsAny<string>(), It.IsAny<string>()),
             Times.Exactly(cvPartnerUserDTOs.Count));
+    }
+
+    [Fact]
+    public async void Given_CvPartnerCvReturned_When_CallingCvPartnerControllerGET_Then_EnsureSavedCvForEmployee()
+    {
+        // Arrange
+        List<EmployeeEntity> employees = new()
+        {
+            new EmployeeEntity
+            {
+                Email = "test1@variant.no", CountryCode = "NO", Name = "Test", OfficeName = "Testgata"
+            },
+            new EmployeeEntity
+            {
+                Email = "test2@variant.no", CountryCode = "NO", Name = "Test", OfficeName = "Testgata"
+            }
+        };
+
+        using var scope = _factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<EmployeeContext>();
+        await db.AddRangeAsync(employees);
+        await db.SaveChangesAsync();
+
+        CVPartnerCvDTO cv =
+            new()
+            {
+                email = "test1@variant.no",
+                project_experiences = new List<Infrastructure.ApiClients.DTOs.ProjectExperience>
+                {
+                    new() { _id = "abc" , description = new Description(), long_description = new LongDescription()}
+                }
+            };
+
+        List<CVPartnerUserDTO> cvUser = new()
+        {
+            new CVPartnerUserDTO() { email = "test1@variant.no", user_id = "test1"},
+            new CVPartnerUserDTO() { email = "test2@variant.no" , user_id = "test2"}
+        };
+
+
+        var cvPartnerApiClientMock = _mocker.GetMock<ICvPartnerApiClient>();
+        cvPartnerApiClientMock.Setup(client => client.GetAllEmployee(It.IsAny<string>()))
+            .ReturnsAsync(new ApiResponse<IEnumerable<CVPartnerUserDTO>>(new HttpResponseMessage(HttpStatusCode.OK),
+                cvUser, new RefitSettings()));
+        
+
+        cvPartnerApiClientMock.Setup(client =>
+                client.GetEmployeeCv(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+            .ReturnsAsync(new ApiResponse<CVPartnerCvDTO>(new HttpResponseMessage(HttpStatusCode.OK),
+                new CVPartnerCvDTO(), new RefitSettings()));
+        
+        cvPartnerApiClientMock.Setup(client =>
+                client.GetEmployeeCv(It.Is
+                    <string>(e => "test1".Equals(e)), It.IsAny<string>(), It.IsAny<string>()))
+            .ReturnsAsync(new ApiResponse<CVPartnerCvDTO>(new HttpResponseMessage(HttpStatusCode.OK),
+                cv, new RefitSettings()));
+
+        var bemanningEmployees =
+            cvUser.Select(dto => new BemanningEmployee(dto.email, DateTime.UtcNow.AddDays(-3), null))
+                .ToList();
+        Mock<IBemanningRepository> bemanningRepositoryMock = _mocker.GetMock<IBemanningRepository>();
+        bemanningRepositoryMock.Setup(client => client.GetBemanningDataForEmployees())
+            .ReturnsAsync(bemanningEmployees);
+
+
+        // Act
+        var employeeResponse = await _client.GetAsync("/Orchestrator/cv");
+
+        // Assert
+        employeeResponse.IsSuccessStatusCode.Should().BeTrue();
+
+
+        db.ProjectExperiences.Count().Should().BeGreaterThan(0);
     }
 }

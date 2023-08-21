@@ -113,7 +113,7 @@ public class EmployeesRepository : IEmployeesRepository
     }
 
     public async Task<bool> UpdateEmployeeInformation(string alias, string country,
-        EmployeeInformation employeeInformation)
+        UpdateEmployeeInformation employeeInformation)
     {
         var employee = await GetEmployeeEntity(alias, country);
 
@@ -122,11 +122,11 @@ public class EmployeesRepository : IEmployeesRepository
             return false;
         }
 
-        employee.Telephone = employeeInformation.Telephone;
-        employee.AccountNumber = employeeInformation.AccountNumber;
-        employee.Address = employeeInformation.Address;
-        employee.ZipCode = employeeInformation.ZipCode;
-        employee.City = employeeInformation.City;
+        employee.Telephone = employeeInformation.phone;
+        employee.AccountNumber = employeeInformation.accountNumber;
+        employee.Address = employeeInformation.address;
+        employee.ZipCode = employeeInformation.zipCode;
+        employee.City = employeeInformation.city;
 
         var changes = await _db.SaveChangesAsync();
         return changes > 0;

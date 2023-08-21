@@ -61,7 +61,7 @@ public class EmployeesService
     }
 
     public async Task<bool> UpdateEmployeeInformationByAliasAndCountry(string alias, string country,
-        EmployeeInformation employeeInformation)
+        UpdateEmployeeInformation employeeInformation)
     {
         return await _employeesRepository.UpdateEmployeeInformation(alias, country, employeeInformation);
     }

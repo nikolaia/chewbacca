@@ -635,7 +635,7 @@ private static List<Presentation> ToPresentations(CVPartnerCvDTO cv)
             return new List<ApplicationCore.Models.ProjectExperience>();
         }
 
-        return cv.project_experiences.Select(dto => new ApplicationCore.Models.ProjectExperience()
+        return cv.project_experiences.Select(dto => new ApplicationCore.Models.ProjectExperience
         {
             Description = dto.long_description.no ?? "",
             MonthFrom = dto.month_from,

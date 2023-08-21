@@ -11,7 +11,7 @@ namespace Web.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-[Authorize]
+//[Authorize]
 public class EmployeesController : ControllerBase
 {
     private readonly EmployeesService _employeeService;
@@ -82,7 +82,7 @@ public class EmployeesController : ControllerBase
     [Microsoft.AspNetCore.Cors.EnableCors("DashCorsPolicy")]
     [HttpPost("information/{country}/{alias}")]
     public async Task<ActionResult> UpdateEmployeeInformation(string alias, string country,
-        [FromBody] EmployeeInformation employeeInformation)
+        [FromBody] UpdateEmployeeInformation employeeInformation)
     {
         var updateSuccess =
             await _employeeService.UpdateEmployeeInformationByAliasAndCountry(alias, country, employeeInformation);
