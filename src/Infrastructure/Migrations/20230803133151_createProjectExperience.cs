@@ -42,32 +42,11 @@ namespace Employees.Migrations
                 table: "ProjectExperiences",
                 column: "EmployeeId");
             
-            migrationBuilder.CreateTable(
-                name: "ProjectExperienceRoles",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ProjectExperienceId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LastSynced = table.Column<bool>(type:"datetime", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ProjectExperienceRoles", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ProjectExperienceRoles_ProjectExperiences",
-                        column: x => x.ProjectExperienceId,
-                        principalTable: "ProjectExperiences",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable("ProjectExperienceRoles");
             migrationBuilder.DropTable(
                 name: "ProjectExperiences");
         }

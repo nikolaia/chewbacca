@@ -38,6 +38,8 @@ public record EmployeeEntity
     public List<ProjectExperienceEntity> ProjectExperiences { get; set; } = new();
     public List<WorkExperienceEntity> WorkExperiences { get; set; } = new();
     public List<PresentationEntity> Presentations { get; set; } = new();
+
+    public List<CertificationEntity> Certifications { get; set; } = new();
 }
 
 public static class EmployeeEntityExtensions
@@ -119,6 +121,15 @@ public static class EmployeeEntityExtensions
                 MonthTo = entity.MonthTo,
                 YearFrom = entity.YearFrom,
                 YearTo = entity.YearTo
+            }).ToList(),
+            Certifiactions = employeeEntity.Certifications.Select(entity => new Certification
+            {
+                Description = entity.Description,
+                Id = entity.Id,
+                Title = entity.Title,
+                IssuedMonth = entity.IssuedMonth,
+                IssuedYear = entity.IssuedYear,
+                ExpiryDate = entity.ExpiryDate
             }).ToList()
         };
     }

@@ -58,6 +58,7 @@ public class EmployeesRepository : IEmployeesRepository
             .ThenInclude(entity => entity.ProjectExperienceRoles)
             .Include(employee => employee.WorkExperiences)
             .Include(employee => employee.Presentations)
+            .Include(employee => employee.Certifications)
             .Where(emp => emp.Email.StartsWith($"{alias}@"))
             .Where(emp => emp.CountryCode == country)
             .SingleOrDefaultAsync();
@@ -180,9 +181,41 @@ public class EmployeesRepository : IEmployeesRepository
             await AddPresentationsUncommitted(cv.Presentations, entity);
             await AddWorkExperienceUncommitted(cv.WorkExperiences, entity);
             await AddProjectExperienceUncommitted(cv.ProjectExperiences, entity);
+            await AddCertificationUncommitted(cv.Certifiactions, entity);
         }
 
         await _db.SaveChangesAsync();
+    }
+
+    private async Task AddCertificationUncommitted(List<Certification> certifications, EmployeeEntity entity)
+    {
+        foreach (Certification certification in certifications)
+        {
+            var certificationEntity = entity.Certifications.SingleOrDefault(c => c.Id == certification.Id);
+            if (certificationEntity == null)
+            {
+                certificationEntity = new CertificationEntity
+                {
+                    Id = certification.Id,
+                    Description = certification.Description,
+                    Title = certification.Title,
+                    IssuedMonth = certification.IssuedMonth,
+                    IssuedYear = certification.IssuedYear,
+                    ExpiryDate = certification.ExpiryDate,
+                    LastSynced = DateTime.Now,
+                    Employee = entity
+                };
+                await _db.AddAsync(certificationEntity);
+                continue;
+            }
+
+            certificationEntity.Title = certification.Title;
+            certificationEntity.Description = certification.Description;
+            certificationEntity.ExpiryDate = certification.ExpiryDate;
+            certificationEntity.IssuedMonth = certification.IssuedMonth;
+            certificationEntity.IssuedYear = certification.IssuedYear;
+            certificationEntity.LastSynced = DateTime.Now;
+        }
     }
 
     private async Task AddPresentationsUncommitted(List<Presentation> presentations, EmployeeEntity entity)

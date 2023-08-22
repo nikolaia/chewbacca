@@ -507,7 +507,6 @@ public class Role
     public int? version { get; set; }
 }
 
-
 public class School
 {
     public string no { get; set; }
@@ -590,8 +589,9 @@ public class WorkExperience
     public string year_to { get; set; }
 }
 
-public static class CvDtoConverter{
-private static List<Presentation> ToPresentations(CVPartnerCvDTO cv)
+public static class CvDtoConverter
+{
+    private static List<Presentation> ToPresentations(CVPartnerCvDTO cv)
     {
         if (cv.presentations == null)
         {
@@ -662,16 +662,49 @@ private static List<Presentation> ToPresentations(CVPartnerCvDTO cv)
         }).ToList();
     }
 
+    private static List<ApplicationCore.Models.Certification> createCertificationFromCv(CVPartnerCvDTO dto)
+    {
+        if (dto.certifications == null)
+        {
+            return new List<ApplicationCore.Models.Certification>();
+        }
+
+        return dto.certifications.Select(cert => new ApplicationCore.Models.Certification
+        {
+            Id = cert._id,
+            Description = cert.long_description.no ?? "",
+            Title = cert.name?.no ?? "",
+            IssuedMonth = cert.month,
+            IssuedYear = cert.year,
+            ExpiryDate = DateFromNullableStrings(cert.month_expire, cert.year_expire)
+        }).ToList();
+    }
+
+    private static DateTime? DateFromNullableStrings(string? month, string? year)
+    {
+        if (string.IsNullOrEmpty(year) || !int.TryParse(year, out int yearValue ))
+        {
+            return null;
+        }
+
+        if (string.IsNullOrEmpty(month) || !int.TryParse(month, out int monthValue))
+        {
+            return new DateTime(yearValue, 1, 1);
+        }
+
+        return new DateTime(yearValue, monthValue, 1);
+    }
+
 
     public static Cv ToCv(CVPartnerCvDTO cvPartnerCv)
     {
-        return new Cv()
+        return new Cv
         {
             Email = cvPartnerCv.email,
             Presentations = ToPresentations(cvPartnerCv),
             WorkExperiences = ToWorkExperience(cvPartnerCv),
-            ProjectExperiences = CreateProjectExperienceFromCv(cvPartnerCv)
+            ProjectExperiences = CreateProjectExperienceFromCv(cvPartnerCv),
+            Certifiactions = createCertificationFromCv(cvPartnerCv)
         };
     }
 }
-

@@ -2,19 +2,16 @@
 
 namespace Infrastructure.Entities;
 
-public record WorkExperienceEntity
+public class CertificationEntity
 {
-    [Key] public string? Id { get; set; }
+    [Key] public string Id { get; set; } = null!;
 
     public Guid EmployeeId { get; set; }
     public EmployeeEntity Employee { get; set; } = null!;
-    public string? MonthFrom { get; set; }
-    public string? YearFrom { get; set; }
-    public string? MonthTo { get; set; }
-    public string? YearTo { get; set; }
-    public int Order { get; set; }
+    public DateTime? ExpiryDate { get; set; }
+    public string? IssuedMonth { get; set; }
+    public string? IssuedYear { get; set; }
     public string Title { get; set; } = null!;
     public string Description { get; set; } = null!;
     public DateTime LastSynced { get; set; }
-    public Uri? Url { get; set; }
 }
