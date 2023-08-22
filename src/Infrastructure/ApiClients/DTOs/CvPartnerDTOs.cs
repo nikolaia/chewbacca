@@ -643,7 +643,7 @@ private static List<Presentation> ToPresentations(CVPartnerCvDTO cv)
             MonthTo = dto.month_to,
             YearTo = dto.year_to,
             Title = dto.description.no ?? "",
-            roles = CreateProjectExperienceRolesFromProject(dto),
+            Roles = CreateProjectExperienceRolesFromProject(dto),
             Id = dto._id
         }).ToList();
     }
@@ -667,6 +667,7 @@ private static List<Presentation> ToPresentations(CVPartnerCvDTO cv)
     {
         return new Cv()
         {
+            Email = cvPartnerCv.email,
             Presentations = ToPresentations(cvPartnerCv),
             WorkExperiences = ToWorkExperience(cvPartnerCv),
             ProjectExperiences = CreateProjectExperienceFromCv(cvPartnerCv)

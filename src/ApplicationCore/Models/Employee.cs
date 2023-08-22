@@ -2,8 +2,7 @@
 
 public record Employee
 {
-    public EmployeeInformation? EmployeeInformation { get; set; }
-    public EmployeeAllergiesAndDietaryPreferences? EmployeeAllergiesAndDietaryPreferences { get; set; }
-    public EmergencyContact? EmergencyContact { get; set; }
-    public Cv? Cv { get; set; }
+    public required EmployeeInformation EmployeeInformation { get; init; }
+    public EmployeeAllergiesAndDietaryPreferences? EmployeeAllergiesAndDietaryPreferences { get; init; }
+    public EmergencyContact? EmergencyContact { get; init; }
 }

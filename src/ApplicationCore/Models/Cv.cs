@@ -2,6 +2,7 @@
 
 public class Cv
 {
+    public required string Email { get; init; }
     public List<WorkExperience> WorkExperiences { get; init; } = new();
     public List<ProjectExperience> ProjectExperiences { get; init; } = new();
     public List<Presentation> Presentations { get; init; } = new();
@@ -9,40 +10,40 @@ public class Cv
 
 public class WorkExperience
 {
-    public string Id { get; set; }
-    public string Title { get; set; } = null!;
-    public string Description { get; set; } = null!;
-    public string? MonthFrom { get; set; }
-    public string? YearFrom { get; set; }
-    public string? MonthTo { get; set; }
-    public string? YearTo { get; set; }
+    public required string Id { get; init; }
+    public required string Title { get; init; } 
+    public required string Description { get; init; }
+    public string? MonthFrom { get; init; }
+    public string? YearFrom { get; init; }
+    public string? MonthTo { get; init; }
+    public string? YearTo { get; init; }
 }
 
 public class ProjectExperience
 {
-    public string Id { get; set; }
-    public string Title { get; set; } = null!;
-    public string Description { get; set; } = null!;
-    public string? MonthFrom { get; set; }
-    public string? YearFrom { get; set; }
-    public string? MonthTo { get; set; }
-    public string? YearTo { get; set; }
+    public required string Id { get; init; }
+    public required string Title { get; init; }
+    public required string Description { get; init; }
+    public string? MonthFrom { get; init; }
+    public string? YearFrom { get; init; }
+    public string? MonthTo { get; init; }
+    public string? YearTo { get; init; }
 
-    public List<ProjectExperienceRole> roles { get; set; } = new();
+    public List<ProjectExperienceRole> Roles { get; init; } = new();
 }
 
 public class ProjectExperienceRole
 {
-    public string Id { get; set; }
-    public string Title { get; set; }
-    public string Description { get; set; }
+    public required string Id { get; init; }
+    public required string Title { get; init; }
+    public required string Description { get; init; }
 }
 
 public class Presentation
 {
-    public string Id { get; set; }
-    public string Title { get; set; } = null!;
-    public string Description { get; set; } = null!;
-    public string? Month { get; set; }
-    public string? Year { get; set; }
+    public required string Id { get; init; }
+    public  required string Title { get; init; }
+    public required string Description { get; init; }
+    public string? Month { get; init; }
+    public string? Year { get; init; }
 }

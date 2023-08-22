@@ -7,7 +7,7 @@ namespace Web.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-[Authorize]
+//[Authorize]
 public class OrchestratorController : ControllerBase
 {
     private readonly OrchestratorService _orchestratorService;

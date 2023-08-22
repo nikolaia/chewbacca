@@ -122,11 +122,11 @@ public class EmployeesRepository : IEmployeesRepository
             return false;
         }
 
-        employee.Telephone = employeeInformation.phone;
-        employee.AccountNumber = employeeInformation.accountNumber;
-        employee.Address = employeeInformation.address;
-        employee.ZipCode = employeeInformation.zipCode;
-        employee.City = employeeInformation.city;
+        employee.Telephone = employeeInformation.Phone;
+        employee.AccountNumber = employeeInformation.AccountNumber;
+        employee.Address = employeeInformation.Address;
+        employee.ZipCode = employeeInformation.ZipCode;
+        employee.City = employeeInformation.City;
 
         var changes = await _db.SaveChangesAsync();
         return changes > 0;
@@ -167,19 +167,19 @@ public class EmployeesRepository : IEmployeesRepository
         return employees.Select(employee => employee.ImageUrl);
     }
 
-    public async Task AddOrUpdateCvInformation(List<Employee> employees)
+    public async Task AddOrUpdateCvInformation(List<Cv> cvs)
     {
-        foreach (Employee employee in employees)
+        foreach (Cv cv in cvs)
         {
-            var entity = await GetEmployeeEntity(employee.EmployeeInformation.Email);
+            var entity = await GetEmployeeEntity(cv.Email);
             if (entity == null)
             {
                 continue;
             }
 
-            await AddPresentationsUncommitted(employee.Cv.Presentations, entity);
-            await AddWorkExperienceUncommitted(employee.Cv.WorkExperiences, entity);
-            await AddProjectExperienceUncommitted(employee.Cv.ProjectExperiences, entity);
+            await AddPresentationsUncommitted(cv.Presentations, entity);
+            await AddWorkExperienceUncommitted(cv.WorkExperiences, entity);
+            await AddProjectExperienceUncommitted(cv.ProjectExperiences, entity);
         }
 
         await _db.SaveChangesAsync();
@@ -282,7 +282,7 @@ public class EmployeesRepository : IEmployeesRepository
                 projectExperienceEntity.LastSynced = DateTime.Now;
             }
             
-            await AddProjectExperienceRoleUncommitted(projectExperience.roles, projectExperienceEntity);
+            await AddProjectExperienceRoleUncommitted(projectExperience.Roles, projectExperienceEntity);
         }
     }
 
@@ -315,14 +315,15 @@ public class EmployeesRepository : IEmployeesRepository
     }
     
 
-    public async Task<Employee> GetEmployeeWithCv(string alias, string country)
+    public async Task<Cv> GetEmployeeWithCv(string alias, string country)
     {
         var entity = await GetEmployeeEntityWithCv(alias, country);
         if (entity == null)
         {
             throw new HttpRequestException("not found", null, HttpStatusCode.NotFound);
         }
-        return entity.ToEmployee();
+
+        return entity.ToCv();
     }
 
     private async Task<EmergencyContact?> SetEmergencyContactAsync(Employee employee)

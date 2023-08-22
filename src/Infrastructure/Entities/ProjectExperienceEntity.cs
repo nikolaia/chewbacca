@@ -37,7 +37,7 @@ public static class ProjectExperienceEntityExtension
             YearTo = entity.YearTo,
             Title = entity.Title,
             Id = entity.Id,
-            roles = entity.ProjectExperienceRoles.ToList()
+            Roles = entity.ProjectExperienceRoles.ToList()
                 .Select(ProjectExperienceRoleExtension.ToProjectExperienceRole).ToList()
         };
     }

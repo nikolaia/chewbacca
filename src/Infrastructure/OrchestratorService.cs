@@ -137,23 +137,16 @@ public class OrchestratorService
         _logger.LogInformation("OrchestratorRepository: FetchMapAndSaveCVData: Started");
         var employeeEntries = await _employeesRepository.GetAllEmployees();
         var userEntries = await _cvPartnerRepository.GetAllEmployees();
+        List<Cv> cvs = new();
 
-        foreach (var employee in employeeEntries)
+        foreach (var user in employeeEntries.Select(employee => userEntries.Find(cv =>
+                     cv.email.ToLower().Trim() == employee.EmployeeInformation.Email.ToLower().Trim())).Where(user => user != null))
         {
-            var user = userEntries.Find(cv => cv.email.ToLower().Trim() == employee.EmployeeInformation.Email.ToLower().Trim());
-
-            if (user == null)
-            {
-                continue;
-            }
-
-            {
-                var cv = await _cvPartnerRepository.GetEmployeeCv(user.user_id, user.default_cv_id);
-                employee.Cv = CvDtoConverter.ToCv(cv);
-            }
+            var cvPartnerCv = await _cvPartnerRepository.GetEmployeeCv(user.user_id, user.default_cv_id);
+            cvs.Add(CvDtoConverter.ToCv(cvPartnerCv));
         }
 
-        await _employeesRepository.AddOrUpdateCvInformation(employeeEntries);
+        await _employeesRepository.AddOrUpdateCvInformation(cvs);
         _logger.LogInformation("OrchestratorRepository: FetchMapAndSaveCvData: Finished");
     }
 

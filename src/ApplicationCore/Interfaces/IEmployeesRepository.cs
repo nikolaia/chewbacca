@@ -21,7 +21,7 @@ public interface IEmployeesRepository
 
     Task<IEnumerable<string?>> EnsureEmployeesWithEndDateBeforeTodayAreDeleted();
 
-    Task AddOrUpdateCvInformation(List<Employee> employees);
+    Task AddOrUpdateCvInformation(List<Cv> cvs);
 
-    Task<Employee> GetEmployeeWithCv(string alias, string country);
+    Task<Cv> GetEmployeeWithCv(string alias, string country);
 }

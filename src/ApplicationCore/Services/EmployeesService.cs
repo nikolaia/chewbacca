@@ -108,7 +108,6 @@ public class EmployeesService
 
     public async Task<Cv> GetCvForEmployee(string alias, string country)
     {
-        var employee = await _employeesRepository.GetEmployeeWithCv(alias, country);
-        return employee.Cv;
+        return await _employeesRepository.GetEmployeeWithCv(alias, country);
     }
 }
