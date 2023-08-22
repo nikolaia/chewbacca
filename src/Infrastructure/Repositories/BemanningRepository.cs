@@ -30,7 +30,7 @@ public class BemanningRepository : IBemanningRepository
         const string bemanningCommand = """"
             SELECT c."Email" as email, MAX(s."YearWeek") as "startWeek", c."EndDate" as endDate
             FROM "Consultant" as c
-            LEFT JOIN "Staffing" s ON c.id = s."ConsultantId" AND s."Hours" <> 0 AND s."EngagementId" = '6b402b81-44c7-40d2-8a89-3d2c7a57b777'
+            LEFT JOIN "Staffing" s ON c.id = s."ConsultantId" AND s."Hours" <> 0 AND s."EngagementId" IN ('6b402b81-44c7-40d2-8a89-3d2c7a57b777', '78618ab0-1cd8-491f-9fca-676c78eb424a')
             WHERE c."Email" IS NOT NULL
             GROUP BY c.id
            """";
