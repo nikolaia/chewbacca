@@ -46,6 +46,17 @@ public class OrchestratorService
 
         var phoneNumberUtil = PhoneNumberUtil.GetInstance();
 
+        foreach (var bemanning in bemanningEntries.Where(employee => !IsActiveEmployee(employee)))
+        {
+            // Remove potential employees that shouldn't have been added.
+            // This should normally not happen, but might happen in cases where
+            // StartDate in bemanning wasn't set properly when orchestrating.
+            _logger.LogInformation(
+                "Deleting employee with email {BemanningEmail} from database, since they haven't started yet",
+                bemanning.Email);
+            await _employeesRepository.EnsureEmployeeIsDeleted(bemanning.Email);
+        }
+
         foreach (var bemanning in bemanningEntries.Where(IsActiveEmployee))
         {
             var cv = cvEntries.Find(cv => cv.email.ToLower().Trim() == bemanning.Email.ToLower().Trim());
@@ -201,10 +212,10 @@ public class OrchestratorService
             MonthFrom = dto.month_from,
             YearFrom = dto.year_from,
             MonthTo = dto.month_to,
-            YearTo = dto.year_to, 
+            YearTo = dto.year_to,
             Title = dto.description.no ?? "",
             LastSynced = DateTime.Now
         });
     }
-    
+
 }
