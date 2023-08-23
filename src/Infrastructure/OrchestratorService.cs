@@ -96,7 +96,7 @@ public class OrchestratorService
         // Remove employees with end date that has been passed.
         var blobUrlsToBeDeleted = (await _employeesRepository.EnsureEmployeesWithEndDateBeforeTodayAreDeleted()).ToList();
 
-        foreach (var bemanning in bemanningEntries.Where(employee => !IsActiveEmployee(employee)))
+        foreach (var bemanning in bemanningEntries.Where(IsFutureEmployee))
         {
             // Remove potential employees that shouldn't have been added.
             // This should normally not happen, but might happen in cases where
@@ -125,6 +125,10 @@ public class OrchestratorService
         return DateTime.Now >= bemanning.StartDate && (bemanning.EndDate == null || DateTime.Now <= bemanning.EndDate);
     }
 
+    private static bool IsFutureEmployee(BemanningEmployee bemanning)
+    {
+        return bemanning.StartDate > DateTime.Now;
+    }
 
     // public async Task FetchMapAndSaveCvData()
     // {
