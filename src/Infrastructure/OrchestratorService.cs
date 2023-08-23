@@ -93,7 +93,21 @@ public class OrchestratorService
             }
         }
 
-        var blobUrlsToBeDeleted = await _employeesRepository.EnsureEmployeesWithEndDateBeforeTodayAreDeleted();
+        // Remove employees with end date that has been passed.
+        var blobUrlsToBeDeleted = (await _employeesRepository.EnsureEmployeesWithEndDateBeforeTodayAreDeleted()).ToList();
+
+        foreach (var bemanning in bemanningEntries.Where(IsFutureEmployee))
+        {
+            // Remove potential employees that shouldn't have been added.
+            // This should normally not happen, but might happen in cases where
+            // StartDate in bemanning wasn't set properly when orchestrating. Covering an edge case
+            _logger.LogInformation(
+                "Deleting employee with email {BemanningEmail} from database, since they haven't started yet",
+                bemanning.Email);
+            blobUrlsToBeDeleted.Add(await _employeesRepository.EnsureEmployeeIsDeleted(bemanning.Email));
+        }
+
+        // Remove all potential images from both past employees and future employees
         foreach (var blobUrlToBeDeleted in blobUrlsToBeDeleted)
         {
             _logger.LogInformation("Deleting blob with url {BlobUrlToBeDeleted}", blobUrlToBeDeleted);
@@ -111,6 +125,10 @@ public class OrchestratorService
         return DateTime.Now >= bemanning.StartDate && (bemanning.EndDate == null || DateTime.Now <= bemanning.EndDate);
     }
 
+    private static bool IsFutureEmployee(BemanningEmployee bemanning)
+    {
+        return bemanning.StartDate > DateTime.Now;
+    }
 
     // public async Task FetchMapAndSaveCvData()
     // {
@@ -201,10 +219,10 @@ public class OrchestratorService
             MonthFrom = dto.month_from,
             YearFrom = dto.year_from,
             MonthTo = dto.month_to,
-            YearTo = dto.year_to, 
+            YearTo = dto.year_to,
             Title = dto.description.no ?? "",
             LastSynced = DateTime.Now
         });
     }
-    
+
 }
