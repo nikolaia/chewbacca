@@ -37,11 +37,11 @@ namespace Employees.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
-
             migrationBuilder.CreateIndex(
                 name: "IX_ProjectExperiences_EmployeeId",
                 table: "ProjectExperiences",
                 column: "EmployeeId");
+            
         }
 
         /// <inheritdoc />

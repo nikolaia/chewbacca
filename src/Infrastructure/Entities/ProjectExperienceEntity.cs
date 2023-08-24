@@ -1,11 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
+using Microsoft.EntityFrameworkCore;
+
 namespace Infrastructure.Entities;
 
 public record ProjectExperienceEntity
 {
-    [Key] 
-    public string? Id { get; set; }
+    [Key] public string Id { get; set; } = null!;
 
     public Guid EmployeeId { get; set; }
     public EmployeeEntity Employee { get; set; } = null!;
@@ -18,4 +19,5 @@ public record ProjectExperienceEntity
     public string Description { get; set; } = null!;
     public DateTime LastSynced { get; set; }
     public Uri? Url { get; set; }
+    public List<ProjectExperienceRoleEntity> ProjectExperienceRoles { get; set; } = new();
 }

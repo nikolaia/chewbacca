@@ -1,4 +1,7 @@
 ﻿// ReSharper disable InconsistentNaming
+
+using ApplicationCore.Models;
+
 #pragma warning disable CS8618
 namespace Infrastructure.ApiClients.DTOs;
 
@@ -353,7 +356,7 @@ public class LongDescription
 
 public class Name
 {
-    public string no { get; set; }
+    public string? no { get; set; }
     public string @int { get; set; }
 }
 
@@ -400,7 +403,7 @@ public class Position
 public class ProjectExperience
 {
     public string _id { get; set; }
-    public List<Role> roles { get; set; }
+    public List<Role>? roles { get; set; }
     public bool diverged_from_master { get; set; }
     public object area_amt { get; set; }
     public object area_unit { get; set; }
@@ -494,7 +497,7 @@ public class Role
     public bool diverged_from_master { get; set; }
     public LongDescription long_description { get; set; }
     public object modifier_id { get; set; }
-    public Name name { get; set; }
+    public Name? name { get; set; }
     public int? order { get; set; }
     public object origin_id { get; set; }
     public bool recently_added { get; set; }
@@ -504,7 +507,6 @@ public class Role
     public int? version { get; set; }
 }
 
-
 public class School
 {
     public string no { get; set; }
@@ -512,7 +514,7 @@ public class School
 
 public class Summary
 {
-    public string no { get; set; }
+    public string? no { get; set; }
 }
 
 public class TagLine
@@ -587,3 +589,122 @@ public class WorkExperience
     public string year_to { get; set; }
 }
 
+public static class CvDtoConverter
+{
+    private static List<Presentation> ToPresentations(CVPartnerCvDTO cv)
+    {
+        if (cv.presentations == null)
+        {
+            return new List<Presentation>();
+        }
+
+        return cv.presentations.Select(dto => new Presentation
+        {
+            Description = dto.long_description.no ?? "",
+            Year = dto.year,
+            Month = dto.month,
+            Title = dto.description.no ?? "",
+            Id = dto._id
+        }).ToList();
+    }
+
+    private static List<ApplicationCore.Models.WorkExperience> ToWorkExperience(CVPartnerCvDTO cv)
+    {
+        if (cv.work_experiences == null)
+        {
+            return new List<ApplicationCore.Models.WorkExperience>();
+        }
+
+        return cv.work_experiences.Select(dto => new ApplicationCore.Models.WorkExperience()
+        {
+            Description = dto.long_description.no ?? "",
+            MonthFrom = dto.month_from,
+            YearFrom = dto.year_from,
+            MonthTo = dto.month_to,
+            YearTo = dto.year_to,
+            Title = dto.description.no ?? "",
+            Id = dto._id
+        }).ToList();
+    }
+
+
+    private static List<ApplicationCore.Models.ProjectExperience> CreateProjectExperienceFromCv(CVPartnerCvDTO cv)
+    {
+        if (cv.project_experiences == null)
+        {
+            return new List<ApplicationCore.Models.ProjectExperience>();
+        }
+
+        return cv.project_experiences.Select(dto => new ApplicationCore.Models.ProjectExperience
+        {
+            Description = dto.long_description.no ?? "",
+            MonthFrom = dto.month_from,
+            YearFrom = dto.year_from,
+            MonthTo = dto.month_to,
+            YearTo = dto.year_to,
+            Title = dto.description.no ?? "",
+            Roles = CreateProjectExperienceRolesFromProject(dto),
+            Id = dto._id
+        }).ToList();
+    }
+
+    private static List<ProjectExperienceRole> CreateProjectExperienceRolesFromProject(
+        ProjectExperience dto)
+    {
+        if (dto.roles == null)
+        {
+            return new List<ProjectExperienceRole>();
+        }
+
+        return dto.roles.Select(role => new ProjectExperienceRole()
+        {
+            Description = role.long_description.no ?? "", Title = role.name?.no ?? "", Id = role._id
+        }).ToList();
+    }
+
+    private static List<ApplicationCore.Models.Certification> createCertificationFromCv(CVPartnerCvDTO dto)
+    {
+        if (dto.certifications == null)
+        {
+            return new List<ApplicationCore.Models.Certification>();
+        }
+
+        return dto.certifications.Select(cert => new ApplicationCore.Models.Certification
+        {
+            Id = cert._id,
+            Description = cert.long_description.no ?? "",
+            Title = cert.name?.no ?? "",
+            IssuedMonth = cert.month,
+            IssuedYear = cert.year,
+            ExpiryDate = DateFromNullableStrings(cert.month_expire, cert.year_expire)
+        }).ToList();
+    }
+
+    private static DateTime? DateFromNullableStrings(string? month, string? year)
+    {
+        if (string.IsNullOrEmpty(year) || !int.TryParse(year, out int yearValue ))
+        {
+            return null;
+        }
+
+        if (string.IsNullOrEmpty(month) || !int.TryParse(month, out int monthValue))
+        {
+            return new DateTime(yearValue, 1, 1);
+        }
+
+        return new DateTime(yearValue, monthValue, 1);
+    }
+
+
+    public static Cv ToCv(CVPartnerCvDTO cvPartnerCv)
+    {
+        return new Cv
+        {
+            Email = cvPartnerCv.email,
+            Presentations = ToPresentations(cvPartnerCv),
+            WorkExperiences = ToWorkExperience(cvPartnerCv),
+            ProjectExperiences = CreateProjectExperienceFromCv(cvPartnerCv),
+            Certifiactions = createCertificationFromCv(cvPartnerCv)
+        };
+    }
+}

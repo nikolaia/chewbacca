@@ -7,7 +7,9 @@ public class EmployeesService
 {
     private readonly IEmployeesRepository _employeesRepository;
     private readonly IEmergencyContactRepository _emergencyContactRepository;
-    private readonly IEmployeeAllergiesAndDietaryPreferencesRepository _employeeAllergiesAndDietaryPreferencesRepository;
+
+    private readonly IEmployeeAllergiesAndDietaryPreferencesRepository
+        _employeeAllergiesAndDietaryPreferencesRepository;
 
     public EmployeesService(IEmployeesRepository employeesRepository,
         IEmployeeAllergiesAndDietaryPreferencesRepository employeeAllergiesAndDietaryPreferencesRepository,
@@ -21,8 +23,8 @@ public class EmployeesService
 
     private static bool IsEmployeeActive(Employee employee)
     {
-        return DateTime.Now > employee.StartDate &&
-               (employee.EndDate == null || DateTime.Now < employee.EndDate);
+        return DateTime.Now > employee.EmployeeInformation.StartDate &&
+               (employee.EmployeeInformation.EndDate == null || DateTime.Now < employee.EmployeeInformation.EndDate);
     }
 
     /**
@@ -45,7 +47,7 @@ public class EmployeesService
 
     public Task AddOrUpdateEmployee(Employee employee)
     {
-        return _employeesRepository.AddToDatabase(employee);
+        return _employeesRepository.AddOrUpdateEmployeeInformation(employee);
     }
 
     public Task<string?> EnsureEmployeeIsDeleted(string email)
@@ -59,14 +61,14 @@ public class EmployeesService
     }
 
     public async Task<bool> UpdateEmployeeInformationByAliasAndCountry(string alias, string country,
-        EmployeeInformation employeeInformation)
+        UpdateEmployeeInformation employeeInformation)
     {
         return await _employeesRepository.UpdateEmployeeInformation(alias, country, employeeInformation);
     }
 
     public async Task<EmergencyContact?> GetEmergencyContactByEmployee(string alias, string country)
     {
-        return await _emergencyContactRepository.GetByEmployee( alias,  country);
+        return await _emergencyContactRepository.GetByEmployee(alias, country);
     }
 
     public async Task<bool> AddOrUpdateEmergencyContactByAliasAndCountry(string alias, string country,
@@ -90,7 +92,8 @@ public class EmployeesService
         return Enum.GetValues(typeof(DietaryPreferenceEnum)).Cast<DietaryPreferenceEnum>().ToList();
     }
 
-    public async Task<EmployeeAllergiesAndDietaryPreferences?> GetAllergiesAndDietaryPreferencesByEmployee(string alias, string country)
+    public async Task<EmployeeAllergiesAndDietaryPreferences?> GetAllergiesAndDietaryPreferencesByEmployee(string alias,
+        string country)
     {
         return await _employeeAllergiesAndDietaryPreferencesRepository.GetByEmployee(alias, country);
     }
@@ -103,13 +106,8 @@ public class EmployeesService
                 country, allergiesAndDietaryPreferences);
     }
 
-    // public async Task<Cv> GetCvForEmployee(string alias, string country)
-    // {
-    //     return new Cv
-    //     {
-    //         Presentations = await _employeesRepository.GetPresentationsByEmployeeId(alias, country),
-    //         WorkExperiences = await _employeesRepository.GetWorkExperiencesByEmployeeId(alias, country),
-    //         ProjectExperiences = await _employeesRepository.GetProjectExperiencesByEmployeeId(alias, country)
-    //     };
-    // }
+    public async Task<Cv> GetCvForEmployee(string alias, string country)
+    {
+        return await _employeesRepository.GetEmployeeWithCv(alias, country);
+    }
 }

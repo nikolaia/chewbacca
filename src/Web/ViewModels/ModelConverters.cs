@@ -1,5 +1,7 @@
 using ApplicationCore.Models;
 
+using Infrastructure.Entities;
+
 namespace Web.ViewModels;
 
 public static class ModelConverters
@@ -8,32 +10,31 @@ public static class ModelConverters
     {
         return new EmployeeJson
         {
-            Name = employee.Name,
-            Email = employee.Email,
-            Telephone = employee.Telephone,
-            ImageUrl = employee.ImageUrl,
-            OfficeName = employee.OfficeName,
-            StartDate = employee.StartDate,
+            Name = employee.EmployeeInformation.Name,
+            Email = employee.EmployeeInformation.Email,
+            Telephone = employee.EmployeeInformation.Telephone,
+            ImageUrl = employee.EmployeeInformation.ImageUrl,
+            OfficeName = employee.EmployeeInformation.OfficeName,
+            StartDate = employee.EmployeeInformation.StartDate,
         };
     }
 
-    public static EmployeeExtendedJson ToEmployeeExtendedJson(Employee employee,
-        EmergencyContact? emergencyContact, EmployeeAllergiesAndDietaryPreferences? allergiesAndDietaryPreferences)
+    public static EmployeeExtendedJson ToEmployeeExtendedJson(Employee employee)
     {
         return new EmployeeExtendedJson
         {
-            Name = employee.Name,
-            Email = employee.Email,
-            Telephone = employee.Telephone,
-            ImageUrl = employee.ImageUrl,
-            OfficeName = employee.OfficeName,
-            AccountNumber = employee.AccountNumber,
-            Address = employee.Address,
-            ZipCode = employee.ZipCode,
-            City = employee.City,
-            EmergencyContact = emergencyContact,
-            AllergiesAndDietaryPreferences = allergiesAndDietaryPreferences != null
-                ? ToEmployeeAllergiesAndDietaryPreferencesJson(allergiesAndDietaryPreferences)
+            Name = employee.EmployeeInformation.Name,
+            Email = employee.EmployeeInformation.Email,
+            Telephone = employee.EmployeeInformation.Telephone,
+            ImageUrl = employee.EmployeeInformation.ImageUrl,
+            OfficeName = employee.EmployeeInformation.OfficeName,
+            AccountNumber = employee.EmployeeInformation.AccountNumber,
+            Address = employee.EmployeeInformation.Address,
+            ZipCode = employee.EmployeeInformation.ZipCode,
+            City = employee.EmployeeInformation.City,
+            EmergencyContact = employee.EmergencyContact,
+            AllergiesAndDietaryPreferences = employee.EmployeeAllergiesAndDietaryPreferences != null
+                ? ToEmployeeAllergiesAndDietaryPreferencesJson(employee.EmployeeAllergiesAndDietaryPreferences)
                 : null
         };
     }
@@ -60,38 +61,5 @@ public static class ModelConverters
         return dietaryPreferences.ConvertAll(dieteryPreference =>
             (DietaryPreferenceEnum)Enum.Parse(typeof(DietaryPreferenceEnum), dieteryPreference));
     }
-
-    public static Presentation ToPresentation(Presentation entity)
-    {
-        return new Presentation()
-        {
-            Title = entity.Title, Description = entity.Description, Month = entity.Month, Year = entity.Year
-        };
-    }
-
-    public static WorkExperience ToWorkExperience(WorkExperience entity)
-    {
-        return new WorkExperience()
-        {
-            Title = entity.Title,
-            Description = entity.Description,
-            MonthFrom = entity.MonthFrom,
-            MonthTo = entity.MonthTo,
-            YearFrom = entity.YearFrom,
-            YearTo = entity.YearTo
-        };
-    }
-
-    public static ProjectExperience ToProjectExperience(ProjectExperience entity)
-    {
-        return new ProjectExperience()
-        {
-            Title = entity.Title,
-            Description = entity.Description,
-            MonthFrom = entity.MonthFrom,
-            MonthTo = entity.MonthTo,
-            YearFrom = entity.YearFrom,
-            YearTo = entity.YearTo
-        };
-    }
+    
 }
