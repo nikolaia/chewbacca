@@ -429,7 +429,7 @@ public class ProjectExperience
     public object origin_id { get; set; }
     public DateTime? owner_updated_at { get; set; }
     public string percent_allocated { get; set; }
-    public List<ProjectExperienceSkill> project_experience_skills { get; set; }
+    public List<ProjectExperienceSkill>? project_experience_skills { get; set; }
     public string project_extent_amt { get; set; }
     public string project_extent_currency { get; set; }
     public string project_extent_hours { get; set; }
@@ -523,7 +523,7 @@ public class TagLine
 
 public class Tags
 {
-    public string no { get; set; }
+    public string? no { get; set; }
 }
 
 public class Technology
@@ -644,8 +644,24 @@ public static class CvDtoConverter
             YearTo = dto.year_to,
             Title = dto.description.no ?? "",
             Roles = CreateProjectExperienceRolesFromProject(dto),
+            Competencies = CreateCompetenciesFromProject(dto),
             Id = dto._id
         }).ToList();
+    }
+
+    private static HashSet<string> CreateCompetenciesFromProject(ProjectExperience dto)
+    {
+        if (dto.project_experience_skills == null)
+        {
+            return new HashSet<string>();
+        }
+
+
+        return dto.project_experience_skills
+            .Select(skill => skill.tags.no)
+            .Where(tag => tag is not null)
+            .Select(tag => tag!.ToUpper()) // Ignore case because tags are unique
+            .ToHashSet();
     }
 
     private static List<ProjectExperienceRole> CreateProjectExperienceRolesFromProject(
@@ -682,7 +698,7 @@ public static class CvDtoConverter
 
     private static DateTime? DateFromNullableStrings(string? month, string? year)
     {
-        if (string.IsNullOrEmpty(year) || !int.TryParse(year, out int yearValue ))
+        if (string.IsNullOrEmpty(year) || !int.TryParse(year, out int yearValue))
         {
             return null;
         }

@@ -24,4 +24,7 @@ public interface IEmployeesRepository
     Task AddOrUpdateCvInformation(List<Cv> cvs);
 
     Task<Cv> GetEmployeeWithCv(string alias, string country);
+
+    Task<List<ProjectExperience>> GetProjectExperiencesByEmailAndTag(string alias, string country,
+        string tag);
 }

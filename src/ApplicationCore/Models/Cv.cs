@@ -32,6 +32,8 @@ public class ProjectExperience
     public string? YearTo { get; init; }
 
     public List<ProjectExperienceRole> Roles { get; init; } = new();
+
+    public HashSet<string> Competencies { get; init; } = new();
 }
 
 public class ProjectExperienceRole
@@ -58,4 +60,9 @@ public class Certification
     public DateTime? ExpiryDate { get; init; }
     public string? IssuedMonth { get; init; }
     public string? IssuedYear { get; init; }
+}
+
+public class Competency
+{
+    public required string Name { get; init; }
 }

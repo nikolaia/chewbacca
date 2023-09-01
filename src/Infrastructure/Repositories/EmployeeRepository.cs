@@ -45,8 +45,11 @@ public class EmployeesRepository : IEmployeesRepository
         return await _db.Employees
             .Include(employee => employee.ProjectExperiences)
             .ThenInclude(entity => entity.ProjectExperienceRoles)
+            .Include(employee => employee.ProjectExperiences)
+            .ThenInclude(entity => entity.Competencies)
             .Include(employee => employee.WorkExperiences)
             .Include(employee => employee.Presentations)
+            .Include(employee => employee.Certifications)
             .Where(emp => emp.Email == email)
             .SingleOrDefaultAsync();
     }
@@ -56,6 +59,8 @@ public class EmployeesRepository : IEmployeesRepository
         return await _db.Employees
             .Include(employee => employee.ProjectExperiences)
             .ThenInclude(entity => entity.ProjectExperienceRoles)
+            .Include(employee => employee.ProjectExperiences)
+            .ThenInclude(entity => entity.Competencies)
             .Include(employee => employee.WorkExperiences)
             .Include(employee => employee.Presentations)
             .Include(employee => employee.Certifications)
@@ -285,7 +290,6 @@ public class EmployeesRepository : IEmployeesRepository
     {
         foreach (ProjectExperience projectExperience in projectExperiences)
         {
-
             var projectExperienceEntity =
                 entity.ProjectExperiences.SingleOrDefault(p => p.Id == projectExperience.Id);
             if (projectExperienceEntity == null)
@@ -314,8 +318,29 @@ public class EmployeesRepository : IEmployeesRepository
                 projectExperienceEntity.YearTo = projectExperience.YearTo;
                 projectExperienceEntity.LastSynced = DateTime.Now;
             }
-            
+
             await AddProjectExperienceRoleUncommitted(projectExperience.Roles, projectExperienceEntity);
+            await AddCompetenciesUncommitted(projectExperience.Competencies, projectExperienceEntity);
+        }
+    }
+
+    private async Task AddCompetenciesUncommitted(HashSet<string> competencies,
+        ProjectExperienceEntity projectExperienceEntity)
+    {
+        foreach (string competency in competencies)
+        {
+            var competencyEntity = projectExperienceEntity.Competencies.SingleOrDefault(e => e.Name == competency);
+            if (competencyEntity == null)
+            {
+                competencyEntity = new CompetencyEntity
+                {
+                    Name = competency, LastSynced = DateTime.Now, ProjectExperience = projectExperienceEntity
+                };
+                await _db.AddAsync(competencyEntity);
+                continue;
+            }
+
+            competencyEntity.LastSynced = DateTime.Now;
         }
     }
 
@@ -328,7 +353,7 @@ public class EmployeesRepository : IEmployeesRepository
                 projectExperienceEntity.ProjectExperienceRoles.SingleOrDefault(e => e.Id == projectExperienceRole.Id);
             if (projectExperienceRoleEntity == null)
             {
-                projectExperienceRoleEntity = new ProjectExperienceRoleEntity()
+                projectExperienceRoleEntity = new ProjectExperienceRoleEntity
                 {
                     Description = projectExperienceRole.Description,
                     Title = projectExperienceRole.Title,
@@ -343,10 +368,9 @@ public class EmployeesRepository : IEmployeesRepository
             projectExperienceRoleEntity.Description = projectExperienceRole.Description;
             projectExperienceRoleEntity.Title = projectExperienceRole.Title;
             projectExperienceRoleEntity.LastSynced = DateTime.Now;
-
         }
     }
-    
+
 
     public async Task<Cv> GetEmployeeWithCv(string alias, string country)
     {
@@ -385,5 +409,24 @@ public class EmployeesRepository : IEmployeesRepository
         }
 
         await _db.SaveChangesAsync();
+    }
+
+    public async Task<List<ProjectExperience>> GetProjectExperiencesByEmailAndTag(string alias, string country,
+        string tag)
+    {
+        var employeeId = await _db.Employees
+            .Where(emp => emp.Email.StartsWith($"{alias}@"))
+            .Where(emp => emp.CountryCode == country)
+            .Select(e => e.Id)
+            .SingleOrDefaultAsync();
+
+        return await _db.ProjectExperiences
+            .Include(pe => pe.ProjectExperienceRoles)
+            .Include(pe => pe.Competencies)
+            .Where(pe =>
+                pe.EmployeeId == employeeId &&
+                _db.Competencies.Any(c => c.ProjectExperienceId == pe.Id && c.Name == tag))
+            .Select(pe => pe.ToProjectExperience())
+            .ToListAsync();
     }
 }

@@ -61,6 +61,16 @@ public class EmployeesController : ControllerBase
         return await _employeeService.GetCvForEmployee(alias, country);
     }
     
+    
+    [HttpGet("cv/projectExperiences")]
+    [OutputCache(Duration = 60)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<List<ProjectExperience>> GetProjectsFromEmployee ([FromQuery] string alias, [FromQuery] string country, [FromQuery] string tag)
+    {
+        return await _employeeService.GetProjectExperiencesForEmployee(alias, country, tag);
+    }
+    
 
     /**
     * <returns>a call to Service's GetByNameAndCountry</returns>

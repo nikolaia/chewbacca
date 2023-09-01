@@ -1,17 +1,17 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Entities;
 
-public record ProjectExperienceRoleEntity
+[PrimaryKey(nameof(Name), nameof(ProjectExperienceId))]
+public class CompetencyEntity
 {
-    [Key] public string? Id { get; set; }
-    public string Title { get; set; }
 
-    public string Description { get; set; }
-    
+    public string Name { get; init; } = null!;
     public string ProjectExperienceId { get; set; }
     
     public ProjectExperienceEntity ProjectExperience { get; set; } = null!;
-
     public DateTime LastSynced { get; set; }
 }
