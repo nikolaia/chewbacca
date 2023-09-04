@@ -1,3 +1,5 @@
+using System.Reflection;
+
 using ApplicationCore.Interfaces;
 using ApplicationCore.Services;
 
@@ -73,6 +75,8 @@ builder.Services.AddSwaggerGen(
                 Name = "Authorization",
                 Type = SecuritySchemeType.ApiKey
             });
+        var filePath = Path.Combine(AppContext.BaseDirectory, "Web.xml");
+        c.IncludeXmlComments(filePath);
     });
 
 builder.Configuration

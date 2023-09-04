@@ -9,9 +9,8 @@ namespace Infrastructure.Entities;
 public class CompetencyEntity
 {
 
-    public string Name { get; init; } = null!;
-    public string ProjectExperienceId { get; set; }
-    
+    public required string Name { get; init; }
+    public string ProjectExperienceId { get; set; } = null!;
     public ProjectExperienceEntity ProjectExperience { get; set; } = null!;
     public DateTime LastSynced { get; set; }
 }

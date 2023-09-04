@@ -25,6 +25,6 @@ public interface IEmployeesRepository
 
     Task<Cv> GetEmployeeWithCv(string alias, string country);
 
-    Task<List<ProjectExperience>> GetProjectExperiencesByEmailAndTag(string alias, string country,
-        string tag);
+    Task<List<ProjectExperience>> GetProjectExperiencesByEmailAndCompetencies(string email, List<string> competencies);
+    Task<List<string>> GetAllCompetencies();
 }

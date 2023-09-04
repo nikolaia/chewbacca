@@ -43,10 +43,8 @@ public class EmployeesRepository : IEmployeesRepository
     private async Task<EmployeeEntity?> GetEmployeeEntity(string email)
     {
         return await _db.Employees
-            .Include(employee => employee.ProjectExperiences)
-            .ThenInclude(entity => entity.ProjectExperienceRoles)
-            .Include(employee => employee.ProjectExperiences)
-            .ThenInclude(entity => entity.Competencies)
+            .Include(employee => employee.ProjectExperiences).ThenInclude(entity => entity.ProjectExperienceRoles)
+            .Include(employee => employee.ProjectExperiences).ThenInclude(entity => entity.Competencies)
             .Include(employee => employee.WorkExperiences)
             .Include(employee => employee.Presentations)
             .Include(employee => employee.Certifications)
@@ -332,10 +330,7 @@ public class EmployeesRepository : IEmployeesRepository
             var competencyEntity = projectExperienceEntity.Competencies.SingleOrDefault(e => e.Name == competency);
             if (competencyEntity == null)
             {
-                competencyEntity = new CompetencyEntity
-                {
-                    Name = competency, LastSynced = DateTime.Now, ProjectExperience = projectExperienceEntity
-                };
+                competencyEntity = new CompetencyEntity { Name = competency, LastSynced = DateTime.Now, ProjectExperience = projectExperienceEntity };
                 await _db.AddAsync(competencyEntity);
                 continue;
             }
@@ -411,12 +406,11 @@ public class EmployeesRepository : IEmployeesRepository
         await _db.SaveChangesAsync();
     }
 
-    public async Task<List<ProjectExperience>> GetProjectExperiencesByEmailAndTag(string alias, string country,
-        string tag)
+    public async Task<List<ProjectExperience>> GetProjectExperiencesByEmailAndCompetencies(string email,
+        List<string> competencies)
     {
         var employeeId = await _db.Employees
-            .Where(emp => emp.Email.StartsWith($"{alias}@"))
-            .Where(emp => emp.CountryCode == country)
+            .Where(emp => emp.Email == email)
             .Select(e => e.Id)
             .SingleOrDefaultAsync();
 
@@ -425,8 +419,13 @@ public class EmployeesRepository : IEmployeesRepository
             .Include(pe => pe.Competencies)
             .Where(pe =>
                 pe.EmployeeId == employeeId &&
-                _db.Competencies.Any(c => c.ProjectExperienceId == pe.Id && c.Name == tag))
+                _db.Competencies.Any(c => competencies.Contains(c.Name) && c.ProjectExperienceId == pe.Id))
             .Select(pe => pe.ToProjectExperience())
             .ToListAsync();
+    }
+
+    public async Task<List<string>> GetAllCompetencies()
+    {
+        return await _db.Competencies.Select(entity => entity.Name).Distinct().ToListAsync();
     }
 }
