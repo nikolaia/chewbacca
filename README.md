@@ -18,7 +18,7 @@ For å kjøre
 ```dotnet run --project src/WebApi```
 
 For å kjøre migrering til Employees-databasen
-```dotnet ef migrations add <navn på migrasjon> --project src/Employees --startup-project src/WebApi``` 
+```dotnet ef migrations add <navn på migrasjon> --project src/Infrastructure --startup-project src/Web``` 
 
 ## Up and running med ekte integrasjoner
 

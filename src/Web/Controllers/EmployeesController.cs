@@ -2,6 +2,7 @@ using ApplicationCore.Models;
 using ApplicationCore.Services;
 
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
 
@@ -61,11 +62,29 @@ public class EmployeesController : ControllerBase
         return await _employeeService.GetCvForEmployee(alias, country);
     }
     
+    
+    /// <summary>
+    /// Returns all project for an employee which is relevant for at least one competency in the competency list
+    /// </summary>
+    [HttpGet("cv/projectExperiences")]
+    [OutputCache(Duration = 60)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<List<ProjectExperience>>> GetProjectsFromEmployee ([FromQuery] string alias, [FromQuery] string country, [FromQuery] List<string> competencies)
+    {
+        var employee = await _employeeService.GetByAliasAndCountry(alias, country);
+        if (employee == null)
+        {
+            return NotFound();
+        }
+        return await _employeeService.GetProjectExperiencesForEmployee(employee.EmployeeInformation.Email, competencies);
+    }
+    
 
     /**
     * <returns>a call to Service's GetByNameAndCountry</returns>
     */
-    [Microsoft.AspNetCore.Cors.EnableCors("DashCorsPolicy")]
+    [EnableCors("DashCorsPolicy")]
     [HttpGet("{alias}/extended")]
     [OutputCache(Duration = 60)]
     public async Task<ActionResult<EmployeeExtendedJson>> GetExtendedByAlias(string alias, [FromQuery] string country)
@@ -79,7 +98,7 @@ public class EmployeesController : ControllerBase
         return ModelConverters.ToEmployeeExtendedJson(employee);
     }
 
-    [Microsoft.AspNetCore.Cors.EnableCors("DashCorsPolicy")]
+    [EnableCors("DashCorsPolicy")]
     [HttpPost("information/{country}/{alias}")]
     public async Task<ActionResult> UpdateEmployeeInformation(string alias, string country,
         [FromBody] UpdateEmployeeInformation employeeInformation)
@@ -98,7 +117,7 @@ public class EmployeesController : ControllerBase
     }
 
 
-    [Microsoft.AspNetCore.Cors.EnableCors("DashCorsPolicy")]
+    [EnableCors("DashCorsPolicy")]
     [HttpPost("emergencyContact/{country}/{alias}")]
     public async Task<ActionResult> UpdateEmergencyContact(string alias, string country,
         [FromBody] EmergencyContact emergencyContact)
@@ -142,7 +161,17 @@ public class EmployeesController : ControllerBase
         return _employeeService.GetDietaryPreferences().Select(a => a.ToString()).ToList();
     }
 
-    [Microsoft.AspNetCore.Cors.EnableCors("DashCorsPolicy")]
+    /// <summary>
+    /// Returns all competencies that Variant has
+    /// </summary>
+    [HttpGet("competencies")]
+    [OutputCache(Duration = 60)]
+    public async Task<List<string>> GetAllCompetencies()
+    {
+        return await _employeeService.GetAllCompetencies();
+    }
+
+    [EnableCors("DashCorsPolicy")]
     [HttpPost("allergiesAndDietaryPreferences/{country}/{alias}")]
     public async Task<IActionResult> UpdateAllergiesAndDietaryPreferences(string alias, string country,
         [FromBody] EmployeeAllergiesAndDietaryPreferencesJson allergiesAndDietaryPreferencesJson)

@@ -86,7 +86,7 @@ public static class EmployeeEntityExtensions
 
     public static Cv ToCv(this EmployeeEntity employeeEntity)
     {
-        return new Cv()
+        return new Cv
         {
             Email = employeeEntity.Email,
             Presentations = employeeEntity.Presentations.Select(entity => new Presentation()
@@ -98,20 +98,7 @@ public static class EmployeeEntityExtensions
                 Year = entity.Year
             }).ToList(),
             ProjectExperiences = employeeEntity.ProjectExperiences.Select(
-                entity => new ProjectExperience
-                {
-                    Description = entity.Description,
-                    MonthFrom = entity.MonthFrom,
-                    MonthTo = entity.MonthTo,
-                    YearFrom = entity.YearFrom,
-                    YearTo = entity.YearTo,
-                    Title = entity.Title,
-                    Id = entity.Id,
-                    Roles = entity.ProjectExperienceRoles.Select(pEntity => new ProjectExperienceRole
-                    {
-                        Description = pEntity.Description, Id = pEntity.Id, Title = pEntity.Title
-                    }).ToList()
-                }).ToList(),
+                entity => entity.ToProjectExperience()).ToList(),
             WorkExperiences = employeeEntity.WorkExperiences.Select(entity => new WorkExperience
             {
                 Description = entity.Description,

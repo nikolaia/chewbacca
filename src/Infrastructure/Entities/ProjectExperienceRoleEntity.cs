@@ -1,7 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-using ApplicationCore.Models;
-
 namespace Infrastructure.Entities;
 
 public record ProjectExperienceRoleEntity
@@ -16,12 +14,4 @@ public record ProjectExperienceRoleEntity
     public ProjectExperienceEntity ProjectExperience { get; set; } = null!;
 
     public DateTime LastSynced { get; set; }
-}
-
-public static class ProjectExperienceRoleExtension
-{
-    public static ProjectExperienceRole ToProjectExperienceRole(ProjectExperienceRoleEntity entity)
-    {
-        return new ProjectExperienceRole { Description = entity.Description, Title = entity.Title, Id = entity.Id };
-    }
 }

@@ -28,6 +28,8 @@ public class EmployeeContext : DbContext
     public DbSet<ProjectExperienceRoleEntity> ProjectExperienceRoles { get; set; }
     
     public DbSet<CertificationEntity> Certifications { get; set; }
+    
+    public DbSet<CompetencyEntity> Competencies { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

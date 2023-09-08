@@ -110,4 +110,15 @@ public class EmployeesService
     {
         return await _employeesRepository.GetEmployeeWithCv(alias, country);
     }
+
+    public async Task<List<ProjectExperience>> GetProjectExperiencesForEmployee(string email,
+        List<string> competencies)
+    {
+        return await _employeesRepository.GetProjectExperiencesByEmailAndCompetencies(email, competencies);
+    }
+
+    public async Task<List<string>> GetAllCompetencies()
+    {
+        return await _employeesRepository.GetAllCompetencies();
+    }
 }
