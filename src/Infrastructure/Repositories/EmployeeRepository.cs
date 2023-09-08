@@ -185,9 +185,8 @@ public class EmployeesRepository : IEmployeesRepository
             await AddWorkExperienceUncommitted(cv.WorkExperiences, entity);
             await AddProjectExperienceUncommitted(cv.ProjectExperiences, entity);
             await AddCertificationUncommitted(cv.Certifiactions, entity);
+            await _db.SaveChangesAsync(); // Azure SQL Server cannot handle the load of all CVs inserted in the same transaction
         }
-
-        await _db.SaveChangesAsync();
     }
 
     private async Task AddCertificationUncommitted(List<Certification> certifications, EmployeeEntity entity)
