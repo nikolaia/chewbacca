@@ -181,15 +181,14 @@ public class EmployeesRepository : IEmployeesRepository
                 continue;
             }
 
-            await AddPresentationsUncommitted(cv.Presentations, entity);
-            await AddWorkExperienceUncommitted(cv.WorkExperiences, entity);
-            await AddProjectExperienceUncommitted(cv.ProjectExperiences, entity);
-            await AddCertificationUncommitted(cv.Certifiactions, entity);
-            await _db.SaveChangesAsync(); // Azure SQL Server cannot handle the load of all CVs inserted in the same transaction
+            await AddPresentations(cv.Presentations, entity);
+            await AddWorkExperience(cv.WorkExperiences, entity);
+            await AddProjectExperience(cv.ProjectExperiences, entity);
+            await AddCertifications(cv.Certifiactions, entity);
         }
     }
 
-    private async Task AddCertificationUncommitted(List<Certification> certifications, EmployeeEntity entity)
+    private async Task AddCertifications(List<Certification> certifications, EmployeeEntity entity)
     {
         foreach (Certification certification in certifications)
         {
@@ -208,19 +207,21 @@ public class EmployeesRepository : IEmployeesRepository
                     Employee = entity
                 };
                 await _db.AddAsync(certificationEntity);
-                continue;
             }
-
-            certificationEntity.Title = certification.Title;
-            certificationEntity.Description = certification.Description;
-            certificationEntity.ExpiryDate = certification.ExpiryDate;
-            certificationEntity.IssuedMonth = certification.IssuedMonth;
-            certificationEntity.IssuedYear = certification.IssuedYear;
-            certificationEntity.LastSynced = DateTime.Now;
+            else
+            {
+                certificationEntity.Title = certification.Title;
+                certificationEntity.Description = certification.Description;
+                certificationEntity.ExpiryDate = certification.ExpiryDate;
+                certificationEntity.IssuedMonth = certification.IssuedMonth;
+                certificationEntity.IssuedYear = certification.IssuedYear;
+                certificationEntity.LastSynced = DateTime.Now;
+            }
         }
+        await _db.SaveChangesAsync();
     }
 
-    private async Task AddPresentationsUncommitted(List<Presentation> presentations, EmployeeEntity entity)
+    private async Task AddPresentations(List<Presentation> presentations, EmployeeEntity entity)
     {
         foreach (Presentation presentation in presentations)
         {
@@ -238,18 +239,22 @@ public class EmployeesRepository : IEmployeesRepository
                     Year = presentation.Year
                 };
                 await _db.AddAsync(presentationEntity);
-                continue;
-            }
 
-            presentationEntity.Description = presentation.Description;
-            presentationEntity.Month = presentation.Month;
-            presentationEntity.Year = presentation.Year;
-            presentationEntity.Title = presentation.Title;
-            presentationEntity.LastSynced = DateTime.Now;
+            }
+            else
+            {
+
+                presentationEntity.Description = presentation.Description;
+                presentationEntity.Month = presentation.Month;
+                presentationEntity.Year = presentation.Year;
+                presentationEntity.Title = presentation.Title;
+                presentationEntity.LastSynced = DateTime.Now;
+            }
+            await _db.SaveChangesAsync();
         }
     }
 
-    private async Task AddWorkExperienceUncommitted(List<WorkExperience> workExperiences, EmployeeEntity entity)
+    private async Task AddWorkExperience(List<WorkExperience> workExperiences, EmployeeEntity entity)
     {
         foreach (WorkExperience workExperience in workExperiences)
         {
@@ -269,20 +274,22 @@ public class EmployeesRepository : IEmployeesRepository
                     LastSynced = DateTime.Now
                 };
                 await _db.AddAsync(workExperienceEntity);
-                continue;
             }
-
-            workExperienceEntity.Description = workExperience.Description;
-            workExperienceEntity.Title = workExperience.Title;
-            workExperienceEntity.MonthFrom = workExperience.MonthFrom;
-            workExperienceEntity.MonthTo = workExperience.MonthTo;
-            workExperienceEntity.YearFrom = workExperience.YearFrom;
-            workExperienceEntity.YearTo = workExperience.YearTo;
-            workExperienceEntity.LastSynced = DateTime.Now;
+            else
+            {
+                workExperienceEntity.Description = workExperience.Description;
+                workExperienceEntity.Title = workExperience.Title;
+                workExperienceEntity.MonthFrom = workExperience.MonthFrom;
+                workExperienceEntity.MonthTo = workExperience.MonthTo;
+                workExperienceEntity.YearFrom = workExperience.YearFrom;
+                workExperienceEntity.YearTo = workExperience.YearTo;
+                workExperienceEntity.LastSynced = DateTime.Now;
+            }
         }
+        await _db.SaveChangesAsync();
     }
 
-    private async Task AddProjectExperienceUncommitted(List<ProjectExperience> projectExperiences,
+    private async Task AddProjectExperience(List<ProjectExperience> projectExperiences,
         EmployeeEntity entity)
     {
         foreach (ProjectExperience projectExperience in projectExperiences)
@@ -315,13 +322,13 @@ public class EmployeesRepository : IEmployeesRepository
                 projectExperienceEntity.YearTo = projectExperience.YearTo;
                 projectExperienceEntity.LastSynced = DateTime.Now;
             }
-
-            await AddProjectExperienceRoleUncommitted(projectExperience.Roles, projectExperienceEntity);
-            await AddCompetenciesUncommitted(projectExperience.Competencies, projectExperienceEntity);
+            await _db.SaveChangesAsync();
+            await AddProjectExperienceRole(projectExperience.Roles, projectExperienceEntity);
+            await AddCompetencies(projectExperience.Competencies, projectExperienceEntity);
         }
     }
 
-    private async Task AddCompetenciesUncommitted(HashSet<string> competencies,
+    private async Task AddCompetencies(HashSet<string> competencies,
         ProjectExperienceEntity projectExperienceEntity)
     {
         foreach (string competency in competencies)
@@ -331,14 +338,16 @@ public class EmployeesRepository : IEmployeesRepository
             {
                 competencyEntity = new CompetencyEntity { Name = competency, LastSynced = DateTime.Now, ProjectExperience = projectExperienceEntity };
                 await _db.AddAsync(competencyEntity);
-                continue;
             }
-
-            competencyEntity.LastSynced = DateTime.Now;
+            else
+            {
+                competencyEntity.LastSynced = DateTime.Now;
+            }
         }
+        await _db.SaveChangesAsync();
     }
 
-    private async Task AddProjectExperienceRoleUncommitted(List<ProjectExperienceRole> projectExperienceRoles,
+    private async Task AddProjectExperienceRole(List<ProjectExperienceRole> projectExperienceRoles,
         ProjectExperienceEntity projectExperienceEntity)
     {
         foreach (ProjectExperienceRole projectExperienceRole in projectExperienceRoles)
@@ -356,13 +365,15 @@ public class EmployeesRepository : IEmployeesRepository
                     ProjectExperience = projectExperienceEntity
                 };
                 await _db.AddAsync(projectExperienceRoleEntity);
-                continue;
             }
-
-            projectExperienceRoleEntity.Description = projectExperienceRole.Description;
-            projectExperienceRoleEntity.Title = projectExperienceRole.Title;
-            projectExperienceRoleEntity.LastSynced = DateTime.Now;
+            else
+            {
+                projectExperienceRoleEntity.Description = projectExperienceRole.Description;
+                projectExperienceRoleEntity.Title = projectExperienceRole.Title;
+                projectExperienceRoleEntity.LastSynced = DateTime.Now;
+            }
         }
+        await _db.SaveChangesAsync();
     }
 
 
