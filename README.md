@@ -15,7 +15,7 @@ Det er tatt noen avgjørelser rundt arkitektur og hvordan vi bruker skytjenester
 ## Kommandoer
 
 For å kjøre
-```dotnet run --project src/WebApi```
+```dotnet run --project src/Web```
 
 For å kjøre migrering til Employees-databasen
 ```dotnet ef migrations add <navn på migrasjon> --project src/Infrastructure --startup-project src/Web``` 

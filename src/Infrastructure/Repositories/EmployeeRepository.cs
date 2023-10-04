@@ -438,4 +438,11 @@ public class EmployeesRepository : IEmployeesRepository
     {
         return await _db.Competencies.Select(entity => entity.Name).Distinct().ToListAsync();
     }
+
+    public async Task<List<string>> GetAllCompetenciesForEmployee(string email)
+    {
+        return await _db.Employees.Where(emp => emp.Email == email)
+        .Join(_db.ProjectExperiences, emp => emp.Id, project => project.EmployeeId, (emp, project) => project)
+        .Join(_db.Competencies, project => project.Id, comp => comp.ProjectExperienceId, (project, comp) => comp.Name).Distinct().ToListAsync();
+    }
 }

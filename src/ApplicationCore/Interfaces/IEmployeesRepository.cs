@@ -27,4 +27,5 @@ public interface IEmployeesRepository
 
     Task<List<ProjectExperience>> GetProjectExperiencesByEmailAndCompetencies(string email, List<string> competencies);
     Task<List<string>> GetAllCompetencies();
+    Task<List<string>> GetAllCompetenciesForEmployee(string email);
 }
