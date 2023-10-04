@@ -12,7 +12,7 @@ namespace Web.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-//[Authorize]
+[Authorize]
 public class EmployeesController : ControllerBase
 {
     private readonly EmployeesService _employeeService;

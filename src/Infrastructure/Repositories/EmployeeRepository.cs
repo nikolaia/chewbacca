@@ -217,8 +217,8 @@ public class EmployeesRepository : IEmployeesRepository
                 certificationEntity.IssuedYear = certification.IssuedYear;
                 certificationEntity.LastSynced = DateTime.Now;
             }
+            await _db.SaveChangesAsync();
         }
-        await _db.SaveChangesAsync();
     }
 
     private async Task AddPresentations(List<Presentation> presentations, EmployeeEntity entity)
@@ -343,8 +343,8 @@ public class EmployeesRepository : IEmployeesRepository
             {
                 competencyEntity.LastSynced = DateTime.Now;
             }
+            await _db.SaveChangesAsync();
         }
-        await _db.SaveChangesAsync();
     }
 
     private async Task AddProjectExperienceRole(List<ProjectExperienceRole> projectExperienceRoles,
