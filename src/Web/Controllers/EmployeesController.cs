@@ -163,12 +163,16 @@ public class EmployeesController : ControllerBase
 
     /// <summary>
     /// Returns all competencies that Variant has
+    /// Specify employee to get all competencies for employee
     /// </summary>
     [HttpGet("competencies")]
     [OutputCache(Duration = 60)]
-    public async Task<List<string>> GetAllCompetencies()
+    public async Task<ActionResult<List<string>>> GetAllCompetencies([FromQuery] string? alias, [FromQuery] string? country)
     {
-        return await _employeeService.GetAllCompetencies();
+        var employee =  alias == null  || country == null ? null: await _employeeService.GetByAliasAndCountry(alias, country);
+        return alias != null && employee == null
+            ? (ActionResult<List<string>>)NotFound()
+            : (ActionResult<List<string>>)await _employeeService.GetAllCompetencies(employee?.EmployeeInformation?.Email);
     }
 
     [EnableCors("DashCorsPolicy")]

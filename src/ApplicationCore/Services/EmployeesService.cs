@@ -117,8 +117,8 @@ public class EmployeesService
         return await _employeesRepository.GetProjectExperiencesByEmailAndCompetencies(email, competencies);
     }
 
-    public async Task<List<string>> GetAllCompetencies()
+    public async Task<List<string>> GetAllCompetencies(string? email = null)
     {
-        return await _employeesRepository.GetAllCompetencies();
+        return await _employeesRepository.GetAllCompetencies(email);
     }
 }
