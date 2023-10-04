@@ -119,8 +119,6 @@ public class EmployeesService
 
     public async Task<List<string>> GetAllCompetencies(string? email = null)
     {
-        return email == null
-            ? await _employeesRepository.GetAllCompetencies()
-            : await _employeesRepository.GetAllCompetenciesForEmployee(email);
+        return await _employeesRepository.GetAllCompetencies(email);
     }
 }
