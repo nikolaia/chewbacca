@@ -285,8 +285,9 @@ public class EmployeesRepository : IEmployeesRepository
                 workExperienceEntity.YearTo = workExperience.YearTo;
                 workExperienceEntity.LastSynced = DateTime.Now;
             }
+            await _db.SaveChangesAsync();
         }
-        await _db.SaveChangesAsync();
+
     }
 
     private async Task AddProjectExperience(List<ProjectExperience> projectExperiences,
@@ -372,8 +373,9 @@ public class EmployeesRepository : IEmployeesRepository
                 projectExperienceRoleEntity.Title = projectExperienceRole.Title;
                 projectExperienceRoleEntity.LastSynced = DateTime.Now;
             }
+            await _db.SaveChangesAsync();
         }
-        await _db.SaveChangesAsync();
+        
     }
 
 
