@@ -7,7 +7,6 @@ param location string = resourceGroup().location
 @description('The web site hosting plan')
 param sku string = 'B1'
 
-
 @description('Specifies sql admin login')
 @secure()
 param sqlAdministratorLogin string = newGuid()
@@ -85,9 +84,12 @@ module sql 'modules/sql.bicep' = {
     location: location
     sqlAdministratorLogin: sqlAdministratorLogin
     sqlAdministratorPassword: sqlAdministratorPassword
-    adminIdentitySid: web.identity.principalId
+    variantDevelopersRoleObjectId: variantDevelopersRoleObjectId
   }
 }
+  
+// TODO: Find a way to automatically create the SQL user for the webapp in the SQL server.
+// For now you have to run sql-webapp-access.sql in the database with the principalId (objectId) and name output from Bicep
 
 resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
   name: applicationInsightsName
@@ -133,3 +135,5 @@ resource webAppSettings 'Microsoft.Web/sites/config@2022-03-01' = {
 }
 
 output siteUrl string = 'https://${web.properties.defaultHostName}/'
+output webappPrincipalName string = web.name
+output webAppPrincipalId string = web.identity.principalId

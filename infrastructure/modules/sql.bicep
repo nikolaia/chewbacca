@@ -10,7 +10,7 @@ param sqlAdministratorLogin string
 @secure()
 param sqlAdministratorPassword string
 
-param adminIdentitySid string
+param variantDevelopersRoleObjectId string
 
 @description('Specifies database name')
 param sqlDatabaseName string
@@ -24,8 +24,8 @@ resource sqlserver 'Microsoft.Sql/servers@2020-11-01-preview' = {
     version: '12.0'
     administrators: {
       administratorType: 'ActiveDirectory'
-      login: 'webappAppLogin'
-      sid: adminIdentitySid
+      login: 'developers'
+      sid: variantDevelopersRoleObjectId
       tenantId: subscription().tenantId
       azureADOnlyAuthentication: true
     }
