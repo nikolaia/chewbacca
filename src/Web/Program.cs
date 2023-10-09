@@ -139,7 +139,7 @@ builder.Services.Configure<AppSettings>(appSettingsSection);
 
 builder.Services.AddDbContextPool<EmployeeContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("EmployeeDatabase"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("EmployeeDatabase"), sqlOptions => sqlOptions.CommandTimeout(45));
     // https://devblogs.microsoft.com/azure-sdk/azure-identity-with-sql-graph-ef/
     options.AddInterceptors(new AzureAdAuthenticationDbConnectionInterceptor());
 });
@@ -233,7 +233,9 @@ app.MapGet("/healthcheck",
 
         var response = new HealthcheckResponse()
         {
-            Database = dbCanConnect, KeyVault = healthcheck.KeyVault, AppConfig = healthcheck.AppConfig
+            Database = dbCanConnect,
+            KeyVault = healthcheck.KeyVault,
+            AppConfig = healthcheck.AppConfig
         };
 
         return response;
