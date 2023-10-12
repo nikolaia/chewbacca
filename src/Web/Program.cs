@@ -166,6 +166,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     {
         const string variantTenantId = "0f16d077-bd82-4a6c-b498-52741239205f";
         options.Authority = $"https://login.microsoftonline.com/{variantTenantId}/v2.0/";
+        options.Audience = "api://chewbacca";
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ClockSkew = TimeSpan.FromMinutes(5),
@@ -177,7 +178,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 $"https://login.microsoftonline.com/{variantTenantId}/v2.0",
                 $"https://sts.windows.net/{variantTenantId}/"
             },
-            ValidateAudience = false,
+            ValidateAudience = true,
             ValidateLifetime = true
         };
     });
