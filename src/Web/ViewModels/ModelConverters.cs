@@ -28,6 +28,7 @@ public static class ModelConverters
             Telephone = employee.EmployeeInformation.Telephone,
             ImageUrl = employee.EmployeeInformation.ImageUrl,
             OfficeName = employee.EmployeeInformation.OfficeName,
+            StartDate = employee.EmployeeInformation.StartDate,
             AccountNumber = employee.EmployeeInformation.AccountNumber,
             Address = employee.EmployeeInformation.Address,
             ZipCode = employee.EmployeeInformation.ZipCode,
