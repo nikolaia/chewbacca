@@ -659,7 +659,7 @@ public static class CvDtoConverter
 
         return dto.project_experience_skills
             .Select(skill => skill.tags.no)
-            .Where(tag => tag is not null)
+            .Where(tag => tag != null)
             .Select(tag => tag!.ToUpper()) // Ignore case because tags are unique
             .ToHashSet();
     }
