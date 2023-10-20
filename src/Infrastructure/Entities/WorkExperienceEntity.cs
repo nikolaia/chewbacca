@@ -4,9 +4,9 @@ namespace Infrastructure.Entities;
 
 public record WorkExperienceEntity
 {
-    [Key] public string? Id { get; set; }
+    [Key] public required string Id { get; set; }
 
-    public Guid EmployeeId { get; set; }
+    public required Guid EmployeeId { get; set; }
     public EmployeeEntity Employee { get; set; } = null!;
     public string? MonthFrom { get; set; }
     public string? YearFrom { get; set; }

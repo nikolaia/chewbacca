@@ -5,17 +5,23 @@ using ApplicationCore.Models;
 
 using Infrastructure.Entities;
 
+using Microsoft.AspNetCore.Authentication.OAuth.Claims;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Repositories;
 
 public class EmployeesRepository : IEmployeesRepository
 {
     private readonly EmployeeContext _db;
+    private readonly ILogger _logger;
 
-    public EmployeesRepository(EmployeeContext db)
+    public EmployeesRepository(EmployeeContext db, ILogger<OrchestratorService> logger)
     {
         _db = db;
+        _logger = logger;
+
     }
 
     public async Task<List<Employee>> GetAllEmployees()
@@ -40,14 +46,14 @@ public class EmployeesRepository : IEmployeesRepository
             .SingleOrDefaultAsync();
     }
 
-    private async Task<EmployeeEntity?> GetEmployeeEntityWithCv(string email)
+    private async Task<EmployeeEntity?> GetEmployeeWithCv(string email)
     {
         return await _db.Employees
-            .Include(employee => employee.ProjectExperiences).ThenInclude(entity => entity.ProjectExperienceRoles)
-            // For å unngå et stort join produkt så inkluderes ikke competencies da det er ca 90 competencies per ansatt
-            .Include(employee => employee.WorkExperiences)
-            .Include(employee => employee.Presentations)
-            .Include(employee => employee.Certifications)
+            .Include(employee => employee.ProjectExperiences).ThenInclude(pe => pe.ProjectExperienceRoles).AsSplitQuery()
+            .Include(employee => employee.WorkExperiences).AsSplitQuery()
+            .Include(employee => employee.Presentations).AsSplitQuery()
+            .Include(employee => employee.Certifications).AsSplitQuery()
+            .Include(employee => employee.ProjectExperiences).ThenInclude(pe => pe.Competencies).AsSplitQuery()
             .Where(emp => emp.Email == email)
             .SingleOrDefaultAsync();
     }
@@ -55,11 +61,11 @@ public class EmployeesRepository : IEmployeesRepository
     private async Task<EmployeeEntity?> GetEmployeeEntityWithCv(string alias, string country)
     {
         return await _db.Employees
-            .Include(employee => employee.ProjectExperiences)
-            .ThenInclude(entity => entity.ProjectExperienceRoles)
-            .Include(employee => employee.WorkExperiences)
-            .Include(employee => employee.Presentations)
-            .Include(employee => employee.Certifications)
+            .Include(employee => employee.ProjectExperiences).ThenInclude(pe => pe.ProjectExperienceRoles).AsSplitQuery()
+            .Include(employee => employee.WorkExperiences).AsSplitQuery()
+            .Include(employee => employee.Presentations).AsSplitQuery()
+            .Include(employee => employee.Certifications).AsSplitQuery()
+            .Include(employee => employee.ProjectExperiences).ThenInclude(pe => pe.Competencies).AsSplitQuery()
             .Where(emp => emp.Email.StartsWith($"{alias}@"))
             .Where(emp => emp.CountryCode == country)
             .SingleOrDefaultAsync();
@@ -173,7 +179,8 @@ public class EmployeesRepository : IEmployeesRepository
     {
         foreach (Cv cv in cvs)
         {
-            var entity = await GetEmployeeEntityWithCv(cv.Email);
+            _logger.LogInformation("Starting cv processing of " + cv.Email);
+            var entity = await GetEmployeeWithCv(cv.Email);
             if (entity == null)
             {
                 continue;
@@ -183,6 +190,7 @@ public class EmployeesRepository : IEmployeesRepository
             await AddWorkExperience(cv.WorkExperiences, entity);
             await AddProjectExperience(cv.ProjectExperiences, entity);
             await AddCertifications(cv.Certifiactions, entity);
+            await _db.SaveChangesAsync();
         }
     }
 
@@ -248,7 +256,6 @@ public class EmployeesRepository : IEmployeesRepository
                 presentationEntity.Title = presentation.Title;
                 presentationEntity.LastSynced = DateTime.Now;
             }
-            await _db.SaveChangesAsync();
         }
     }
 
@@ -262,7 +269,7 @@ public class EmployeesRepository : IEmployeesRepository
                 workExperienceEntity = new WorkExperienceEntity()
                 {
                     Id = workExperience.Id,
-                    Employee = entity,
+                    EmployeeId = entity.Id,
                     Description = workExperience.Description,
                     MonthFrom = workExperience.MonthFrom,
                     MonthTo = workExperience.MonthTo,
@@ -283,7 +290,6 @@ public class EmployeesRepository : IEmployeesRepository
                 workExperienceEntity.YearTo = workExperience.YearTo;
                 workExperienceEntity.LastSynced = DateTime.Now;
             }
-            await _db.SaveChangesAsync();
         }
 
     }
@@ -291,6 +297,7 @@ public class EmployeesRepository : IEmployeesRepository
     private async Task AddProjectExperience(List<ProjectExperience> projectExperiences,
         EmployeeEntity entity)
     {
+
         foreach (ProjectExperience projectExperience in projectExperiences)
         {
             var projectExperienceEntity =
@@ -321,7 +328,6 @@ public class EmployeesRepository : IEmployeesRepository
                 projectExperienceEntity.YearTo = projectExperience.YearTo;
                 projectExperienceEntity.LastSynced = DateTime.Now;
             }
-            await _db.SaveChangesAsync();
             await AddProjectExperienceRole(projectExperience.Roles, projectExperienceEntity);
             await AddCompetencies(projectExperience.Competencies, projectExperienceEntity);
         }
@@ -329,9 +335,10 @@ public class EmployeesRepository : IEmployeesRepository
 
     private async Task AddCompetencies(HashSet<string> competencies, ProjectExperienceEntity projectExperienceEntity)
     {
+
         foreach (string competency in competencies)
         {
-            var competencyEntity = _db.Competencies.Where(c => c.Name == competency && c.ProjectExperienceId == projectExperienceEntity.Id).SingleOrDefault();
+            var competencyEntity = projectExperienceEntity.Competencies.SingleOrDefault(c => c.Name == competency);
             if (competencyEntity == null)
             {
                 competencyEntity = new CompetencyEntity { Name = competency, LastSynced = DateTime.Now, ProjectExperience = projectExperienceEntity };
@@ -341,7 +348,6 @@ public class EmployeesRepository : IEmployeesRepository
             {
                 competencyEntity.LastSynced = DateTime.Now;
             }
-            await _db.SaveChangesAsync();
         }
     }
 
@@ -350,8 +356,7 @@ public class EmployeesRepository : IEmployeesRepository
     {
         foreach (ProjectExperienceRole projectExperienceRole in projectExperienceRoles)
         {
-            var projectExperienceRoleEntity =
-                projectExperienceEntity.ProjectExperienceRoles.SingleOrDefault(e => e.Id == projectExperienceRole.Id);
+            var projectExperienceRoleEntity = projectExperienceEntity.ProjectExperienceRoles.SingleOrDefault(per => per.Id == projectExperienceRole.Id);
             if (projectExperienceRoleEntity == null)
             {
                 projectExperienceRoleEntity = new ProjectExperienceRoleEntity
@@ -370,7 +375,6 @@ public class EmployeesRepository : IEmployeesRepository
                 projectExperienceRoleEntity.Title = projectExperienceRole.Title;
                 projectExperienceRoleEntity.LastSynced = DateTime.Now;
             }
-            await _db.SaveChangesAsync();
         }
 
     }
@@ -380,17 +384,10 @@ public class EmployeesRepository : IEmployeesRepository
         pe.Competencies.UnionWith(_db.Competencies.Where(c => c.ProjectExperienceId == pe.Id).Select(c => c.Name).Distinct().ToHashSet());
     }
 
-
     public async Task<Cv> GetEmployeeWithCv(string alias, string country)
     {
-        var entity = await GetEmployeeEntityWithCv(alias, country);
-        if (entity == null)
-        {
-            throw new HttpRequestException("not found", null, HttpStatusCode.NotFound);
-        }
-        Cv cv = entity.ToCv();
-        cv.ProjectExperiences.ForEach(AddCompetenciesToProjects);
-        return cv;
+        var entity = await GetEmployeeEntityWithCv(alias, country) ?? throw new HttpRequestException("not found", null, HttpStatusCode.NotFound);
+        return entity.ToCv();
     }
 
     private async Task<EmergencyContact?> SetEmergencyContactAsync(Employee employee)
