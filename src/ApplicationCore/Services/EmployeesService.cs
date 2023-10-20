@@ -60,12 +60,6 @@ public class EmployeesService
         return _employeesRepository.EnsureEmployeesWithEndDateBeforeTodayAreDeleted();
     }
 
-    public async Task<bool> UpdateEmployeeInformationByAliasAndCountry(string alias, string country,
-        UpdateEmployeeInformation employeeInformation)
-    {
-        return await _employeesRepository.UpdateEmployeeInformation(alias, country, employeeInformation);
-    }
-
     public async Task<EmergencyContact?> GetEmergencyContactByEmployee(string alias, string country)
     {
         return await _emergencyContactRepository.GetByEmployee(alias, country);

@@ -99,25 +99,6 @@ public class EmployeesController : ControllerBase
     }
 
     [EnableCors("DashCorsPolicy")]
-    [HttpPost("information/{country}/{alias}")]
-    public async Task<ActionResult> UpdateEmployeeInformation(string alias, string country,
-        [FromBody] UpdateEmployeeInformation employeeInformation)
-    {
-        var updateSuccess =
-            await _employeeService.UpdateEmployeeInformationByAliasAndCountry(alias, country, employeeInformation);
-        if (updateSuccess)
-        {
-            return NoContent();
-        }
-
-        _logger.LogError(
-            "Can't update EmployeeInformation because there is no matching Employee to alias {alias} and country {country}",
-            alias, country);
-        return NotFound();
-    }
-
-
-    [EnableCors("DashCorsPolicy")]
     [HttpPost("emergencyContact/{country}/{alias}")]
     public async Task<ActionResult> UpdateEmergencyContact(string alias, string country,
         [FromBody] EmergencyContact emergencyContact)
