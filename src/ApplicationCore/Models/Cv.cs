@@ -13,12 +13,12 @@ public class Cv
 public class WorkExperience
 {
     public required string Id { get; init; }
-    public required string Title { get; init; } 
+    public required string Title { get; init; }
     public required string Description { get; init; }
-    public string? MonthFrom { get; init; }
-    public string? YearFrom { get; init; }
-    public string? MonthTo { get; init; }
-    public string? YearTo { get; init; }
+
+    public required string Company {get; init;}
+    public DateOnly? FromDate { get; init; }
+    public required DateOnly ToDate { get; init; }
 }
 
 public class ProjectExperience
@@ -26,10 +26,10 @@ public class ProjectExperience
     public required string Id { get; init; }
     public required string Title { get; init; }
     public required string Description { get; init; }
-    public string? MonthFrom { get; init; }
-    public string? YearFrom { get; init; }
-    public string? MonthTo { get; init; }
-    public string? YearTo { get; init; }
+    public DateOnly? FromDate { get; init; }
+    public required DateOnly ToDate { get; init; }
+
+    public required string Customer {get; init;}
 
     public List<ProjectExperienceRole> Roles { get; init; } = new();
 
@@ -46,10 +46,9 @@ public class ProjectExperienceRole
 public class Presentation
 {
     public required string Id { get; init; }
-    public  required string Title { get; init; }
+    public required string Title { get; init; }
     public required string Description { get; init; }
-    public string? Month { get; init; }
-    public string? Year { get; init; }
+    public DateOnly? Date { get; init; }
 }
 
 public class Certification
@@ -57,9 +56,10 @@ public class Certification
     public required string Id { get; init; }
     public required string Title { get; init; }
     public required string Description { get; init; }
-    public DateTime? ExpiryDate { get; init; }
-    public string? IssuedMonth { get; init; }
-    public string? IssuedYear { get; init; }
+
+    public required string Issuer {get; init;}
+    public DateOnly? ExpiryDate { get; init; }
+    public DateOnly? IssuedDate { get; init; }
 }
 
 public class Competency

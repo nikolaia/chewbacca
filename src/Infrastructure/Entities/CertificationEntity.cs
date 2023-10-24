@@ -4,14 +4,15 @@ namespace Infrastructure.Entities;
 
 public class CertificationEntity
 {
-    [Key] public string Id { get; set; } = null!;
+    [Key] public required string Id { get; set; }
 
     public Guid EmployeeId { get; set; }
     public EmployeeEntity Employee { get; set; } = null!;
-    public DateTime? ExpiryDate { get; set; }
-    public string? IssuedMonth { get; set; }
-    public string? IssuedYear { get; set; }
-    public string Title { get; set; } = null!;
-    public string Description { get; set; } = null!;
+    public DateOnly? ExpiryDate { get; set; }
+    public DateOnly? IssuedDate { get; set; }
+    public required string Title { get; set; }
+    public required string Description { get; set; } 
+
+    public required string Issuer {get; set;}
     public DateTime LastSynced { get; set; }
 }

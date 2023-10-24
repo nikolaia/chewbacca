@@ -8,13 +8,15 @@ public record WorkExperienceEntity
 
     public required Guid EmployeeId { get; set; }
     public EmployeeEntity Employee { get; set; } = null!;
-    public string? MonthFrom { get; set; }
-    public string? YearFrom { get; set; }
-    public string? MonthTo { get; set; }
-    public string? YearTo { get; set; }
+
+    public DateOnly? FromDate {get; set;}
+
+    public DateOnly ToDate {get; set;}
     public int Order { get; set; }
-    public string Title { get; set; } = null!;
-    public string Description { get; set; } = null!;
+    public required string Title { get; set; } 
+    public required string Description { get; set; }
+
+    public required string Company {get; set;}
     public DateTime LastSynced { get; set; }
     public Uri? Url { get; set; }
 }

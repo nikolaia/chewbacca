@@ -139,8 +139,10 @@ builder.Services.Configure<AppSettings>(appSettingsSection);
 
 builder.Services.AddDbContextPool<EmployeeContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("EmployeeDatabase"), sqlOptions => sqlOptions.CommandTimeout(45));
-    // https://devblogs.microsoft.com/azure-sdk/azure-identity-with-sql-graph-ef/
+    options.UseSqlServer(builder.Configuration.GetConnectionString("EmployeeDatabase"), sqlOptions =>{
+         sqlOptions.CommandTimeout(45);
+         sqlOptions.UseDateOnlyTimeOnly();
+         });
     options.AddInterceptors(new AzureAdAuthenticationDbConnectionInterceptor());
 });
 

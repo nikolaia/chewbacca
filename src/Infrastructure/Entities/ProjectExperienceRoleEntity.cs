@@ -7,15 +7,15 @@ namespace Infrastructure.Entities;
 public record ProjectExperienceRoleEntity
 {
     [Key] public required string Id { get; set; }
-    public string Title { get; set; }
+    public required string Title { get; set; }
 
-    public string Description { get; set; }
+    public required string Description { get; set; }
     
-    public string ProjectExperienceId { get; set; }
+    public string ProjectExperienceId { get; set; } = null!;
     
     public ProjectExperienceEntity ProjectExperience { get; set; } = null!;
 
-    public DateTime LastSynced { get; set; }
+    public required DateTime LastSynced { get; set; }
 }
 
 public static class ProjectExperienceRoleEntityExtension

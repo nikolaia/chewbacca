@@ -408,7 +408,7 @@ public class ProjectExperience
     public object area_amt { get; set; }
     public object area_unit { get; set; }
     public DateTime created_at { get; set; }
-    public Customer customer { get; set; }
+    public Customer? customer { get; set; }
     public CustomerAnonymized customer_anonymized { get; set; }
     public CustomerDescription customer_description { get; set; }
     public string customer_selected { get; set; }
@@ -601,8 +601,7 @@ public static class CvDtoConverter
         return cv.presentations.Select(dto => new Presentation
         {
             Description = dto.long_description.no ?? "",
-            Year = dto.year,
-            Month = dto.month,
+            Date  = DateFromNullableStrings(dto.month, dto.year),
             Title = dto.description.no ?? "",
             Id = dto._id
         }).ToList();
@@ -618,10 +617,9 @@ public static class CvDtoConverter
         return cv.work_experiences.Select(dto => new ApplicationCore.Models.WorkExperience()
         {
             Description = dto.long_description.no ?? "",
-            MonthFrom = dto.month_from,
-            YearFrom = dto.year_from,
-            MonthTo = dto.month_to,
-            YearTo = dto.year_to,
+            FromDate = DateFromNullableStrings(dto.month_from, dto.year_from),
+            ToDate = DateFromNullableStrings(dto.month_to, dto.year_to)?? DateOnly.FromDateTime(DateTime.Now),
+            Company = dto.employer.no ?? "",
             Title = dto.description.no ?? "",
             Id = dto._id
         }).ToList();
@@ -638,10 +636,9 @@ public static class CvDtoConverter
         return cv.project_experiences.Select(dto => new ApplicationCore.Models.ProjectExperience
         {
             Description = dto.long_description.no ?? "",
-            MonthFrom = dto.month_from,
-            YearFrom = dto.year_from,
-            MonthTo = dto.month_to,
-            YearTo = dto.year_to,
+            FromDate = DateFromNullableStrings(dto.month_from, dto.year_from),
+            ToDate = DateFromNullableStrings(dto.month_to, dto.year_to) ?? DateOnly.FromDateTime(DateTime.Now),
+            Customer = dto.customer?.no ?? "",
             Title = dto.description.no ?? "",
             Roles = CreateProjectExperienceRolesFromProject(dto),
             Competencies = CreateCompetenciesFromProject(dto),
@@ -678,7 +675,7 @@ public static class CvDtoConverter
         }).ToList();
     }
 
-    private static List<ApplicationCore.Models.Certification> createCertificationFromCv(CVPartnerCvDTO dto)
+    private static List<ApplicationCore.Models.Certification> CreateCertificationFromCv(CVPartnerCvDTO dto)
     {
         if (dto.certifications == null)
         {
@@ -690,13 +687,13 @@ public static class CvDtoConverter
             Id = cert._id,
             Description = cert.long_description.no ?? "",
             Title = cert.name?.no ?? "",
-            IssuedMonth = cert.month,
-            IssuedYear = cert.year,
+            Issuer = cert.organiser.no ?? "", 
+            IssuedDate = DateFromNullableStrings(cert.month, cert.year),
             ExpiryDate = DateFromNullableStrings(cert.month_expire, cert.year_expire)
         }).ToList();
     }
 
-    private static DateTime? DateFromNullableStrings(string? month, string? year)
+    private static DateOnly? DateFromNullableStrings(string? month, string? year)
     {
         if (string.IsNullOrEmpty(year) || !int.TryParse(year, out int yearValue))
         {
@@ -705,11 +702,12 @@ public static class CvDtoConverter
 
         if (string.IsNullOrEmpty(month) || !int.TryParse(month, out int monthValue))
         {
-            return new DateTime(yearValue, 1, 1);
+            return new DateOnly(yearValue, 1, 1);
         }
 
-        return new DateTime(yearValue, monthValue, 1);
+        return new DateOnly(yearValue, monthValue, 1);
     }
+
 
 
     public static Cv ToCv(CVPartnerCvDTO cvPartnerCv)
@@ -720,7 +718,7 @@ public static class CvDtoConverter
             Presentations = ToPresentations(cvPartnerCv),
             WorkExperiences = ToWorkExperience(cvPartnerCv),
             ProjectExperiences = CreateProjectExperienceFromCv(cvPartnerCv),
-            Certifiactions = createCertificationFromCv(cvPartnerCv)
+            Certifiactions = CreateCertificationFromCv(cvPartnerCv)
         };
     }
 }
