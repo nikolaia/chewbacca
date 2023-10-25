@@ -94,8 +94,7 @@ public static class EmployeeEntityExtensions
                 Description = entity.Description,
                 Id = entity.Id,
                 Title = entity.Title,
-                Month = entity.Month,
-                Year = entity.Year
+                Date = entity.Date
             }).ToList(),
             ProjectExperiences = employeeEntity.ProjectExperiences.Select(
                 entity => entity.ToProjectExperience()).ToList(),
@@ -104,18 +103,17 @@ public static class EmployeeEntityExtensions
                 Description = entity.Description,
                 Id = entity.Id,
                 Title = entity.Title,
-                MonthFrom = entity.MonthFrom,
-                MonthTo = entity.MonthTo,
-                YearFrom = entity.YearFrom,
-                YearTo = entity.YearTo
+                FromDate = entity.FromDate,
+                ToDate = entity.ToDate,
+                Company = entity.Company
             }).ToList(),
             Certifiactions = employeeEntity.Certifications.Select(entity => new Certification
             {
                 Description = entity.Description,
                 Id = entity.Id,
                 Title = entity.Title,
-                IssuedMonth = entity.IssuedMonth,
-                IssuedYear = entity.IssuedYear,
+                IssuedDate = entity.IssuedDate,
+                Issuer = entity.Issuer,
                 ExpiryDate = entity.ExpiryDate
             }).ToList()
         };

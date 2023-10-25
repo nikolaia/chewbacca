@@ -5,9 +5,7 @@ using ApplicationCore.Models;
 
 using Infrastructure.Entities;
 
-using Microsoft.AspNetCore.Authentication.OAuth.Claims;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Repositories;
@@ -206,9 +204,9 @@ public class EmployeesRepository : IEmployeesRepository
                     Id = certification.Id,
                     Description = certification.Description,
                     Title = certification.Title,
-                    IssuedMonth = certification.IssuedMonth,
-                    IssuedYear = certification.IssuedYear,
+                    IssuedDate = certification.IssuedDate,
                     ExpiryDate = certification.ExpiryDate,
+                    Issuer = certification.Issuer,
                     LastSynced = DateTime.Now,
                     Employee = entity
                 };
@@ -219,8 +217,7 @@ public class EmployeesRepository : IEmployeesRepository
                 certificationEntity.Title = certification.Title;
                 certificationEntity.Description = certification.Description;
                 certificationEntity.ExpiryDate = certification.ExpiryDate;
-                certificationEntity.IssuedMonth = certification.IssuedMonth;
-                certificationEntity.IssuedYear = certification.IssuedYear;
+                certificationEntity.IssuedDate = certification.IssuedDate;
                 certificationEntity.LastSynced = DateTime.Now;
             }
             await _db.SaveChangesAsync();
@@ -240,9 +237,9 @@ public class EmployeesRepository : IEmployeesRepository
                     Employee = entity,
                     Description = presentation.Description ?? "",
                     LastSynced = DateTime.Now,
-                    Month = presentation.Month,
+                    Date = presentation.Date,
                     Title = presentation.Title,
-                    Year = presentation.Year
+    
                 };
                 await _db.AddAsync(presentationEntity);
 
@@ -251,8 +248,7 @@ public class EmployeesRepository : IEmployeesRepository
             {
 
                 presentationEntity.Description = presentation.Description;
-                presentationEntity.Month = presentation.Month;
-                presentationEntity.Year = presentation.Year;
+                presentationEntity.Date = presentation.Date;
                 presentationEntity.Title = presentation.Title;
                 presentationEntity.LastSynced = DateTime.Now;
             }
@@ -271,11 +267,10 @@ public class EmployeesRepository : IEmployeesRepository
                     Id = workExperience.Id,
                     EmployeeId = entity.Id,
                     Description = workExperience.Description,
-                    MonthFrom = workExperience.MonthFrom,
-                    MonthTo = workExperience.MonthTo,
-                    YearFrom = workExperience.YearFrom,
-                    YearTo = workExperience.YearTo,
+                    FromDate = workExperience.FromDate,
+                    ToDate = workExperience.ToDate,
                     Title = workExperience.Title,
+                    Company = workExperience.Company,
                     LastSynced = DateTime.Now
                 };
                 await _db.AddAsync(workExperienceEntity);
@@ -284,10 +279,9 @@ public class EmployeesRepository : IEmployeesRepository
             {
                 workExperienceEntity.Description = workExperience.Description;
                 workExperienceEntity.Title = workExperience.Title;
-                workExperienceEntity.MonthFrom = workExperience.MonthFrom;
-                workExperienceEntity.MonthTo = workExperience.MonthTo;
-                workExperienceEntity.YearFrom = workExperience.YearFrom;
-                workExperienceEntity.YearTo = workExperience.YearTo;
+                workExperienceEntity.FromDate = workExperience.FromDate;
+                workExperienceEntity.ToDate = workExperience.ToDate;
+                workExperienceEntity.Company = workExperience.Company;
                 workExperienceEntity.LastSynced = DateTime.Now;
             }
         }
@@ -310,10 +304,9 @@ public class EmployeesRepository : IEmployeesRepository
                     Employee = entity,
                     Description = projectExperience.Description,
                     Title = projectExperience.Title,
-                    MonthFrom = projectExperience.MonthFrom,
-                    MonthTo = projectExperience.MonthTo,
-                    YearFrom = projectExperience.YearFrom,
-                    YearTo = projectExperience.YearTo,
+                    FromDate = projectExperience.FromDate,
+                    ToDate = projectExperience.ToDate,
+                    Customer = projectExperience.Customer,
                     LastSynced = DateTime.Now,
                 };
                 await _db.AddAsync(projectExperienceEntity);
@@ -322,10 +315,9 @@ public class EmployeesRepository : IEmployeesRepository
             {
                 projectExperienceEntity.Description = projectExperience.Description;
                 projectExperienceEntity.Title = projectExperience.Title;
-                projectExperienceEntity.MonthFrom = projectExperience.MonthFrom;
-                projectExperienceEntity.MonthTo = projectExperience.MonthTo;
-                projectExperienceEntity.YearFrom = projectExperience.YearFrom;
-                projectExperienceEntity.YearTo = projectExperience.YearTo;
+                projectExperienceEntity.FromDate = projectExperience.FromDate;
+                projectExperienceEntity.ToDate = projectExperience.ToDate;
+                projectExperienceEntity.Customer = projectExperience.Customer;
                 projectExperienceEntity.LastSynced = DateTime.Now;
             }
             await AddProjectExperienceRole(projectExperience.Roles, projectExperienceEntity);
