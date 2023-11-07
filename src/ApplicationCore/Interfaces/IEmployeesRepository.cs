@@ -9,9 +9,6 @@ public interface IEmployeesRepository
     Task<Employee?> GetEmployeeAsync(string alias, string country);
     Task AddOrUpdateEmployeeInformation(Employee employee);
 
-    Task<bool> UpdateEmployeeInformation(string alias, string country,
-        UpdateEmployeeInformation employeeInformation);
-
     /// <summary>
     /// Deletes the employee from the database, if they exist, and returns the image url to the employees image blob that needs to be cleaned up
     /// </summary>

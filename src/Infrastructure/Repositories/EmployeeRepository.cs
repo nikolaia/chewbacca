@@ -118,26 +118,6 @@ public class EmployeesRepository : IEmployeesRepository
         await _db.SaveChangesAsync();
     }
 
-    public async Task<bool> UpdateEmployeeInformation(string alias, string country,
-        UpdateEmployeeInformation employeeInformation)
-    {
-        var employee = await GetEmployeeEntity(alias, country);
-
-        if (employee == null)
-        {
-            return false;
-        }
-
-        employee.Telephone = employeeInformation.Phone;
-        employee.AccountNumber = employeeInformation.AccountNumber;
-        employee.Address = employeeInformation.Address;
-        employee.ZipCode = employeeInformation.ZipCode;
-        employee.City = employeeInformation.City;
-
-        var changes = await _db.SaveChangesAsync();
-        return changes > 0;
-    }
-
     /// <summary>
     /// Deletes the employee from the database, if they exist, and returns the image url to the employees image blob that needs to be cleaned up
     /// </summary>
