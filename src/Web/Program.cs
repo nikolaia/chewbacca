@@ -47,7 +47,7 @@ builder.Services.AddCors(options =>
             options.AddPolicy("DashCorsPolicy",
                 policy =>
                 {
-                    policy.AllowAnyMethod().AllowAnyHeader().WithOrigins("https://dash.variant.no");
+                    policy.AllowAnyMethod().AllowAnyHeader().WithOrigins("https://dash.variant.no", "https://variantdash-dev.azurewebsites.net");
                 });
         }
     }
