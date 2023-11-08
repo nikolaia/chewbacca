@@ -38,7 +38,7 @@ builder.Services.AddCors(options =>
             policy =>
             {
                 policy.AllowAnyMethod().AllowAnyHeader()
-                    .WithOrigins("https://dash.variant.no", "http://localhost:3000");
+                    .WithOrigins("https://dash.variant.no", "https://variantdash-dev.azurewebsites.net", "http://localhost:3000");
             });
     }
     else
@@ -47,7 +47,7 @@ builder.Services.AddCors(options =>
             options.AddPolicy("DashCorsPolicy",
                 policy =>
                 {
-                    policy.AllowAnyMethod().AllowAnyHeader().WithOrigins("https://dash.variant.no");
+                    policy.AllowAnyMethod().AllowAnyHeader().WithOrigins("https://dash.variant.no", "https://variantdash-dev.azurewebsites.net");
                 });
         }
     }
