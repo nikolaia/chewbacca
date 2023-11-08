@@ -105,14 +105,24 @@ public class EmployeesService
         return await _employeesRepository.GetEmployeeWithCv(alias, country);
     }
 
-    public async Task<List<ProjectExperience>> GetProjectExperiencesForEmployee(string email,
+    public async Task<ProjectExprienceResponse> GetProjectExperiencesForEmployee(string email,
         List<string> competencies)
     {
-        return await _employeesRepository.GetProjectExperiencesByEmailAndCompetencies(email, competencies);
+        List<ProjectExperience> relevantProjects =  await _employeesRepository.GetProjectExperiencesByEmailAndCompetencies(email, competencies);
+        return new ProjectExprienceResponse{
+            projects = relevantProjects,
+            MonthsOfExperience = relevantProjects.Select( pe => CalculateMonths(pe.FromDate, pe.ToDate)).Sum()
+        };
     }
 
     public async Task<List<string>> GetAllCompetencies(string? email = null)
     {
         return await _employeesRepository.GetAllCompetencies(email);
+    }
+    private static int CalculateMonths(DateOnly? from, DateOnly to){
+        if(from == null){
+            return 0;
+        }
+        return ((to.Year - from.Value.Year) * 12) + (to.Month - from.Value.Month) + 1;
     }
 }
