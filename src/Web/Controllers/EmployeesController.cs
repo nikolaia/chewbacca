@@ -70,7 +70,7 @@ public class EmployeesController : ControllerBase
     [OutputCache(Duration = 60)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<List<ProjectExperience>>> GetProjectsFromEmployee ([FromQuery] string alias, [FromQuery] string country, [FromQuery] List<string> competencies)
+    public async Task<ActionResult<ProjectExprienceResponse>> GetProjectsFromEmployee ([FromQuery] string alias, [FromQuery] string country, [FromQuery] List<string> competencies)
     {
         var employee = await _employeeService.GetByAliasAndCountry(alias, country);
         if (employee == null)
