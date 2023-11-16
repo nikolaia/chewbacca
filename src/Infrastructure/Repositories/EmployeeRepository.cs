@@ -153,24 +153,56 @@ public class EmployeesRepository : IEmployeesRepository
         return employees.Select(employee => employee.ImageUrl);
     }
 
-    public async Task AddOrUpdateCvInformation(List<Cv> cvs)
+    private async Task AddOrUpdateCvInformation(Cv cv)
     {
-        foreach (Cv cv in cvs)
+        _logger.LogInformation("Starting cv processing of " + cv.Email);
+        var entity = await GetEmployeeWithCv(cv.Email);
+        if (entity == null)
         {
-            _logger.LogInformation("Starting cv processing of " + cv.Email);
-            var entity = await GetEmployeeWithCv(cv.Email);
-            if (entity == null)
-            {
-                continue;
-            }
-
-            await AddPresentations(cv.Presentations, entity);
-            await AddWorkExperience(cv.WorkExperiences, entity);
-            await AddProjectExperience(cv.ProjectExperiences, entity);
-            await AddCertifications(cv.Certifiactions, entity);
-            await _db.SaveChangesAsync();
+            return;
         }
+
+        await AddPresentations(cv.Presentations, entity);
+        await AddWorkExperience(cv.WorkExperiences, entity);
+        await AddProjectExperience(cv.ProjectExperiences, entity);
+        await AddCertifications(cv.Certifiactions, entity);
+        await _db.SaveChangesAsync();
     }
+
+    private async Task DeleteCvDataOutOfSync()
+    {
+        DateTime cutOff = DateTime.Now.AddDays(-2);
+        
+        var deleteProjects = _db.ProjectExperiences.Where(pe => pe.LastSynced < cutOff);
+        _db.ProjectExperiences.RemoveRange(deleteProjects);
+
+        var deleteWorkExperience = _db.WorkExperiences.Where(pe => pe.LastSynced < cutOff);
+        _db.WorkExperiences.RemoveRange(deleteWorkExperience);
+
+        var deleteCompetencies = _db.Competencies.Where(pe => pe.LastSynced < cutOff);
+        _db.Competencies.RemoveRange(deleteCompetencies);
+
+        var deleteRoles = _db.ProjectExperienceRoles.Where(pe => pe.LastSynced < cutOff);
+        _db.ProjectExperienceRoles.RemoveRange(deleteRoles);
+
+        var deleteCertifications = _db.Certifications.Where(pe => pe.LastSynced < cutOff);
+        _db.Certifications.RemoveRange(deleteCertifications);
+
+        var deletePresentations = _db.Presentations.Where(pe => pe.LastSynced < cutOff);
+        _db.Presentations.RemoveRange(deletePresentations);
+
+        await _db.SaveChangesAsync();
+    }
+
+public async Task AddOrUpdateCvInformation(List<Cv> cvs)
+{
+    foreach (var cv in cvs)
+    {
+        await AddOrUpdateCvInformation(cv);
+    }
+    
+    await DeleteCvDataOutOfSync();
+}
 
     private async Task AddCertifications(List<Certification> certifications, EmployeeEntity entity)
     {
@@ -219,7 +251,7 @@ public class EmployeesRepository : IEmployeesRepository
                     LastSynced = DateTime.Now,
                     Date = presentation.Date,
                     Title = presentation.Title,
-    
+
                 };
                 await _db.AddAsync(presentationEntity);
 
