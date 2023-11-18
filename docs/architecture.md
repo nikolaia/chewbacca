@@ -5,6 +5,8 @@ Målet til Chewbacca er at de som jobber på det skal få nettopp den kunderelev
 
 ## Ressurser
 
+https://www.youtube.com/watch?v=yF9SwL0p0Y0
+
 learn.microsoft.com/en-us/dotnet/architecture/modern-web-apps-azure/common-web-application-architectures#clean-architecture
 
 github.com/ardalis/CleanArchitecture
