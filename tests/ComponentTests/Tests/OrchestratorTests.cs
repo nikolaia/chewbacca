@@ -1,10 +1,7 @@
 using System.Net;
-using System.Runtime.InteropServices;
-using System.Runtime.Serialization;
 using System.Security.Claims;
 
 using ApplicationCore.Interfaces;
-using ApplicationCore.Models;
 
 using AutoFixture;
 
@@ -14,6 +11,7 @@ using Infrastructure;
 using Infrastructure.ApiClients;
 using Infrastructure.ApiClients.DTOs;
 using Infrastructure.Entities;
+using Infrastructure.Repositories;
 
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,8 +22,6 @@ using Moq.AutoMock;
 using Refit;
 
 using Web;
-
-using ProjectExperience = ApplicationCore.Models.ProjectExperience;
 
 namespace IntegrationTests.Tests;
 
@@ -59,10 +55,10 @@ public class OrchestratorTest :
                 cvPartnerUserDTOs, new RefitSettings()));
 
         var bemanningEmployees =
-            cvPartnerUserDTOs.Select(dto => new BemanningEmployee(dto.email, DateTime.UtcNow.AddDays(-3), null))
+            cvPartnerUserDTOs.Select(dto => new VibesEmploymentDTO(dto.email, DateTime.UtcNow.AddDays(-3), null))
                 .ToList();
-        Mock<IBemanningRepository> bemanningRepositoryMock = _mocker.GetMock<IBemanningRepository>();
-        bemanningRepositoryMock.Setup(client => client.GetBemanningDataForEmployees())
+        Mock<IVibesRepository> bemanningRepositoryMock = _mocker.GetMock<IVibesRepository>();
+        bemanningRepositoryMock.Setup(client => client.GetEmployment())
             .ReturnsAsync(bemanningEmployees);
 
         // Act
@@ -142,12 +138,11 @@ public class OrchestratorTest :
                 cv, new RefitSettings()));
 
         var bemanningEmployees =
-            cvUser.Select(dto => new BemanningEmployee(dto.email, DateTime.UtcNow.AddDays(-3), null))
+            cvUser.Select(dto => new VibesEmploymentDTO(dto.email, DateTime.UtcNow.AddDays(-3), null))
                 .ToList();
-        Mock<IBemanningRepository> bemanningRepositoryMock = _mocker.GetMock<IBemanningRepository>();
-        bemanningRepositoryMock.Setup(client => client.GetBemanningDataForEmployees())
+        Mock<IVibesRepository> bemanningRepositoryMock = _mocker.GetMock<IVibesRepository>();
+        bemanningRepositoryMock.Setup(client => client.GetEmployment())
             .ReturnsAsync(bemanningEmployees);
-
 
         // Act
         var employeeResponse = await _client.GetAsync("/Orchestrator/cv");

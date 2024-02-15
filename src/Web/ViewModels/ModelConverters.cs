@@ -1,7 +1,5 @@
 using ApplicationCore.Models;
 
-using Infrastructure.Entities;
-
 namespace Web.ViewModels;
 
 public static class ModelConverters

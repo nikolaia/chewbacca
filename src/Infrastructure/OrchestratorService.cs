@@ -17,13 +17,13 @@ public class OrchestratorService
 {
     private readonly IEmployeesRepository _employeesRepository;
     private readonly CvPartnerRepository _cvPartnerRepository;
-    private readonly IBemanningRepository _bemanningRepository;
+    private readonly IVibesRepository _vibesRepository;
     private readonly BlobStorageService _blobStorageService;
     private readonly ILogger<OrchestratorService> _logger;
     private readonly FilteredUids _filteredUids;
 
     public OrchestratorService(CvPartnerRepository cvPartnerRepository,
-        IBemanningRepository bemanningRepository,
+        IVibesRepository vibesRepository,
         IEmployeesRepository employeesRepository,
         BlobStorageService blobStorageService,
         FilteredUids filteredUids,
@@ -31,7 +31,7 @@ public class OrchestratorService
     {
         _employeesRepository = employeesRepository;
         _cvPartnerRepository = cvPartnerRepository;
-        _bemanningRepository = bemanningRepository;
+        _vibesRepository = vibesRepository;
         _blobStorageService = blobStorageService;
         _logger = logger;
         _filteredUids = filteredUids;
@@ -40,14 +40,14 @@ public class OrchestratorService
     public async Task FetchMapAndSaveEmployeeData()
     {
         _logger.LogInformation("OrchestratorRepository: FetchMapAndSaveEmployeeData: Started");
-        var bemanningEntries = await _bemanningRepository.GetBemanningDataForEmployees();
+        var bemanningEntries = await _vibesRepository.GetEmployment();
         var cvEntries = await _cvPartnerRepository.GetAllEmployees();
 
         var phoneNumberUtil = PhoneNumberUtil.GetInstance();
 
         foreach (var bemanning in bemanningEntries.Where(IsActiveEmployee))
         {
-            var cv = cvEntries.Find(cv => cv.email.ToLower().Trim() == bemanning.Email.ToLower().Trim());
+            var cv = cvEntries.Find(cv => cv.email.ToLower().Trim() == bemanning.email.ToLower().Trim());
 
             if (cv != null)
             {
@@ -72,8 +72,8 @@ public class OrchestratorService
                                 ? await _blobStorageService.SaveToBlob(cv.user_id, cv.image.url)
                                 : null,
                         OfficeName = cv.office_name,
-                        StartDate = bemanning.StartDate,
-                        EndDate = bemanning.EndDate,
+                        StartDate = bemanning.startDate,
+                        EndDate = bemanning.endDate,
                         CountryCode = countryCode
                     }
                 });
@@ -83,8 +83,8 @@ public class OrchestratorService
                 // If the employee does not exist in CV Partner, only in Bemanning, we should ensure the employee is not in the database.
                 _logger.LogInformation(
                     "Deleting employee with email {BemanningEmail} from database, since it does not exist in CV Partner",
-                    bemanning.Email);
-                var blobUrlToBeDeleted = await _employeesRepository.EnsureEmployeeIsDeleted(bemanning.Email);
+                    bemanning.email);
+                var blobUrlToBeDeleted = await _employeesRepository.EnsureEmployeeIsDeleted(bemanning.email);
                 if (blobUrlToBeDeleted == null)
                 {
                     continue;
@@ -105,8 +105,8 @@ public class OrchestratorService
             // StartDate in bemanning wasn't set properly when orchestrating. Covering an edge case
             _logger.LogInformation(
                 "Deleting employee with email {BemanningEmail} from database, since they haven't started yet",
-                bemanning.Email);
-            blobUrlsToBeDeleted.Add(await _employeesRepository.EnsureEmployeeIsDeleted(bemanning.Email));
+                bemanning.email);
+            blobUrlsToBeDeleted.Add(await _employeesRepository.EnsureEmployeeIsDeleted(bemanning.email));
         }
 
         // Remove all potential images from both past employees and future employees
@@ -122,14 +122,14 @@ public class OrchestratorService
         _logger.LogInformation("OrchestratorRepository: FetchMapAndSaveEmployeeData: Finished");
     }
 
-    private static bool IsActiveEmployee(BemanningEmployee bemanning)
+    private static bool IsActiveEmployee(VibesEmploymentDTO employmentDto)
     {
-        return DateTime.Now >= bemanning.StartDate && (bemanning.EndDate == null || DateTime.Now <= bemanning.EndDate);
+        return DateTime.Now >= employmentDto.startDate && (employmentDto.endDate == null || DateTime.Now <= employmentDto.endDate);
     }
 
-    private static bool IsFutureEmployee(BemanningEmployee bemanning)
+    private static bool IsFutureEmployee(VibesEmploymentDTO employmentDto)
     {
-        return bemanning.StartDate > DateTime.Now;
+        return employmentDto.startDate > DateTime.Now;
     }
 
     public async Task FetchMapAndSaveCvData()

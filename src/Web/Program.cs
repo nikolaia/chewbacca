@@ -1,5 +1,3 @@
-using System.Reflection;
-
 using ApplicationCore.Interfaces;
 using ApplicationCore.Services;
 
@@ -86,17 +84,12 @@ builder.Configuration
     .AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true)
     .AddEnvironmentVariables();
 
-
 // Bind configuration "TestApp:Settings" section to the Settings object
 var appSettingsSection = builder.Configuration
     .GetSection("AppSettings");
 var initialAppSettings = appSettingsSection.Get<AppSettings>();
 
 if (initialAppSettings == null) throw new Exception("Unable to load app settings");
-
-
-builder.Services.AddScoped<IBemanningRepository, BemanningRepository>();
-builder.Services.AddScoped<BemanningRepository>();
 
 builder.Services.AddScoped<BlobStorageService>();
 builder.Services.AddScoped<IBlobStorageRepository, BlobStorageRepository>();
@@ -115,6 +108,7 @@ builder.Services.AddScoped<EmployeesRepository>();
 
 builder.Services.AddScoped<FilteredUids>();
 builder.Services.AddScoped<CvPartnerRepository>();
+builder.Services.AddScoped<IVibesRepository, VibesRepository>();
 
 // ApplicationCore
 builder.Services.AddScoped<OrchestratorService>();
@@ -122,7 +116,10 @@ builder.Services.AddScoped<OrchestratorService>();
 // Refit
 builder.Services.AddRefitClient<ICvPartnerApiClient>()
     .ConfigureHttpClient(c => c.BaseAddress = initialAppSettings.CvPartner.Uri);
-
+builder.Services.AddRefitClient<IVibesApiClient>()
+    .ConfigureHttpClient(c => c.BaseAddress = initialAppSettings.Vibes.BaseUri)
+    .AddHttpMessageHandler(() => new RefitBearerTokenHandler(new DefaultAzureCredential(), initialAppSettings.Vibes.Scope));
+    
 if (initialAppSettings.UseAzureAppConfig)
 {
     builder.Services.AddAzureAppConfiguration();
