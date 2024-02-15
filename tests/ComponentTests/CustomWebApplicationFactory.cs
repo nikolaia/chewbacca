@@ -1,11 +1,11 @@
 ﻿using System.Net;
 
 using ApplicationCore.Interfaces;
-using ApplicationCore.Models;
 
 using Infrastructure;
 using Infrastructure.ApiClients;
 using Infrastructure.ApiClients.DTOs;
+using Infrastructure.Repositories;
 
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -58,9 +58,9 @@ public class CustomWebApplicationFactory<TStartup>
             services.Replace(ServiceDescriptor.Transient(_ => cvPartnerApiMock.Object));
 
             // Creates mock of Bemanning Repository
-            var bemanningRepositoryMock = Mocker.GetMock<IBemanningRepository>();
-            bemanningRepositoryMock.Setup(client => client.GetBemanningDataForEmployees())
-                .ReturnsAsync(new List<BemanningEmployee>());
+            var bemanningRepositoryMock = Mocker.GetMock<IVibesRepository>();
+            bemanningRepositoryMock.Setup(client => client.GetEmployment())
+                .ReturnsAsync(new List<VibesEmploymentDTO>());
             services.Replace(ServiceDescriptor.Transient(_ => bemanningRepositoryMock.Object));
 
             // Creates mock of BlobStorageRepository and replaces it in program.cs. Returns string "test"
