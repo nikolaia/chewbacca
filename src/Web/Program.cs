@@ -27,16 +27,17 @@ using Web;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
+var isDevelopment = builder.Environment.EnvironmentName.Equals("Development");
 builder.Services.AddCors(options =>
 {
-    if (builder.Environment.EnvironmentName.Equals("Development"))
+    if (isDevelopment)
     {
         options.AddPolicy("DashCorsPolicy",
             policy =>
             {
                 policy.AllowAnyMethod().AllowAnyHeader()
-                    .WithOrigins("https://dash.variant.no", "https://variantdash-dev.azurewebsites.net", "http://localhost:3000");
+                    .WithOrigins("https://dash.variant.no", "https://variantdash-dev.azurewebsites.net",
+                        "http://localhost:3000");
             });
     }
     else
@@ -45,7 +46,8 @@ builder.Services.AddCors(options =>
             options.AddPolicy("DashCorsPolicy",
                 policy =>
                 {
-                    policy.AllowAnyMethod().AllowAnyHeader().WithOrigins("https://dash.variant.no", "https://variantdash-dev.azurewebsites.net");
+                    policy.AllowAnyMethod().AllowAnyHeader().WithOrigins("https://dash.variant.no",
+                        "https://variantdash-dev.azurewebsites.net");
                 });
         }
     }
@@ -84,13 +86,6 @@ builder.Configuration
     .AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true)
     .AddEnvironmentVariables();
 
-// Bind configuration "TestApp:Settings" section to the Settings object
-var appSettingsSection = builder.Configuration
-    .GetSection("AppSettings");
-var initialAppSettings = appSettingsSection.Get<AppSettings>();
-
-if (initialAppSettings == null) throw new Exception("Unable to load app settings");
-
 builder.Services.AddScoped<BlobStorageService>();
 builder.Services.AddScoped<IBlobStorageRepository, BlobStorageRepository>();
 
@@ -110,16 +105,12 @@ builder.Services.AddScoped<FilteredUids>();
 builder.Services.AddScoped<CvPartnerRepository>();
 builder.Services.AddScoped<IVibesRepository, VibesRepository>();
 
+// Bind configuration "TestApp:Settings" section to the Settings object
+var initialAppSettings = builder.Configuration.GetSection("AppSettings").Get<AppSettings>();
+if (initialAppSettings == null) throw new Exception("Unable to load app settings");
+
 // ApplicationCore
 builder.Services.AddScoped<OrchestratorService>();
-
-// Refit
-builder.Services.AddRefitClient<ICvPartnerApiClient>()
-    .ConfigureHttpClient(c => c.BaseAddress = initialAppSettings.CvPartner.Uri);
-builder.Services.AddRefitClient<IVibesApiClient>()
-    .ConfigureHttpClient(c => c.BaseAddress = initialAppSettings.Vibes.BaseUri)
-    .AddHttpMessageHandler(() => new RefitBearerTokenHandler(new DefaultAzureCredential(), initialAppSettings.Vibes.Scope));
-    
 if (initialAppSettings.UseAzureAppConfig)
 {
     builder.Services.AddAzureAppConfiguration();
@@ -132,14 +123,28 @@ if (initialAppSettings.UseAzureAppConfig)
             }));
 }
 
-builder.Services.Configure<AppSettings>(appSettingsSection);
+initialAppSettings = builder.Configuration.GetSection("AppSettings").Get<AppSettings>();
+
+// Refit
+builder.Services.AddRefitClient<ICvPartnerApiClient>()
+    .ConfigureHttpClient(c => c.BaseAddress = initialAppSettings.CvPartner.Uri);
+builder.Services.AddRefitClient<IVibesApiClient>()
+    .ConfigureHttpClient(c => c.BaseAddress = initialAppSettings.Vibes.BaseUri)
+    .AddHttpMessageHandler(() =>
+        new RefitBearerTokenHandler(new ClientSecretCredential(initialAppSettings.Identity.TenantId,
+                initialAppSettings.Identity.ClientId,
+                initialAppSettings.Identity.ClientSecret)
+            , initialAppSettings.Vibes.Scope));
+
+builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 
 builder.Services.AddDbContextPool<EmployeeContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("EmployeeDatabase"), sqlOptions =>{
-         sqlOptions.CommandTimeout(45);
-         sqlOptions.UseDateOnlyTimeOnly();
-         });
+    options.UseSqlServer(builder.Configuration.GetConnectionString("EmployeeDatabase"), sqlOptions =>
+    {
+        sqlOptions.CommandTimeout(45);
+        sqlOptions.UseDateOnlyTimeOnly();
+    });
     options.AddInterceptors(new AzureAdAuthenticationDbConnectionInterceptor());
 });
 
@@ -163,7 +168,7 @@ builder.Services.AddScheduler(ctx =>
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        const string variantTenantId = "0f16d077-bd82-4a6c-b498-52741239205f";
+        var variantTenantId = initialAppSettings.Identity.TenantId;
         options.Authority = $"https://login.microsoftonline.com/{variantTenantId}/v2.0/";
         options.Audience = "api://chewbacca";
         options.TokenValidationParameters = new TokenValidationParameters
@@ -231,11 +236,9 @@ app.MapGet("/healthcheck",
         var dbCanConnect = await db.Database.CanConnectAsync();
         var healthcheck = appSettings.Value.Healthcheck;
 
-        var response = new HealthcheckResponse()
+        var response = new HealthcheckResponse
         {
-            Database = dbCanConnect,
-            KeyVault = healthcheck.KeyVault,
-            AppConfig = healthcheck.AppConfig
+            Database = dbCanConnect, KeyVault = healthcheck.KeyVault, AppConfig = healthcheck.AppConfig
         };
 
         return response;
