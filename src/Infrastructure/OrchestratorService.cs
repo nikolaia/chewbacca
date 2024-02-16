@@ -72,7 +72,7 @@ public class OrchestratorService
                                 ? await _blobStorageService.SaveToBlob(cv.user_id, cv.image.url)
                                 : null,
                         OfficeName = cv.office_name,
-                        StartDate = bemanning.startDate,
+                        StartDate = bemanning.startDate ?? new DateTime(2018,08,01),
                         EndDate = bemanning.endDate,
                         CountryCode = countryCode
                     }
@@ -124,7 +124,7 @@ public class OrchestratorService
 
     private static bool IsActiveEmployee(VibesEmploymentDTO employmentDto)
     {
-        return DateTime.Now >= employmentDto.startDate && (employmentDto.endDate == null || DateTime.Now <= employmentDto.endDate);
+        return (employmentDto.startDate == null || DateTime.Now >= employmentDto.startDate) && (employmentDto.endDate == null || DateTime.Now <= employmentDto.endDate);
     }
 
     private static bool IsFutureEmployee(VibesEmploymentDTO employmentDto)
