@@ -82,7 +82,7 @@ public class OrchestratorService
             {
                 // If the employee does not exist in CV Partner, only in Bemanning, we should ensure the employee is not in the database.
                 _logger.LogInformation(
-                    "Deleting employee with email {BemanningEmail} from database, since it does not exist in CV Partner",
+                    "Deleting employee with email {BemanningEmail} from database, since their CV does not exist in CV Partner",
                     bemanning.email);
                 var blobUrlToBeDeleted = await _employeesRepository.EnsureEmployeeIsDeleted(bemanning.email);
                 if (blobUrlToBeDeleted == null)
@@ -95,7 +95,7 @@ public class OrchestratorService
             }
         }
 
-        // Remove employees with end date that has been passed.
+        // Remove employees where end date has passed
         var blobUrlsToBeDeleted = (await _employeesRepository.EnsureEmployeesWithEndDateBeforeTodayAreDeleted()).ToList();
 
         foreach (var bemanning in bemanningEntries.Where(IsFutureEmployee))
@@ -104,11 +104,23 @@ public class OrchestratorService
             // This should normally not happen, but might happen in cases where
             // StartDate in bemanning wasn't set properly when orchestrating. Covering an edge case
             _logger.LogInformation(
-                "Deleting employee with email {BemanningEmail} from database, since they haven't started yet",
+                "Ensure employee with email {BemanningEmail} is excluded, since they haven't started yet",
                 bemanning.email);
             blobUrlsToBeDeleted.Add(await _employeesRepository.EnsureEmployeeIsDeleted(bemanning.email));
         }
 
+        // Delete all employees that are not in Bemanning
+        var employees = await _employeesRepository.GetAllEmployees();
+        var employeesNotInBemanning = employees.Where(employee => bemanningEntries.All(bemanning => bemanning.email != employee.EmployeeInformation.Email)).ToList();
+        foreach (var employee in employeesNotInBemanning)
+        {
+            _logger.LogInformation(
+                "Deleting employee with email {EmployeeEmail} from database, since they are not in Bemanning",
+                employee.EmployeeInformation.Email);
+            blobUrlsToBeDeleted.Add(
+                await _employeesRepository.EnsureEmployeeIsDeleted(employee.EmployeeInformation.Email));
+        }
+        
         // Remove all potential images from both past employees and future employees
         foreach (var blobUrlToBeDeleted in blobUrlsToBeDeleted)
         {
