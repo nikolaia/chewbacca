@@ -55,7 +55,7 @@ public class OrchestratorTest :
                 cvPartnerUserDTOs, new RefitSettings()));
 
         var bemanningEmployees =
-            cvPartnerUserDTOs.Select(dto => new VibesEmploymentDTO(dto.email, DateTime.UtcNow.AddDays(-3), null))
+            cvPartnerUserDTOs.Select(dto => new VibesEmploymentDTO { email = dto.email, startDate = DateTime.UtcNow.AddDays(-3), endDate = null})
                 .ToList();
         Mock<IVibesRepository> bemanningRepositoryMock = _mocker.GetMock<IVibesRepository>();
         bemanningRepositoryMock.Setup(client => client.GetEmployment())
@@ -138,7 +138,7 @@ public class OrchestratorTest :
                 cv, new RefitSettings()));
 
         var bemanningEmployees =
-            cvUser.Select(dto => new VibesEmploymentDTO(dto.email, DateTime.UtcNow.AddDays(-3), null))
+            cvUser.Select(dto => new VibesEmploymentDTO { email = dto.email, startDate = DateTime.UtcNow.AddDays(-3), endDate = null})
                 .ToList();
         Mock<IVibesRepository> bemanningRepositoryMock = _mocker.GetMock<IVibesRepository>();
         bemanningRepositoryMock.Setup(client => client.GetEmployment())
