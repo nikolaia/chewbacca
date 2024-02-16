@@ -24,6 +24,13 @@ public record VibesConfig
     public string Scope { get; set; }
 }
 
+public class IdentityConfig
+{
+    public string TenantId { get; set; }
+    public string ClientId { get; set; }
+    public string ClientSecret { get; set; }
+}
+
 public record AppSettings
 {
     public Uri AzureAppConfigUri { get; set; } = null!;
@@ -33,4 +40,5 @@ public record AppSettings
     public VibesConfig Vibes { get; set; }
     public string FilteredUids { get; set; } = null!;
     public BlobStorageConfig BlobStorage { get; set; } = null!;
+    public IdentityConfig Identity { get; set; }
 }
