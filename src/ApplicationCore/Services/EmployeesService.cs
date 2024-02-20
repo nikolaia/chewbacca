@@ -55,11 +55,6 @@ public class EmployeesService
         return _employeesRepository.EnsureEmployeeIsDeleted(email);
     }
 
-    public Task<IEnumerable<string?>> EnsureEmployeesWithEndDateBeforeTodayAreDeleted()
-    {
-        return _employeesRepository.EnsureEmployeesWithEndDateBeforeTodayAreDeleted();
-    }
-
     public async Task<EmergencyContact?> GetEmergencyContactByEmployee(string alias, string country)
     {
         return await _emergencyContactRepository.GetByEmployee(alias, country);

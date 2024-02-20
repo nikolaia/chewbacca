@@ -138,21 +138,6 @@ public class EmployeesRepository : IEmployeesRepository
         return employee.ImageUrl;
     }
 
-    public async Task<IEnumerable<string?>> EnsureEmployeesWithEndDateBeforeTodayAreDeleted()
-    {
-        var employees = await _db.Employees.Where(e => e.EndDate < DateTime.Now).ToListAsync();
-
-        if (!employees.Any())
-        {
-            return Array.Empty<string>();
-        }
-
-        _db.RemoveRange(employees);
-        await _db.SaveChangesAsync();
-
-        return employees.Select(employee => employee.ImageUrl);
-    }
-
     private async Task AddOrUpdateCvInformation(Cv cv)
     {
         _logger.LogInformation("Starting cv processing of " + cv.Email);

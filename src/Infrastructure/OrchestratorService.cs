@@ -45,103 +45,92 @@ public class OrchestratorService
 
         var phoneNumberUtil = PhoneNumberUtil.GetInstance();
 
-        foreach (var bemanning in bemanningEntries.Where(IsActiveEmployee))
+        foreach (var bemanning in bemanningEntries)
         {
             var cv = cvEntries.Find(cv => cv.email.ToLower().Trim() == bemanning.email.ToLower().Trim());
 
-            if (cv != null)
+            // If the employee is not active or does not have a CV in CV Partner, ensure they do not exist in the database
+            if (!IsActiveEmployee(bemanning) || cv == null)
             {
-                var countryCode = cv.email.ToLower().EndsWith(".se") ? "SE" : "NO";
-
-                var phoneNumber = phoneNumberUtil.IsPossibleNumber(cv.telephone, countryCode)
-                    ? phoneNumberUtil.Format(phoneNumberUtil.Parse(cv.telephone, countryCode),
-                        PhoneNumberFormat.E164)
-                    : null;
-
-                var isFilteredPhone = _filteredUids.Uids.Contains(cv.user_id);
-
-                await _employeesRepository.AddOrUpdateEmployeeInformation(new Employee
-                {
-                    EmployeeInformation = new EmployeeInformation()
-                    {
-                        Name = cv.name,
-                        Email = cv.email,
-                        Telephone = isFilteredPhone ? null : phoneNumber,
-                        ImageUrl =
-                            cv.image.url != null
-                                ? await _blobStorageService.SaveToBlob(cv.user_id, cv.image.url)
-                                : null,
-                        OfficeName = cv.office_name,
-                        StartDate = bemanning.startDate ?? new DateTime(2018,08,01),
-                        EndDate = bemanning.endDate,
-                        CountryCode = countryCode
-                    }
-                });
-            }
-            else
-            {
-                // If the employee does not exist in CV Partner, only in Bemanning, we should ensure the employee is not in the database.
                 _logger.LogInformation(
-                    "Deleting employee with email {BemanningEmail} from database, since their CV does not exist in CV Partner",
+                    "Ensure employee with email {BemanningEmail} is deleted, since they are not active or do not have a CV in CV Partner",
                     bemanning.email);
-                var blobUrlToBeDeleted = await _employeesRepository.EnsureEmployeeIsDeleted(bemanning.email);
-                if (blobUrlToBeDeleted == null)
-                {
-                    continue;
-                }
-
-                _logger.LogInformation("Deleting blob with url {BlobUrlToBeDeleted}", blobUrlToBeDeleted);
-                await _blobStorageService.DeleteBlob(blobUrlToBeDeleted);
+                await EnsureEmployeeAndBlobIsDeleted(bemanning.email);
+                continue;
             }
-        }
 
-        // Remove employees where end date has passed
-        var blobUrlsToBeDeleted = (await _employeesRepository.EnsureEmployeesWithEndDateBeforeTodayAreDeleted()).ToList();
+            var countryCode = cv.email.ToLower().EndsWith(".se") ? "SE" : "NO";
 
-        foreach (var bemanning in bemanningEntries.Where(IsFutureEmployee))
-        {
-            // Remove potential employees that shouldn't have been added.
-            // This should normally not happen, but might happen in cases where
-            // StartDate in bemanning wasn't set properly when orchestrating. Covering an edge case
-            _logger.LogInformation(
-                "Ensure employee with email {BemanningEmail} is excluded, since they haven't started yet",
-                bemanning.email);
-            blobUrlsToBeDeleted.Add(await _employeesRepository.EnsureEmployeeIsDeleted(bemanning.email));
+            var phoneNumber = phoneNumberUtil.IsPossibleNumber(cv.telephone, countryCode)
+                ? phoneNumberUtil.Format(phoneNumberUtil.Parse(cv.telephone, countryCode),
+                    PhoneNumberFormat.E164)
+                : null;
+
+            var isFilteredPhone = _filteredUids.Uids.Contains(cv.user_id);
+
+            await _employeesRepository.AddOrUpdateEmployeeInformation(new Employee
+            {
+                EmployeeInformation = new EmployeeInformation()
+                {
+                    Name = cv.name,
+                    Email = cv.email,
+                    Telephone = isFilteredPhone ? null : phoneNumber,
+                    ImageUrl =
+                        cv.image.url != null
+                            ? await _blobStorageService.SaveToBlob(cv.user_id, cv.image.url)
+                            : null,
+                    OfficeName = cv.office_name,
+                    StartDate = bemanning.startDate ?? new DateTime(2018, 08, 01),
+                    EndDate = bemanning.endDate,
+                    CountryCode = countryCode
+                }
+            });
         }
 
         // Delete all employees that are not in Bemanning
         var employees = await _employeesRepository.GetAllEmployees();
-        var employeesNotInBemanning = employees.Where(employee => bemanningEntries.All(bemanning => bemanning.email != employee.EmployeeInformation.Email)).ToList();
+        var employeesNotInBemanning = employees.Where(employee =>
+            bemanningEntries.All(bemanning => bemanning.email != employee.EmployeeInformation.Email)).ToList();
+
         foreach (var employee in employeesNotInBemanning)
         {
             _logger.LogInformation(
                 "Deleting employee with email {EmployeeEmail} from database, since they are not in Bemanning",
                 employee.EmployeeInformation.Email);
-            blobUrlsToBeDeleted.Add(
-                await _employeesRepository.EnsureEmployeeIsDeleted(employee.EmployeeInformation.Email));
-        }
-        
-        // Remove all potential images from both past employees and future employees
-        foreach (var blobUrlToBeDeleted in blobUrlsToBeDeleted)
-        {
-            _logger.LogInformation("Deleting blob with url {BlobUrlToBeDeleted}", blobUrlToBeDeleted);
-            if (blobUrlToBeDeleted != null)
-            {
-                await _blobStorageService.DeleteBlob(blobUrlToBeDeleted);
-            }
+            await EnsureEmployeeAndBlobIsDeleted(employee.EmployeeInformation.Email);
         }
 
         _logger.LogInformation("OrchestratorRepository: FetchMapAndSaveEmployeeData: Finished");
     }
 
-    private static bool IsActiveEmployee(VibesEmploymentDTO employmentDto)
+    private async Task EnsureEmployeeAndBlobIsDeleted(string email)
     {
-        return (employmentDto.startDate == null || DateTime.Now >= employmentDto.startDate) && (employmentDto.endDate == null || DateTime.Now <= employmentDto.endDate);
+        var blobUrlToBeDeleted = await _employeesRepository.EnsureEmployeeIsDeleted(email);
+        if (blobUrlToBeDeleted == null)
+        {
+            return;
+        }
+
+        _logger.LogInformation("Deleting blob with url {BlobUrlToBeDeleted}", blobUrlToBeDeleted);
+        await _blobStorageService.DeleteBlob(blobUrlToBeDeleted);
     }
 
-    private static bool IsFutureEmployee(VibesEmploymentDTO employmentDto)
+    /// <summary>
+    /// Determines if the employee is active and should be added to the database
+    /// </summary>
+    /// <param name="employmentDto"></param>
+    /// <returns></returns>
+    private static bool IsActiveEmployee(VibesEmploymentDTO employmentDto)
     {
-        return employmentDto.startDate > DateTime.Now;
+        if (employmentDto.startDate == null)
+        {
+            return false;
+        }
+
+        var startDateInPast = DateTime.Now >= employmentDto.startDate;
+        var endDateNullOrInFuture = employmentDto.endDate == null || DateTime.Now <= employmentDto.endDate;
+
+        return startDateInPast && endDateNullOrInFuture;
     }
 
     public async Task FetchMapAndSaveCvData()
@@ -152,7 +141,8 @@ public class OrchestratorService
         List<Cv> cvs = new();
 
         foreach (var user in employeeEntries.Select(employee => userEntries.Find(cv =>
-                     cv.email.ToLower().Trim() == employee.EmployeeInformation.Email.ToLower().Trim())).Where(user => user != null))
+                         cv.email.ToLower().Trim() == employee.EmployeeInformation.Email.ToLower().Trim()))
+                     .Where(user => user != null))
         {
             var cvPartnerCv = await _cvPartnerRepository.GetEmployeeCv(user.user_id, user.default_cv_id);
             cvs.Add(CvDtoConverter.ToCv(cvPartnerCv));
@@ -161,5 +151,4 @@ public class OrchestratorService
         await _employeesRepository.AddOrUpdateCvInformation(cvs);
         _logger.LogInformation("OrchestratorRepository: FetchMapAndSaveCvData: Finished");
     }
-
 }

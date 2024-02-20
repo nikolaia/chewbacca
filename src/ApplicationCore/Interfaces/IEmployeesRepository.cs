@@ -16,8 +16,6 @@ public interface IEmployeesRepository
     /// <returns>The image url to the employees image blob that needs to be cleaned up</returns>
     Task<string?> EnsureEmployeeIsDeleted(string email);
 
-    Task<IEnumerable<string?>> EnsureEmployeesWithEndDateBeforeTodayAreDeleted();
-
     Task AddOrUpdateCvInformation(List<Cv> cvs);
 
     Task<Cv> GetEmployeeWithCv(string alias, string country);
