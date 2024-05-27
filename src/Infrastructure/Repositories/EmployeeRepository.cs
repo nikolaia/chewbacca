@@ -93,6 +93,7 @@ public class EmployeesRepository : IEmployeesRepository
             updateEmployee.Email = employeeInformation.Email;
             updateEmployee.Name = employeeInformation.Name;
             updateEmployee.ImageUrl = employeeInformation.ImageUrl;
+            updateEmployee.ImageThumbUrl = employeeInformation.ImageThumbUrl;
             updateEmployee.Telephone = employeeInformation.Telephone;
             updateEmployee.OfficeName = employeeInformation.OfficeName;
             updateEmployee.StartDate = employeeInformation.StartDate;

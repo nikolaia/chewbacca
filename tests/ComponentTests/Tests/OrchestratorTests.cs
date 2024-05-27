@@ -55,7 +55,11 @@ public class OrchestratorTest :
                 cvPartnerUserDTOs, new RefitSettings()));
 
         var bemanningEmployees =
-            cvPartnerUserDTOs.Select(dto => new VibesEmploymentDTO { email = dto.email, startDate = DateTime.UtcNow.AddDays(-3), endDate = null})
+            cvPartnerUserDTOs.Select(dto =>
+                    new VibesEmploymentDTO
+                    {
+                        email = dto.email, startDate = DateTime.UtcNow.AddDays(-3), endDate = null
+                    })
                 .ToList();
         Mock<IVibesRepository> bemanningRepositoryMock = _mocker.GetMock<IVibesRepository>();
         bemanningRepositoryMock.Setup(client => client.GetEmployment())
@@ -79,7 +83,7 @@ public class OrchestratorTest :
         // Check if blobService runs x amount of times
         var blobStorageServiceMocker = _mocker.GetMock<IBlobStorageRepository>();
         blobStorageServiceMocker.Verify(x => x.SaveToBlob(It.IsAny<string>(), It.IsAny<string>()),
-            Times.Exactly(cvPartnerUserDTOs.Count));
+            Times.Exactly(cvPartnerUserDTOs.Count * 2)); // One time for image and one time for thumb
     }
 
     [Fact]
@@ -109,14 +113,19 @@ public class OrchestratorTest :
                 email = "test1@variant.no",
                 project_experiences = new List<Infrastructure.ApiClients.DTOs.ProjectExperience>
                 {
-                    new() { _id = "abc" , description = new Description(), long_description = new LongDescription()}
+                    new()
+                    {
+                        _id = "abc",
+                        description = new Description(),
+                        long_description = new LongDescription()
+                    }
                 }
             };
 
         List<CVPartnerUserDTO> cvUser = new()
         {
-            new CVPartnerUserDTO() { email = "test1@variant.no", user_id = "test1"},
-            new CVPartnerUserDTO() { email = "test2@variant.no" , user_id = "test2"}
+            new CVPartnerUserDTO() { email = "test1@variant.no", user_id = "test1" },
+            new CVPartnerUserDTO() { email = "test2@variant.no", user_id = "test2" }
         };
 
 
@@ -124,13 +133,13 @@ public class OrchestratorTest :
         cvPartnerApiClientMock.Setup(client => client.GetAllEmployee(It.IsAny<string>()))
             .ReturnsAsync(new ApiResponse<IEnumerable<CVPartnerUserDTO>>(new HttpResponseMessage(HttpStatusCode.OK),
                 cvUser, new RefitSettings()));
-        
+
 
         cvPartnerApiClientMock.Setup(client =>
                 client.GetEmployeeCv(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
             .ReturnsAsync(new ApiResponse<CVPartnerCvDTO>(new HttpResponseMessage(HttpStatusCode.OK),
                 new CVPartnerCvDTO(), new RefitSettings()));
-        
+
         cvPartnerApiClientMock.Setup(client =>
                 client.GetEmployeeCv(It.Is
                     <string>(e => "test1".Equals(e)), It.IsAny<string>(), It.IsAny<string>()))
@@ -138,7 +147,11 @@ public class OrchestratorTest :
                 cv, new RefitSettings()));
 
         var bemanningEmployees =
-            cvUser.Select(dto => new VibesEmploymentDTO { email = dto.email, startDate = DateTime.UtcNow.AddDays(-3), endDate = null})
+            cvUser.Select(dto =>
+                    new VibesEmploymentDTO
+                    {
+                        email = dto.email, startDate = DateTime.UtcNow.AddDays(-3), endDate = null
+                    })
                 .ToList();
         Mock<IVibesRepository> bemanningRepositoryMock = _mocker.GetMock<IVibesRepository>();
         bemanningRepositoryMock.Setup(client => client.GetEmployment())
