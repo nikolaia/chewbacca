@@ -79,6 +79,10 @@ public class OrchestratorService
                         cv.image.url != null
                             ? await _blobStorageService.SaveToBlob(cv.user_id, cv.image.url)
                             : null,
+                    ImageThumbUrl =
+                        cv.image.thumb.url != null
+                            ? await _blobStorageService.SaveToBlob($"{cv.user_id}-thumb", cv.image.thumb.url)
+                            : null,
                     OfficeName = cv.office_name,
                     StartDate = bemanning.startDate ?? new DateTime(2018, 08, 01),
                     EndDate = bemanning.endDate,

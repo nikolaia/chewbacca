@@ -8,6 +8,7 @@ public record EmployeeExtendedJson
     public string Name { get; set; } = null!;
     public string? Telephone { get; set; }
     public string? ImageUrl { get; set; }
+    public string? ImageThumbUrl { get; set; }
     public string OfficeName { get; set; } = null!;
     public DateTime StartDate { get; set; }
     public string? AccountNumber { get; init; }

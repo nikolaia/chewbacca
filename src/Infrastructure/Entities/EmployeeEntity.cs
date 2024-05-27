@@ -20,6 +20,7 @@ public record EmployeeEntity
 
     public string? Telephone { get; set; }
     public string? ImageUrl { get; set; }
+    public string? ImageThumbUrl { get; set; }
     public string OfficeName { get; set; } = null!;
 
     [StringLength(maximumLength: 3)] public string CountryCode { get; set; } = null!;
@@ -59,6 +60,7 @@ public static class EmployeeEntityExtensions
                 CountryCode = employeeEntity.CountryCode,
                 EndDate = employeeEntity.EndDate,
                 ImageUrl = employeeEntity.ImageUrl,
+                ImageThumbUrl = employeeEntity.ImageThumbUrl,
                 OfficeName = employeeEntity.OfficeName,
                 StartDate = employeeEntity.StartDate,
                 ZipCode = employeeEntity.ZipCode

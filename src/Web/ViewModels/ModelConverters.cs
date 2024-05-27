@@ -12,6 +12,7 @@ public static class ModelConverters
             Email = employee.EmployeeInformation.Email,
             Telephone = employee.EmployeeInformation.Telephone,
             ImageUrl = employee.EmployeeInformation.ImageUrl,
+            ImageThumbUrl = employee.EmployeeInformation.ImageThumbUrl,
             OfficeName = employee.EmployeeInformation.OfficeName,
             StartDate = employee.EmployeeInformation.StartDate,
         };
@@ -25,6 +26,7 @@ public static class ModelConverters
             Email = employee.EmployeeInformation.Email,
             Telephone = employee.EmployeeInformation.Telephone,
             ImageUrl = employee.EmployeeInformation.ImageUrl,
+            ImageThumbUrl = employee.EmployeeInformation.ImageThumbUrl,
             OfficeName = employee.EmployeeInformation.OfficeName,
             StartDate = employee.EmployeeInformation.StartDate,
             AccountNumber = employee.EmployeeInformation.AccountNumber,
