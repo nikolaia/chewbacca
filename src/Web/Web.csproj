@@ -16,7 +16,6 @@
     <PackageReference Include="Azure.Identity" Version="1.11.3" />
     <PackageReference Include="CronScheduler.AspNetCore" Version="3.1.0" />
     <PackageReference Include="DateOnlyTimeOnly.AspNet" Version="2.1.1" />
-    <PackageReference Include="ErikEJ.EntityFrameworkCore.SqlServer.DateOnlyTimeOnly" Version="7.0.9" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.AzureAppServices.HostingStartup" Version="8.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.AzureAppServicesIntegration" Version="8.0.5" />

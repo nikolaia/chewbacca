@@ -143,7 +143,6 @@ builder.Services.AddDbContextPool<EmployeeContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("EmployeeDatabase"), sqlOptions =>
     {
         sqlOptions.CommandTimeout(45);
-        sqlOptions.UseDateOnlyTimeOnly();
     });
     options.AddInterceptors(new AzureAdAuthenticationDbConnectionInterceptor());
 });
