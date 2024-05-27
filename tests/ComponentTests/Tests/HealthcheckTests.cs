@@ -45,5 +45,6 @@ public class HealthcheckTest :
         content?.Database.Should().Be(true);
         content?.AppConfig.Should().Be(false);
         content?.KeyVault.Should().Be(false);
+        content?.FeatureManagement.Should().Be(false);
     }
 }

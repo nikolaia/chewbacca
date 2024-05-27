@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.FeatureManagement;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
@@ -85,6 +86,8 @@ builder.Configuration
     // appsettings.Local.json is in the .gitignore. Using a local config instead of userSecrets to avoid references in the .csproj:
     .AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true)
     .AddEnvironmentVariables();
+
+builder.Services.AddFeatureManagement();
 
 builder.Services.AddScoped<BlobStorageService>();
 builder.Services.AddScoped<IBlobStorageRepository, BlobStorageRepository>();
@@ -228,16 +231,17 @@ app.MapControllers();
 
 // Example of Minimal API instead of using Controllers
 app.MapGet("/healthcheck",
-    async ([FromServices] EmployeeContext db, [FromServices] IOptionsSnapshot<AppSettings> appSettings) =>
+    async ([FromServices] EmployeeContext db, [FromServices] IFeatureManager featureManager, [FromServices] IOptionsSnapshot<AppSettings> appSettings) =>
     {
         app.Logger.LogInformation("Getting employees from database");
 
         var dbCanConnect = await db.Database.CanConnectAsync();
         var healthcheck = appSettings.Value.Healthcheck;
-
+        
+        var featuresFromAppCfg = await featureManager.IsEnabledAsync("ReadsFeatureManagementFromAppConfig");
         var response = new HealthcheckResponse
         {
-            Database = dbCanConnect, KeyVault = healthcheck.KeyVault, AppConfig = healthcheck.AppConfig
+            Database = dbCanConnect, KeyVault = healthcheck.KeyVault, AppConfig = healthcheck.AppConfig, FeatureManagement = featuresFromAppCfg
         };
 
         return response;
