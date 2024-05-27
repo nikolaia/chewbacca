@@ -119,6 +119,7 @@ if (initialAppSettings.UseAzureAppConfig)
     builder.Services.AddAzureAppConfiguration();
     // Load configuration from Azure App Configuration
     builder.Configuration.AddAzureAppConfiguration(options => options
+        .UseFeatureFlags()
         .Connect(initialAppSettings.AzureAppConfigUri, new DefaultAzureCredential()).ConfigureKeyVault(
             vaultOptions =>
             {
