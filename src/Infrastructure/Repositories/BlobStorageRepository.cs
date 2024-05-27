@@ -5,9 +5,11 @@ using ApplicationCore.Interfaces;
 
 using Azure.Identity;
 using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.FeatureManagement;
 
 using Shared;
 
@@ -15,6 +17,7 @@ namespace Infrastructure.Repositories;
 
 public class BlobStorageRepository : IBlobStorageRepository
 {
+    private readonly IFeatureManager _featureManager;
     private readonly IOptionsSnapshot<AppSettings> _appSettings;
     private ILogger<BlobStorageRepository> _logger;
 
@@ -25,8 +28,9 @@ public class BlobStorageRepository : IBlobStorageRepository
      * <param name="appSettings"> Options for connection string and which container to add to </param>
      * <param name="logger">ILogger interface for logging</param>
      */
-    public BlobStorageRepository(IOptionsSnapshot<AppSettings> appSettings, ILogger<BlobStorageRepository> logger)
+    public BlobStorageRepository(IFeatureManager featureManager, IOptionsSnapshot<AppSettings> appSettings, ILogger<BlobStorageRepository> logger)
     {
+        _featureManager = featureManager;
         _appSettings = appSettings;
         _logger = logger;
     }
@@ -44,7 +48,6 @@ public class BlobStorageRepository : IBlobStorageRepository
 
         var blockBlobClient = container.GetBlobClient($"{cvPartnerUserId}.png");
 
-
         using var client = new HttpClient();
         var message = new HttpRequestMessage(HttpMethod.Get, uri);
 
@@ -60,11 +63,20 @@ public class BlobStorageRepository : IBlobStorageRepository
         var response = await client.SendAsync(message);
         if (response.StatusCode == HttpStatusCode.NotModified)
         {
-            // No need to update the blob
-            _logger.LogInformation(
-                "No need to update the blob for {CvPartnerUserId} as the image has not changed",
-                cvPartnerUserId);
-            return blockBlobClient.Uri.AbsoluteUri;
+            if (await _featureManager.IsEnabledAsync("ForceImageUploadToBlobStorage"))
+            {
+                _logger.LogWarning(
+                    "No need to update the blob for {CvPartnerUserId} as the image has not changed, but the feature flag is enabled to force the upload anyway",
+                    cvPartnerUserId);
+            }
+            else
+            {
+                // No need to update the blob
+                _logger.LogInformation(
+                    "No need to update the blob for {CvPartnerUserId} as the image has not changed",
+                    cvPartnerUserId);
+                return blockBlobClient.Uri.AbsoluteUri;
+            }
         }
 
         if (!response.IsSuccessStatusCode)
@@ -82,7 +94,8 @@ public class BlobStorageRepository : IBlobStorageRepository
         await stream.FlushAsync();
         await stream.DisposeAsync();
 
-        await blockBlobClient.SetMetadataAsync(new Dictionary<string, string>()
+        await blockBlobClient.SetHttpHeadersAsync(new BlobHttpHeaders { ContentType = "image/png" });
+        await blockBlobClient.SetMetadataAsync(new Dictionary<string, string>
         {
             { "name", cvPartnerUserId }, { BlobMetadataLastModifiedKey, lastModified }
         });

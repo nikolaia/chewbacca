@@ -9,3 +9,9 @@ GO
 ALTER ROLE db_datawriter
 	ADD MEMBER [chewie-webapp-ld2ijhpvmb34c];  
 GO
+
+-- Additional permissions needed for migrations
+GRANT ALTER TO [chewie-webapp-ld2ijhpvmb34c];
+GRANT CREATE TABLE TO [chewie-webapp-ld2ijhpvmb34c];
+GRANT REFERENCES TO [chewie-webapp-ld2ijhpvmb34c];
+GO
