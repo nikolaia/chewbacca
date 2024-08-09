@@ -30,6 +30,10 @@ For å få tilgang til integrasjoner må man ha:
 
 Man kan da få konfigurasjon og secrets fra azure uten noe ekstra oppsett gjennom Azure App Configuration. Når man utvikler kjører man opp SQL Server og Blob Storage lokalt, siden det er disse to tjenestene som skrives til - så de er grei å ha kontroll på selv. De er definert i `docker-compose.yml`. Installer Docker Desktop og kjør `docker-compose up -d`.
 
+### Manuell synkronisering
+
+Data fra integrasjoner hentes inn og synkroniseres med databasen én gang i døgnet. Under utvikling er det nyttig å kjøre datainnhenting ved behov. Dette kan gjøres ved å kalle `/Orchestrator`-endepunktet (f.eks. via Swagger UI). Her kreves autorisering, som beskrevet i [Auth](#Auth).
+
 ## Auth
 
 For å gjøre kall til endepunkter som er bak _auth_ kan man kjøre `az account get-access-token --scope api://chewbacca/employees` for å få et gyldig token. Man kan da trykke Authorize knappen øverst til høyre i Swagger UI på `/swagger/index.html` og lime inn tokenet der: `Bearer <token>`. Man kan da kalle de låste endepunktene.
