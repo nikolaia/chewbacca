@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Employees.Migrations
+namespace Infrastructure.Migrations
 {
     [DbContext(typeof(EmployeeContext))]
     [Migration("20230621074137_MergeEmployeeAndEmployeeInforamtion")]

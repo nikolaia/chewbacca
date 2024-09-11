@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Employees.Migrations
+namespace Infrastructure.Migrations
 {
     [DbContext(typeof(EmployeeContext))]
     [Migration("20240527085024_EmployeeImageThumbUrl")]
