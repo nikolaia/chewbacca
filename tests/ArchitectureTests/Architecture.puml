@@ -1,0 +1,16 @@
+@startuml
+[Refit] <<Refit.*>>
+[ApplicationCore] <<ApplicationCore.*>>
+[Infrastructure] <<Infrastructure.*>>
+[Web] <<Web.*>>
+[Shared] <<Shared.*>>
+
+[ApplicationCore] --> [Shared]
+[Infrastructure] --> [ApplicationCore]
+[Infrastructure] --> [Shared]
+[Infrastructure] --> [Refit]
+[Refit] --> [Infrastructure]
+[Web] --> [ApplicationCore]
+[Web] --> [Infrastructure]
+[Web] --> [Shared]
+@enduml

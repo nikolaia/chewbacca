@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Employees.Migrations
+namespace Infrastructure.Migrations
 {
     /// <inheritdoc />
     public partial class CreateCompetencies : Migration

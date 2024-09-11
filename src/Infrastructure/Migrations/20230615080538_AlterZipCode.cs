@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace Employees.Migrations
+namespace Infrastructure.Migrations
 {
     /// <inheritdoc />
     public partial class AlterZipCode : Migration

@@ -13,21 +13,21 @@
   </PropertyGroup>
     
   <ItemGroup>
-    <PackageReference Include="Azure.Identity" Version="1.11.3" />
-    <PackageReference Include="CronScheduler.AspNetCore" Version="3.1.0" />
+    <PackageReference Include="Azure.Identity" Version="1.12.0" />
+    <PackageReference Include="CronScheduler.AspNetCore" Version="3.2.0" />
     <PackageReference Include="DateOnlyTimeOnly.AspNet" Version="2.1.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.5" />
-    <PackageReference Include="Microsoft.AspNetCore.AzureAppServices.HostingStartup" Version="8.0.5" />
-    <PackageReference Include="Microsoft.AspNetCore.AzureAppServicesIntegration" Version="8.0.5" />
-    <PackageReference Include="Microsoft.Azure.AppConfiguration.AspNetCore" Version="7.2.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.5">
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.8" />
+    <PackageReference Include="Microsoft.AspNetCore.AzureAppServices.HostingStartup" Version="8.0.8" />
+    <PackageReference Include="Microsoft.AspNetCore.AzureAppServicesIntegration" Version="8.0.8" />
+    <PackageReference Include="Microsoft.Azure.AppConfiguration.AspNetCore" Version="7.3.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.8">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="8.0.5" />
-    <PackageReference Include="Microsoft.FeatureManagement.AspNetCore" Version="3.3.1" />
-    <PackageReference Include="Refit" Version="7.0.0" />
-      <PackageReference Include="Refit.HttpClientFactory" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="8.0.8" />
+    <PackageReference Include="Microsoft.FeatureManagement.AspNetCore" Version="3.5.0" />
+    <PackageReference Include="Refit" Version="7.1.2" />
+      <PackageReference Include="Refit.HttpClientFactory" Version="7.1.2" />
       <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="8.0.2" />
   </ItemGroup>
     
