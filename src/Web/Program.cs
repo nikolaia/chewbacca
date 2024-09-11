@@ -116,10 +116,23 @@ if (initialAppSettings == null) throw new Exception("Unable to load app settings
 builder.Services.AddScoped<OrchestratorService>();
 if (initialAppSettings.UseAzureAppConfig)
 {
+    /*
+     * Free Tier of Azure App Configuration has a limit of 1,000 requests per day, so be careful with the number of requests.
+     * Feature Flags does not have a Sentinel feature, so it results in one request per feature flag.
+     */
     builder.Services.AddAzureAppConfiguration();
     // Load configuration from Azure App Configuration
     builder.Configuration.AddAzureAppConfiguration(options => options
-        .UseFeatureFlags()
+        .ConfigureRefresh(refreshOptions =>
+        {
+            refreshOptions.Register("Sentinel", refreshAll: true)
+                .SetCacheExpiration(TimeSpan.FromMinutes(10));
+        })
+        .UseFeatureFlags(options =>
+        {
+            // See comment above about the number of requests
+            options.CacheExpirationInterval = TimeSpan.FromHours(12);
+        })
         .Connect(initialAppSettings.AzureAppConfigUri, new DefaultAzureCredential()).ConfigureKeyVault(
             vaultOptions =>
             {
