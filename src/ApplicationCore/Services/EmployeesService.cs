@@ -40,7 +40,7 @@ public class EmployeesService
             .Where(IsEmployeeActive);
     }
 
-    public async Task<Employee?> GetByAliasAndCountry(string alias, string country)
+    public async Task<Employee?> GetByAliasAndCountry(string alias, string? country = null)
     {
         return await _employeesRepository.GetEmployeeAsync(alias, country);
     }

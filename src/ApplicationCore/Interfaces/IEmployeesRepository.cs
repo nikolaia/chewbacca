@@ -6,7 +6,7 @@ public interface IEmployeesRepository
 {
     Task<List<Employee>> GetAllEmployees();
     Task<List<Employee>> GetEmployeesByCountry(string country);
-    Task<Employee?> GetEmployeeAsync(string alias, string country);
+    Task<Employee?> GetEmployeeAsync(string alias, string? country = null);
     Task AddOrUpdateEmployeeInformation(Employee employee);
 
     /// <summary>

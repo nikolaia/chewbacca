@@ -70,14 +70,18 @@ public class EmployeesRepository : IEmployeesRepository
     }
 
 
-    public async Task<Employee?> GetEmployeeAsync(string alias, string country)
+    public async Task<Employee?> GetEmployeeAsync(string alias, string? country = null)
     {
-        var employee = await _db.Employees
+        var employeeQuery = _db.Employees
             .Include(employee => employee.AllergiesAndDietaryPreferences)
             .Include(employee => employee.EmergencyContact)
-            .Where(emp => emp.Email.StartsWith($"{alias}@"))
-            .Where(emp => emp.CountryCode == country)
-            .SingleOrDefaultAsync();
+            .Where(emp => emp.Email.StartsWith($"{alias}@"));
+        if (country != null)
+        {
+            employeeQuery = employeeQuery.Where(emp => emp.CountryCode == country);
+        }
+
+        var employee = await employeeQuery.SingleOrDefaultAsync();
         return employee?.ToEmployee();
     }
 

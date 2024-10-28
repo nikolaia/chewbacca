@@ -42,7 +42,7 @@ public class EmployeesController : ControllerBase
     [HttpGet("{alias}")]
     [OutputCache(Duration = 60)]
     [AllowAnonymous]
-    public async Task<ActionResult<EmployeeJson>> GetByAlias(string alias, [FromQuery] string country)
+    public async Task<ActionResult<EmployeeJson>> GetByAlias(string alias, [FromQuery] string? country = null)
     {
         var employee = await _employeeService.GetByAliasAndCountry(alias, country);
 
