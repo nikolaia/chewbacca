@@ -41,13 +41,21 @@ public class OrchestratorService
     {
         _logger.LogInformation("OrchestratorRepository: FetchMapAndSaveEmployeeData: Started");
         var bemanningEntries = await _vibesRepository.GetEmployment();
-        var cvEntries = await _cvPartnerRepository.GetAllEmployees();
+        Dictionary<string, VibesConsultantDTO> bemanningConsultantEntries = (await _vibesRepository.GetConsultants())
+            .ToDictionary(x => x.Email.ToLower().Trim());
+
+        Dictionary<string, CVPartnerUserDTO> cvEntries = (await _cvPartnerRepository.GetAllEmployees())
+            .ToDictionary(x => x.email.ToLower().Trim());
+        
+        
 
         var phoneNumberUtil = PhoneNumberUtil.GetInstance();
 
         foreach (var bemanning in bemanningEntries)
         {
-            var cv = cvEntries.Find(cv => cv.email.ToLower().Trim() == bemanning.email.ToLower().Trim());
+            string emailKey = bemanning.email.ToLower().ToLower();
+            CVPartnerUserDTO? cv = cvEntries.GetValueOrDefault(emailKey);
+            VibesConsultantDTO? consultant = bemanningConsultantEntries.GetValueOrDefault(emailKey);
 
             // If the employee is not active or does not have a CV in CV Partner, ensure they do not exist in the database
             if (!IsActiveEmployee(bemanning) || cv == null)
@@ -70,7 +78,7 @@ public class OrchestratorService
 
             await _employeesRepository.AddOrUpdateEmployeeInformation(new Employee
             {
-                EmployeeInformation = new EmployeeInformation()
+                EmployeeInformation = new EmployeeInformation
                 {
                     Name = cv.name,
                     Email = cv.email,
@@ -86,7 +94,9 @@ public class OrchestratorService
                     OfficeName = cv.office_name,
                     StartDate = bemanning.startDate ?? new DateTime(2018, 08, 01),
                     EndDate = bemanning.endDate,
-                    CountryCode = countryCode
+                    CountryCode = countryCode,
+                    Competences = consultant?.Competences.Select(competence => competence.Name).ToList() ??
+                                  new List<string>()
                 }
             });
         }

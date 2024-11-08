@@ -33,6 +33,8 @@ public record EmployeeEntity
     public string? ZipCode { get; set; }
     public string? City { get; set; }
 
+    public List<string> Competences { get; set; } = new();
+
     public EmergencyContactEntity? EmergencyContact { get; set; }
     public EmployeeAllergiesAndDietaryPreferencesEntity? AllergiesAndDietaryPreferences { get; set; }
 
@@ -63,7 +65,8 @@ public static class EmployeeEntityExtensions
                 ImageThumbUrl = employeeEntity.ImageThumbUrl,
                 OfficeName = employeeEntity.OfficeName,
                 StartDate = employeeEntity.StartDate,
-                ZipCode = employeeEntity.ZipCode
+                ZipCode = employeeEntity.ZipCode,
+                Competences = employeeEntity.Competences
             },
             EmergencyContact = employeeEntity.EmergencyContact != null
                 ? new EmergencyContact
