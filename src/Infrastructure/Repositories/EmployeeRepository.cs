@@ -98,6 +98,7 @@ public class EmployeesRepository : IEmployeesRepository
             updateEmployee.OfficeName = employeeInformation.OfficeName;
             updateEmployee.StartDate = employeeInformation.StartDate;
             updateEmployee.EndDate = employeeInformation.EndDate;
+            updateEmployee.Competences = employeeInformation.Competences;
             // Don't set Address, AccountNumber, ZipCode and City since these aren't fetched from external sources,
             // and hence the information given from variantdash will be overwritten
         }
@@ -112,7 +113,8 @@ public class EmployeesRepository : IEmployeesRepository
                 OfficeName = employeeInformation.OfficeName,
                 StartDate = employeeInformation.StartDate,
                 EndDate = employeeInformation.EndDate,
-                CountryCode = employeeInformation.CountryCode
+                CountryCode = employeeInformation.CountryCode,
+                Competences = employeeInformation.Competences
             });
         }
 

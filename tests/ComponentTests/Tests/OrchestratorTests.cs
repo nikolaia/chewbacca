@@ -61,9 +61,18 @@ public class OrchestratorTest :
                         email = dto.email, startDate = DateTime.UtcNow.AddDays(-3), endDate = null
                     })
                 .ToList();
+
+        List<VibesConsultantDTO> bemanningConsultants = cvPartnerUserDTOs.Select(dto => new VibesConsultantDTO
+        {
+            Email = dto.email,
+            Competences = new List<CompetenceDTO> { new() { Id = "frontend", Name = "Frontend" } }
+        }).ToList();
+        
         Mock<IVibesRepository> bemanningRepositoryMock = _mocker.GetMock<IVibesRepository>();
         bemanningRepositoryMock.Setup(client => client.GetEmployment())
             .ReturnsAsync(bemanningEmployees);
+        bemanningRepositoryMock.Setup(client => client.GetConsultants())
+            .ReturnsAsync(bemanningConsultants);
 
         // Act
         var employeeResponse = await _client.GetAsync("/Orchestrator");
@@ -79,6 +88,9 @@ public class OrchestratorTest :
 
         //Check if updated date from Bemanning
         db.Employees.FirstOrDefault()!.StartDate.Should().NotBe(new DateTime(2018, 1, 1));
+
+        // Check if Competences were saved
+        db.Employees.FirstOrDefault()!.Competences.Should().BeEquivalentTo(new List<string> { "Frontend" });
 
         // Check if blobService runs x amount of times
         var blobStorageServiceMocker = _mocker.GetMock<IBlobStorageRepository>();
@@ -111,7 +123,7 @@ public class OrchestratorTest :
             new()
             {
                 email = "test1@variant.no",
-                project_experiences = new List<Infrastructure.ApiClients.DTOs.ProjectExperience>
+                project_experiences = new List<ProjectExperience>
                 {
                     new()
                     {

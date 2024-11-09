@@ -8,6 +8,7 @@ namespace Infrastructure.Repositories;
 public interface IVibesRepository
 {
     public Task<List<VibesEmploymentDTO>> GetEmployment();
+    public Task<List<VibesConsultantDTO>> GetConsultants();
 }
 
 public class VibesRepository : IVibesRepository
@@ -30,6 +31,20 @@ public class VibesRepository : IVibesRepository
             await _vibesApiClient.GetEmploymentDates(organisationDto.UrlKey));
 
         var apiResponses = await Task.WhenAll(getEmploymentTasks);
+
+        return apiResponses.SelectMany(response => response).ToList();
+    }
+
+    public async Task<List<VibesConsultantDTO>> GetConsultants()
+    {
+        _logger.LogInformation("VibesRepository.GetConsultants: Fetching consultants from Vibes/Bemanning\"");
+
+        IEnumerable<VibesOrganisationDTO> organisationsResponse = await _vibesApiClient.GetOrganisations();
+
+        List<Task<IEnumerable<VibesConsultantDTO>>> getConsultantsTasks = organisationsResponse
+            .Select(async organisationDto => await _vibesApiClient.GetConsultants(organisationDto.UrlKey)).ToList();
+
+        IEnumerable<VibesConsultantDTO>[] apiResponses = await Task.WhenAll(getConsultantsTasks);
 
         return apiResponses.SelectMany(response => response).ToList();
     }

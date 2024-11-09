@@ -1,4 +1,5 @@
 ﻿using Infrastructure.ApiClients.DTOs;
+
 using Refit;
 
 namespace Infrastructure.ApiClients;
@@ -11,4 +12,7 @@ public interface IVibesApiClient
     
     [Get("/v0/{companyCountry}/consultants/employment")]
     Task<IEnumerable<VibesEmploymentDTO>> GetEmploymentDates(string companyCountry);
+
+    [Get("/v0/{companyCountry}/consultants")]
+    Task<IEnumerable<VibesConsultantDTO>> GetConsultants(string companyCountry);
 }
