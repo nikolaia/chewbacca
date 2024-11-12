@@ -2,16 +2,17 @@
 
 public record EmployeesJson
 {
-    public IEnumerable<EmployeeJson> Employees { get; init; } = null!;
+    public required IEnumerable<EmployeeJson> Employees { get; init; }
 };
 
 public record EmployeeJson
 {
-    public string Email { get; init; } = null!;
-    public string Name { get; set; } = null!;
+    public required string Email { get; init; }
+    public required string Name { get; set; }
     public string? Telephone { get; set; }
     public string? ImageUrl { get; set; }
     public string? ImageThumbUrl { get; set; }
-    public string OfficeName { get; set; } = null!;
+    public required string OfficeName { get; set; }
     public DateTime StartDate { get; set; }
+    public required IEnumerable<string> Competences { get; init; }
 }

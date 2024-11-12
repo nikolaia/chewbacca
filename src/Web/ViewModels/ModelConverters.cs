@@ -15,6 +15,7 @@ public static class ModelConverters
             ImageThumbUrl = employee.EmployeeInformation.ImageThumbUrl,
             OfficeName = employee.EmployeeInformation.OfficeName,
             StartDate = employee.EmployeeInformation.StartDate,
+            Competences = employee.EmployeeInformation.Competences
         };
     }
 
@@ -29,6 +30,7 @@ public static class ModelConverters
             ImageThumbUrl = employee.EmployeeInformation.ImageThumbUrl,
             OfficeName = employee.EmployeeInformation.OfficeName,
             StartDate = employee.EmployeeInformation.StartDate,
+            Competences = employee.EmployeeInformation.Competences,
             AccountNumber = employee.EmployeeInformation.AccountNumber,
             Address = employee.EmployeeInformation.Address,
             ZipCode = employee.EmployeeInformation.ZipCode,
@@ -59,8 +61,8 @@ public static class ModelConverters
 
     public static List<DietaryPreferenceEnum> DietaryPreferenceStringListToEnumList(List<string> dietaryPreferences)
     {
-        return dietaryPreferences.ConvertAll(dieteryPreference =>
-            (DietaryPreferenceEnum)Enum.Parse(typeof(DietaryPreferenceEnum), dieteryPreference));
+        return dietaryPreferences.ConvertAll(dietaryPreference =>
+            (DietaryPreferenceEnum)Enum.Parse(typeof(DietaryPreferenceEnum), dietaryPreference));
     }
     
 }
